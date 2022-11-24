@@ -1,0 +1,8 @@
+{
+	"geode": "0.6.1",
+	"version": "v1.0.0",
+	"id": "geode.devtools",
+	"name": "DevTools",
+	"developer": "Geode Team",
+	"description": "Developer tools for Geode"
+}
