@@ -41,34 +41,45 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
 void DevTools::drawPages() {
     const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
 
-    const auto cond = m_shouldRelayout ? ImGuiCond_Always : ImGuiCond_Once;
-
-    if (m_shouldRelayout)
+    static bool first = true;
+    if (first || m_shouldRelayout) {
+        first = false;
         m_shouldRelayout = false;
 
-    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 2), cond);
-    ImGui::SetNextWindowPos(ImVec2(0, 0), cond);
+        auto id = m_dockspaceID;
+        ImGui::DockBuilderRemoveNode(id);
+        ImGui::DockBuilderAddNode(id, ImGuiDockNodeFlags_PassthruCentralNode);
+
+        auto leftDock = ImGui::DockBuilderSplitNode(m_dockspaceID, ImGuiDir_Left, 0.3f, nullptr, &id);
+
+        auto topLeftDock = ImGui::DockBuilderSplitNode(leftDock, ImGuiDir_Up, 0.4f, nullptr, &leftDock);
+
+        auto bottomLeftTopHalfDock = ImGui::DockBuilderSplitNode(leftDock, ImGuiDir_Up, 0.6f, nullptr, &leftDock);
+
+        ImGui::DockBuilderDockWindow(U8STR(FEATHER_GIT_MERGE " Tree"), topLeftDock);
+        ImGui::DockBuilderDockWindow(U8STR(FEATHER_SETTINGS " Settings"), topLeftDock);
+        ImGui::DockBuilderDockWindow(U8STR(FEATHER_TOOL " Attributes"), bottomLeftTopHalfDock);
+        ImGui::DockBuilderDockWindow(U8STR(FEATHER_DATABASE " Layout"), leftDock);
+        ImGui::DockBuilderDockWindow("Geometry Dash", id);
+
+        ImGui::DockBuilderFinish(id);
+    }
+
     this->drawPage(
         U8STR(FEATHER_GIT_MERGE " Tree"),
         &DevTools::drawTree
     );
 
-    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 3), cond);
-    ImGui::SetNextWindowPos(ImVec2(size.width / 5, 0), cond);
     this->drawPage(
         U8STR(FEATHER_SETTINGS " Settings"),
         &DevTools::drawSettings
     );
 
-    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 4), cond);
-    ImGui::SetNextWindowPos(ImVec2(0, size.height / 2), cond);
     this->drawPage(
         U8STR(FEATHER_TOOL " Attributes"),
         &DevTools::drawAttributes
     );
 
-    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 4), cond);
-    ImGui::SetNextWindowPos(ImVec2(0, size.height / 2 + size.height / 4), cond);
     this->drawPage(
         U8STR(FEATHER_DATABASE " Layout"),
         &DevTools::drawLayout
@@ -82,9 +93,9 @@ void DevTools::draw(GLRenderCtx* ctx) {
             m_reloadTheme = false;
         }
 
-        // m_dockspaceID = ImGui::DockSpaceOverViewport(
-        //     nullptr, ImGuiDockNodeFlags_PassthruCentralNode
-        // );
+        m_dockspaceID = ImGui::DockSpaceOverViewport(
+            nullptr, ImGuiDockNodeFlags_PassthruCentralNode
+        );
 
         ImGui::PushFont(m_defaultFont);
         this->drawPages();
