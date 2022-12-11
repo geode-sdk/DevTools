@@ -143,6 +143,13 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
     glDisable(GL_SCISSOR_TEST);
 }
 
+enum TouchMessageType : unsigned int {
+    Began = 0,
+    Moved = 1,
+    Ended = 2,
+    Cancelled = 3
+};
+
 class $modify(CCTouchDispatcher) {
     void touches(CCSet* touches, CCEvent* event, unsigned int type) {
         auto& io = ImGui::GetIO();
@@ -169,20 +176,25 @@ class $modify(CCTouchDispatcher) {
                     
                     ImGui::SetWindowFocus("Geometry Dash");
                     didGDSwallow = true;
+                    io.AddMouseButtonEvent(0, false);
                 }
             }
 
+            // TODO: dragging out of gd makes it click in imgui
             if (!didGDSwallow) {
-                if (type == 0) {
+                if (type == TouchMessageType::Began || type == TouchMessageType::Moved) {
                     io.AddMouseButtonEvent(0, true);
-                } else if (type == 2) {
+                } else {
                     io.AddMouseButtonEvent(0, false);
                 }
             }
         } else {
-            io.AddMouseButtonEvent(0, false);
-            if (!DevTools::get()->shouldPopGame())
+            if (type != TouchMessageType::Moved) {
+                io.AddMouseButtonEvent(0, false);
+            }
+            if (!DevTools::get()->shouldPopGame()) {
                 CCTouchDispatcher::touches(touches, event, type);
+            }
         }
     }
 };
