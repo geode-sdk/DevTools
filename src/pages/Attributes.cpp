@@ -1,6 +1,7 @@
 #include "../fonts/FeatherIcons.hpp"
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
+#include <misc/cpp/imgui_stdlib.h>
 
 USE_GEODE_NAMESPACE();
 
@@ -83,12 +84,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     }
     
     if (auto labelNode = dynamic_cast<CCLabelProtocol*>(node)) {
-        auto labelStr = labelNode->getString();
-        char text[256];
-        strcpy_s(text, labelStr);
-        ImGui::InputText("Text", text, 256);
-        if (strcmp(text, labelStr)) {
-            labelNode->setString(text);
+        std::string str = labelNode->getString();
+        if (ImGui::InputText("Text", &str, 256)) {
+            labelNode->setString(str.c_str());
         }
     }
 }
