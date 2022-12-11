@@ -22,6 +22,7 @@ protected:
     bool m_GDInWindow = true;
     bool m_attributesInTree = false;
     bool m_alwaysHighlight = true;
+    bool m_shouldRelayout = false;
     std::string m_theme = DARK_THEME;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;

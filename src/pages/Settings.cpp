@@ -65,4 +65,8 @@ void DevTools::drawSettings() {
         Loader::get()->getVersion().toString().c_str(),
         Mod::get()->getVersion().toString().c_str()
     );
+
+    if (ImGui::Button("Reset Layout")) {
+        m_shouldRelayout = true;
+    }
 }

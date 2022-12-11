@@ -41,29 +41,34 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
 void DevTools::drawPages() {
     const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
 
-    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 2), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
+    const auto cond = m_shouldRelayout ? ImGuiCond_Always : ImGuiCond_Once;
+
+    if (m_shouldRelayout)
+        m_shouldRelayout = false;
+
+    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 2), cond);
+    ImGui::SetNextWindowPos(ImVec2(0, 0), cond);
     this->drawPage(
         U8STR(FEATHER_GIT_MERGE " Tree"),
         &DevTools::drawTree
     );
 
-    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 3), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(size.width / 5, 0), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 3), cond);
+    ImGui::SetNextWindowPos(ImVec2(size.width / 5, 0), cond);
     this->drawPage(
         U8STR(FEATHER_SETTINGS " Settings"),
         &DevTools::drawSettings
     );
 
-    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 4), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, size.height / 2), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 4), cond);
+    ImGui::SetNextWindowPos(ImVec2(0, size.height / 2), cond);
     this->drawPage(
         U8STR(FEATHER_TOOL " Attributes"),
         &DevTools::drawAttributes
     );
 
-    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 4), ImGuiCond_Once);
-    ImGui::SetNextWindowPos(ImVec2(0, size.height / 2 + size.height / 4), ImGuiCond_Once);
+    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 4), cond);
+    ImGui::SetNextWindowPos(ImVec2(0, size.height / 2 + size.height / 4), cond);
     this->drawPage(
         U8STR(FEATHER_DATABASE " Layout"),
         &DevTools::drawLayout
