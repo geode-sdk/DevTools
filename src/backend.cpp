@@ -1,9 +1,8 @@
-#include "platform.hpp"
 #include <cocos2d.h>
-#include <Geode/modify/CCEGLView.hpp>
 #include <Geode/modify/CCTouchDispatcher.hpp>
-#include "../DevTools.hpp"
-#include "../ImGui.hpp"
+#include "platform/platform.hpp"
+#include "DevTools.hpp"
+#include "ImGui.hpp"
 
 using namespace cocos2d;
 
@@ -143,13 +142,6 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
 
     glDisable(GL_SCISSOR_TEST);
 }
-
-class $modify(CCEGLView) {
-    void updateWindow(int width, int height) {
-        shouldUpdateGDRenderBuffer() = true;
-        CCEGLView::updateWindow(width, height);
-    }
-};
 
 class $modify(CCTouchDispatcher) {
     void touches(CCSet* touches, CCEvent* event, unsigned int type) {

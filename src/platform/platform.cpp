@@ -1,6 +1,7 @@
 #include "platform.hpp"
 #include "../ImGui.hpp"
 #include <Geode/loader/Log.hpp>
+#include <glew.h>
 
 USE_GEODE_NAMESPACE();
 

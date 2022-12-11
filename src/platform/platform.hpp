@@ -1,10 +1,7 @@
 #pragma once
 
-#include <glew.h>
 #include <imgui.h>
 #include <imgui_internal.h>
-
-class GLRenderCtx;
 
 ImRect& getGDWindowRect();
 bool& shouldPassEventsToGDButTransformed();
