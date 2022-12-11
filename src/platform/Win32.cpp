@@ -1,3 +1,7 @@
+#include <Geode/platform/platform.hpp>
+
+#ifdef GEODE_IS_WINDOWS
+
 #include <Geode/modify/CCEGLView.hpp>
 #include "platform.hpp"
 
@@ -9,3 +13,5 @@ class $modify(CCEGLView) {
         CCEGLView::updateWindow(width, height);
     }
 };
+
+#endif

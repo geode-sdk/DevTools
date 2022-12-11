@@ -27,7 +27,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
         name << "{" << node->getChildrenCount() << "} ";
     }
     if (ImGui::TreeNodeEx(
-        node, flags, name.str().c_str()
+        node, flags, "%s", name.str().c_str()
     )) {
         if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
             if (selected) {
