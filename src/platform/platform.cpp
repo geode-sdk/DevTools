@@ -1,7 +1,7 @@
 #include "platform.hpp"
 #include "../ImGui.hpp"
 #include <Geode/loader/Log.hpp>
-#include <glew.h>
+#include <Geode/cocos/platform/CCGL.h>
 
 USE_GEODE_NAMESPACE();
 

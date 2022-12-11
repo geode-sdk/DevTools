@@ -11,7 +11,7 @@ file(GLOB_RECURSE SOURCES
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 # This must be precompiled or cocos2d's glew.h takes over
-target_precompile_headers(${PROJECT_NAME} PUBLIC GLEW/glew.h)
+# target_precompile_headers(${PROJECT_NAME} PUBLIC GLEW/glew.h)
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
@@ -26,7 +26,7 @@ include(cmake/CPM.cmake)
 
 CPMAddPackage("gh:ocornut/imgui#c191faf")
 
-target_include_directories(${PROJECT_NAME} PRIVATE GLEW ${imgui_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${imgui_SOURCE_DIR})
 
 target_sources(${PROJECT_NAME} PRIVATE
     ${imgui_SOURCE_DIR}/imgui.cpp
