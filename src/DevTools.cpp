@@ -83,13 +83,13 @@ void DevTools::draw(GLRenderCtx* ctx) {
             nullptr, ImGuiDockNodeFlags_PassthruCentralNode
         );
 
-        // ImGui::PushFont(m_defaultFont);
+        ImGui::PushFont(m_defaultFont);
         this->drawPages();
         if (m_selectedNode) {
             this->highlightNode(m_selectedNode, HighlightMode::Selected);
         }
         this->drawGD(ctx);
-        // ImGui::PopFont();
+        ImGui::PopFont();
     }
 }
 
@@ -98,31 +98,26 @@ void DevTools::setupFonts() {
     static const ImWchar box_ranges[]  = { BOX_DRAWING_MIN_FA, BOX_DRAWING_MAX_FA, 0 };
     static const ImWchar* def_ranges   = ImGui::GetIO().Fonts->GetGlyphRangesDefault();
     
-    static const auto add_font = +[](
-        ImFont** member, void* font, float size, const ImWchar* range
-    ) -> void {
+    static constexpr auto add_font = [](
+        void* font, float size, const ImWchar* range
+    ) {
         auto& io = ImGui::GetIO();
         ImFontConfig config;
         config.MergeMode = true;
-        *member = io.Fonts->AddFontFromMemoryTTF(
-            font, sizeof font, size, nullptr, range
+        auto* result = io.Fonts->AddFontFromMemoryTTF(
+            font, sizeof(font), size, nullptr, range
         );
         io.Fonts->AddFontFromMemoryTTF(
-            Font_FeatherIcons, sizeof Font_FeatherIcons, size - 4.f, &config, icon_ranges
+            Font_FeatherIcons, sizeof(Font_FeatherIcons), size - 4.f, &config, icon_ranges
         );
         io.Fonts->Build();
+        return result;
     };
 
-    add_font(&m_defaultFont, Font_OpenSans,           18.f, def_ranges);
-    add_font(&m_smallFont,   Font_OpenSans,           10.f, def_ranges);
-    add_font(&m_monoFont,    Font_RobotoMono,         18.f, def_ranges);
-    add_font(&m_boxFont,     Font_SourceCodeProLight, 23.f, box_ranges);
-
-    // auto& io = ImGui::GetIO();
-    // m_defaultFont = io.FontDefault;
-    // m_smallFont = io.FontDefault;
-    // m_monoFont = io.FontDefault;
-    // m_boxFont = io.FontDefault;
+    m_defaultFont = add_font(Font_OpenSans, 18.f, def_ranges);
+    m_smallFont = add_font(Font_OpenSans, 10.f, def_ranges);
+    m_monoFont = add_font(Font_RobotoMono, 18.f, def_ranges);
+    m_boxFont = add_font(Font_SourceCodeProLight, 23.f, box_ranges);
 }
 
 void DevTools::setup() {

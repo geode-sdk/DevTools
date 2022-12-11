@@ -118,7 +118,7 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
                     toCocos(b.pos),
                     toCocos(c.pos),
                 };
-                constexpr auto ccc4FromImColor = [](const ImColor color) {
+                static constexpr auto ccc4FromImColor = [](const ImColor color) {
                     // beautiful
                     return ccc4f(color.Value.x, color.Value.y, color.Value.z, color.Value.w);
                 };
