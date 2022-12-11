@@ -9,6 +9,7 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 	CCPoint bb_min(bounding_box.getMinX(), bounding_box.getMinY());
 	CCPoint bb_max(bounding_box.getMaxX(), bounding_box.getMaxY());
 
+#ifdef GEODE_IS_WINDOWS
 	auto cameraParent = node;
 	while (cameraParent) {
 		auto camera = cameraParent->getCamera();
@@ -21,6 +22,7 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 
 		cameraParent = cameraParent->getParent();
 	}
+#endif
 
 	auto min = toVec2(parent ? parent->convertToWorldSpace(bb_min) : bb_min);
 	auto max = toVec2(parent ? parent->convertToWorldSpace(bb_max) : bb_max);
