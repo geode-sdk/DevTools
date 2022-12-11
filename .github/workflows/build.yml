@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "main"
+      - '**'
 
 env:
   GEODE_SDK: ${{ github.workspace }}/sdk
