@@ -23,6 +23,8 @@ void DevTools::drawNodeLayout(CCNode* node) {
 	CCPoint bb_min(bounding_box.getMinX(), bounding_box.getMinY());
 	CCPoint bb_max(bounding_box.getMaxX(), bounding_box.getMaxY());
 
+#ifdef GEODE_IS_WINDOWS
+    // TODO: define CCCamera::getEyeXYZ on mac
 	auto cameraParent = node;
 	while (cameraParent) {
 		auto camera = cameraParent->getCamera();
@@ -35,6 +37,7 @@ void DevTools::drawNodeLayout(CCNode* node) {
 
 		cameraParent = cameraParent->getParent();
 	}
+#endif
 
 	auto min = parent ? parent->convertToWorldSpace(bb_min) : bb_min;
 	auto max = parent ? parent->convertToWorldSpace(bb_max) : bb_max;
