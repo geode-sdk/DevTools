@@ -1,7 +1,5 @@
 #include "../fonts/FeatherIcons.hpp"
 #include <Geode/utils/cocos.hpp>
-#include <Geode/utils/operators.hpp>
-#include <Geode/utils/platform.hpp>
 #include "../DevTools.hpp"
 
 USE_GEODE_NAMESPACE();

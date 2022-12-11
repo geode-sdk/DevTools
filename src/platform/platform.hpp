@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GLEW/glew.h"
+#include <glew.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 

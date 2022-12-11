@@ -1,15 +1,15 @@
-
 #include "../platform/platform.hpp"
 #include "../fonts/FeatherIcons.hpp"
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
 #include "../ImGui.hpp"
 #include <Geode/loader/Log.hpp>
-#include <Geode/utils/operators.hpp>
 
 USE_GEODE_NAMESPACE();
 
 void DevTools::drawNodeLayout(CCNode* node) {
+    // TODO: this creates a new texture every frame and kills my gpu :sob:
+    return;
     auto list = ImGui::GetWindowDrawList();
     auto winPos = ImGui::GetWindowPos() +
         ImGui::GetWindowContentRegionMin();

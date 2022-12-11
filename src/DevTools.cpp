@@ -7,7 +7,6 @@
 #include "fonts/RobotoMono.hpp"
 #include "fonts/SourceCodeProLight.hpp"
 #include "platform/platform.hpp"
-#include <Geode/utils/operators.hpp>
 #include <Geode/loader/Log.hpp>
 #include "ImGui.hpp"
 
@@ -40,18 +39,31 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
 }
 
 void DevTools::drawPages() {
+    const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
+
+    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 2), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Once);
     this->drawPage(
         U8STR(FEATHER_GIT_MERGE " Tree"),
         &DevTools::drawTree
     );
+
+    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 3), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(size.width / 5, 0), ImGuiCond_Once);
     this->drawPage(
         U8STR(FEATHER_SETTINGS " Settings"),
         &DevTools::drawSettings
     );
+
+    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 4), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, size.height / 2), ImGuiCond_Once);
     this->drawPage(
         U8STR(FEATHER_TOOL " Attributes"),
         &DevTools::drawAttributes
     );
+
+    ImGui::SetNextWindowSize(ImVec2(size.width / 5, size.height / 4), ImGuiCond_Once);
+    ImGui::SetNextWindowPos(ImVec2(0, size.height / 2 + size.height / 4), ImGuiCond_Once);
     this->drawPage(
         U8STR(FEATHER_DATABASE " Layout"),
         &DevTools::drawLayout
@@ -71,13 +83,13 @@ void DevTools::draw(GLRenderCtx* ctx) {
             nullptr, ImGuiDockNodeFlags_PassthruCentralNode
         );
 
-        ImGui::PushFont(m_defaultFont);
+        // ImGui::PushFont(m_defaultFont);
         this->drawPages();
         if (m_selectedNode) {
             this->highlightNode(m_selectedNode, HighlightMode::Selected);
         }
         this->drawGD(ctx);
-        ImGui::PopFont();
+        // ImGui::PopFont();
     }
 }
 
@@ -105,6 +117,12 @@ void DevTools::setupFonts() {
     add_font(&m_smallFont,   Font_OpenSans,           10.f, def_ranges);
     add_font(&m_monoFont,    Font_RobotoMono,         18.f, def_ranges);
     add_font(&m_boxFont,     Font_SourceCodeProLight, 23.f, box_ranges);
+
+    // auto& io = ImGui::GetIO();
+    // m_defaultFont = io.FontDefault;
+    // m_smallFont = io.FontDefault;
+    // m_monoFont = io.FontDefault;
+    // m_boxFont = io.FontDefault;
 }
 
 void DevTools::setup() {

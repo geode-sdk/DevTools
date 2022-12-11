@@ -1,8 +1,6 @@
-
 #include "../platform/platform.hpp"
 #include "../DevTools.hpp"
 #include "../ImGui.hpp"
-#include <Geode/utils/operators.hpp>
 
 void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 	auto& foreground = *ImGui::GetWindowDrawList();
@@ -69,6 +67,9 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 
 void DevTools::drawGD(GLRenderCtx* gdCtx) {
     if (gdCtx) {
+        const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
+        ImGui::SetNextWindowSize(ImVec2(4.f * size.width / 5.f, 4.f * size.height / 5.f), ImGuiCond_Once);
+        ImGui::SetNextWindowPos(ImVec2(size.width / 5.f, size.height / 5.f), ImGuiCond_Once);
         if (ImGui::Begin("Geometry Dash")) {
             auto list = ImGui::GetWindowDrawList();
             auto ratio = gdCtx->size().x / gdCtx->size().y;

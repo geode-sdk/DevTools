@@ -4,7 +4,7 @@
 #include <imgui.h>
 #include "themes.hpp"
 #include <cocos2d.h>
-#include <Geode/utils/Ref.hpp>
+#include <Geode/utils/cocos.hpp>
 #include <unordered_map>
 
 USE_GEODE_NAMESPACE();
@@ -46,6 +46,9 @@ protected:
     void drawPage(const char* name, void(DevTools::* fun)());
     void drawPages();
     void draw(GLRenderCtx* ctx);
+
+    void newFrame();
+    void renderDrawData(ImDrawData*);
 
 public:
     static DevTools* get();

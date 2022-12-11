@@ -1,4 +1,3 @@
-
 #include "platform.hpp"
 #include "../ImGui.hpp"
 #include <Geode/loader/Log.hpp>
@@ -31,6 +30,7 @@ void GLRenderCtx::cleanup() {
         m_depth = 0;
     }
     if (m_texture) {
+        log::info("deleting texture {}", m_texture);
         glDeleteTextures(1, &m_texture);
         m_texture = 0;
     }
@@ -43,6 +43,7 @@ void GLRenderCtx::cleanup() {
 GLRenderCtx::GLRenderCtx(ImVec2 const& size) : m_size(size) {}
 
 ImTextureID GLRenderCtx::texture() const {
+    // TODO: this wont work on 64 bit
     return reinterpret_cast<ImTextureID>(m_texture);
 }
 
@@ -59,6 +60,13 @@ bool GLRenderCtx::begin() {
     if (!m_texture) {
         glGenTextures(1, &m_texture);
         glBindTexture(GL_TEXTURE_2D, m_texture);
+
+        static int texture_count = 0;
+        texture_count++;
+        log::info("new texture is {}", m_texture);
+        if (texture_count > 100) {
+            exit(1);
+        }
 
         glTexImage2D(
             GL_TEXTURE_2D, 0, GL_RGB,
