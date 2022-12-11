@@ -32,6 +32,8 @@ void DevTools::setupPlatform() {
 
     io.BackendPlatformUserData = this;
     io.BackendPlatformName = "cocos2d-2.2.3 GD";
+    // this is a lie hehe
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 
     unsigned char* pixels;
     int width, height;
@@ -187,7 +189,8 @@ class $modify(CCTouchDispatcher) {
             }
         } else {
             io.AddMouseButtonEvent(0, false);
-            CCTouchDispatcher::touches(touches, event, type);
+            if (!DevTools::get()->shouldPopGame())
+                CCTouchDispatcher::touches(touches, event, type);
         }
     }
 };

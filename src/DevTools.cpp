@@ -77,11 +77,9 @@ void DevTools::draw(GLRenderCtx* ctx) {
             m_reloadTheme = false;
         }
 
-        ImGuiWindowFlags flags = ImGuiWindowFlags_NoScrollbar;
-
-        m_dockspaceID = ImGui::DockSpaceOverViewport(
-            nullptr, ImGuiDockNodeFlags_PassthruCentralNode
-        );
+        // m_dockspaceID = ImGui::DockSpaceOverViewport(
+        //     nullptr, ImGuiDockNodeFlags_PassthruCentralNode
+        // );
 
         ImGui::PushFont(m_defaultFont);
         this->drawPages();
@@ -130,9 +128,11 @@ void DevTools::setup() {
     
     auto& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-    io.ConfigDockingWithShift = true;
-
+    // if this is true then it just doesnt work :( why
+    io.ConfigDockingWithShift = false;
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+    io.ConfigWindowsResizeFromEdges = true;
+
     this->setupFonts();
     this->setupPlatform();
 }

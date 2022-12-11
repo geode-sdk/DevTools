@@ -31,12 +31,12 @@ class $modify(CCDirector) {
     void drawScene() {
         DevTools::get()->setup();
 
-        static GLRenderCtx* CTX = nullptr;
+        static GLRenderCtx* gdTexture = nullptr;
 
         if (!DevTools::get()->shouldPopGame()) {
-            if (CTX) {
-                delete CTX;
-                CTX = nullptr;
+            if (gdTexture) {
+                delete gdTexture;
+                gdTexture = nullptr;
             }
             shouldPassEventsToGDButTransformed() = false;
             CCDirector::drawScene();
@@ -45,29 +45,29 @@ class $modify(CCDirector) {
         }
 
         if (shouldUpdateGDRenderBuffer()) {
-            if (CTX) {
-                delete CTX;
-                CTX = nullptr;
+            if (gdTexture) {
+                delete gdTexture;
+                gdTexture = nullptr;
             }
             shouldUpdateGDRenderBuffer() = false;
         }
 
         auto winSize = this->getOpenGLView()->getViewPortRect();
-        if (!CTX) {
-            CTX = new GLRenderCtx({ winSize.size.width, winSize.size.height });
+        if (!gdTexture) {
+            gdTexture = new GLRenderCtx({ winSize.size.width, winSize.size.height });
         }
 
-        if (!CTX->begin()) {
-            delete CTX;
-            CTX = nullptr;
+        if (!gdTexture->begin()) {
+            delete gdTexture;
+            gdTexture = nullptr;
             CCDirector::drawScene();
             DevTools::get()->render(nullptr);
             return;
         }
         CCDirector::drawScene();
-        CTX->end();
+        gdTexture->end();
 
-        DevTools::get()->render(CTX);
+        DevTools::get()->render(gdTexture);
 
         // if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         //     auto backup_current_context = this->getOpenGLView()->getWindow();
