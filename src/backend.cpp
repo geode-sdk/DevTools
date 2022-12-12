@@ -1,5 +1,6 @@
 #include <cocos2d.h>
 #include <Geode/modify/CCTouchDispatcher.hpp>
+#include <Geode/modify/CCIMEDispatcher.hpp>
 #include "platform/platform.hpp"
 #include "DevTools.hpp"
 #include "ImGui.hpp"
@@ -196,5 +197,26 @@ class $modify(CCTouchDispatcher) {
                 CCTouchDispatcher::touches(touches, event, type);
             }
         }
+    }
+};
+
+class $modify(CCIMEDispatcher) {
+    void dispatchInsertText(const char* text, int len) {
+        auto& io = ImGui::GetIO();
+        if (!io.WantCaptureKeyboard) {
+            CCIMEDispatcher::dispatchInsertText(text, len);
+        }
+        std::string str(text, len);
+        io.AddInputCharactersUTF8(str.c_str());
+    }
+
+    void dispatchDeleteBackward() {
+        auto& io = ImGui::GetIO();
+        if (!io.WantCaptureKeyboard) {
+            CCIMEDispatcher::dispatchDeleteBackward();
+        }
+        // is this really how youre supposed to do this
+        io.AddKeyEvent(ImGuiKey_Backspace, true);
+        io.AddKeyEvent(ImGuiKey_Backspace, false);
     }
 };
