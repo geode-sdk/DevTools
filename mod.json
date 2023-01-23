@@ -1,8 +1,13 @@
 {
-	"geode": "0.6.1",
+	"geode": "v1.0.0-alpha",
 	"version": "v1.0.0",
 	"id": "geode.devtools",
 	"name": "DevTools",
 	"developer": "Geode Team",
-	"description": "Developer tools for Geode"
+	"description": "Developer tools for Geode",
+	"repository": "https://github.com/geode-sdk/DevTools",
+	"issues": {
+		"url": "https://github.com/geode-sdk/DevTools/issues",
+		"info": "If you encounter an issue using DevTools, please report it to the GitHub issues page."
+	}
 }
