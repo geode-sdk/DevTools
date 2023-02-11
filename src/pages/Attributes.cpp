@@ -61,6 +61,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     ImGui::DragFloat2("Content Size", &contentSize.width);
     if (contentSize != node->getContentSize()) {
         node->setContentSize(contentSize);
+        node->updateLayout();
     }
 
     int zOrder = node->getZOrder();
