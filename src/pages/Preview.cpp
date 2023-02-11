@@ -7,7 +7,7 @@
 
 USE_GEODE_NAMESPACE();
 
-void DevTools::drawNodeLayout(CCNode* node) {
+void DevTools::drawNodePreview(CCNode* node) {
     // TODO: this creates a new texture every frame and kills my gpu :sob:
     return;
     auto list = ImGui::GetWindowDrawList();
@@ -93,10 +93,10 @@ void DevTools::drawNodeLayout(CCNode* node) {
     }, ctx);
 }
 
-void DevTools::drawLayout() {
+void DevTools::drawPreview() {
     if (!m_selectedNode) {
         ImGui::TextWrapped("Select a Node to Edit in the Scene or Tree");
     } else {
-        this->drawNodeLayout(m_selectedNode);
+        this->drawNodePreview(m_selectedNode);
     }
 }

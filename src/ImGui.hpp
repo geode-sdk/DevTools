@@ -32,6 +32,12 @@ static ImVec2 operator-(ImVec2 const& a) {
     return { -a.x, -a.y };
 }
 
+static ImVec2& operator-=(ImVec2& a, ImVec2 const& b) {
+    a.x -= b.x;
+    a.y -= b.y;
+    return a;
+}
+
 static ImVec2 operator/(ImVec2 const& a, ImVec2 const& b) {
     return {
         a.x / b.x,

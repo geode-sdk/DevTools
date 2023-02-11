@@ -8,6 +8,7 @@
 #include "fonts/SourceCodeProLight.hpp"
 #include "platform/platform.hpp"
 #include <Geode/loader/Log.hpp>
+#include <Geode/loader/Mod.hpp>
 #include "ImGui.hpp"
 
 DevTools* DevTools::get() {
@@ -41,9 +42,7 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
 void DevTools::drawPages() {
     const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
 
-    static bool first = true;
-    if (first || m_shouldRelayout) {
-        first = false;
+    if (!Mod::get()->setSavedValue("layout-loaded", true) || m_shouldRelayout) {
         m_shouldRelayout = false;
 
         auto id = m_dockspaceID;
@@ -59,7 +58,7 @@ void DevTools::drawPages() {
         ImGui::DockBuilderDockWindow(U8STR(FEATHER_GIT_MERGE " Tree"), topLeftDock);
         ImGui::DockBuilderDockWindow(U8STR(FEATHER_SETTINGS " Settings"), topLeftDock);
         ImGui::DockBuilderDockWindow(U8STR(FEATHER_TOOL " Attributes"), bottomLeftTopHalfDock);
-        ImGui::DockBuilderDockWindow(U8STR(FEATHER_DATABASE " Layout"), leftDock);
+        ImGui::DockBuilderDockWindow(U8STR(FEATHER_DATABASE " Preview"), leftDock);
         ImGui::DockBuilderDockWindow("Geometry Dash", id);
 
         ImGui::DockBuilderFinish(id);
@@ -81,8 +80,8 @@ void DevTools::drawPages() {
     );
 
     this->drawPage(
-        U8STR(FEATHER_DATABASE " Layout"),
-        &DevTools::drawLayout
+        U8STR(FEATHER_DATABASE " Preview"),
+        &DevTools::drawPreview
     );
 }
 
@@ -140,7 +139,7 @@ void DevTools::setup() {
 
     IMGUI_CHECKVERSION();
     
-    ImGui::CreateContext();
+    auto ctx = ImGui::CreateContext();
     
     auto& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -148,7 +147,7 @@ void DevTools::setup() {
     io.ConfigDockingWithShift = false;
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigWindowsResizeFromEdges = true;
-
+        
     this->setupFonts();
     this->setupPlatform();
 }

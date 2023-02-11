@@ -2,6 +2,163 @@
 #include "../DevTools.hpp"
 #include "../ImGui.hpp"
 
+void drawRowAxisArrow(
+    ImDrawList& foreground,
+    float x, float y,
+    ImVec2 const& tmax, ImVec2 const& tmin,
+    AxisAlignment align,
+    bool reverse, auto color
+) {
+    float axisArrowStart = x;
+    float axisArrowLength = (tmax.x - tmin.x) / 2;
+    if (align == AxisAlignment::Even) {
+        axisArrowLength = tmax.x - tmin.x;
+    }
+    if (align == AxisAlignment::End) {
+        axisArrowStart -= axisArrowLength;
+    }
+    if (align == AxisAlignment::Center && reverse) {
+        axisArrowStart -= axisArrowLength;
+    }
+    if (reverse) {
+        foreground.AddLine(
+            ImVec2(axisArrowStart + 15.f, y),
+            ImVec2(axisArrowStart + axisArrowLength, y),
+            color, 4.f
+        );
+        foreground.AddTriangleFilled(
+            ImVec2(axisArrowStart + 21.f, y + 10.f),
+            ImVec2(axisArrowStart + 21.f, y - 10.f),
+            ImVec2(axisArrowStart + 6.f, y),
+            color
+        );
+    }
+    else {
+        foreground.AddLine(
+            ImVec2(axisArrowStart, y),
+            ImVec2(axisArrowStart + axisArrowLength - 10.f, y),
+            color, 4.f
+        );
+        foreground.AddTriangleFilled(
+            ImVec2(axisArrowStart + axisArrowLength - 15.f, y + 10.f),
+            ImVec2(axisArrowStart + axisArrowLength - 15.f, y - 10.f),
+            ImVec2(axisArrowStart + axisArrowLength, y),
+            color
+        );
+    }
+}
+
+void drawColAxisArrow(
+    ImDrawList& foreground,
+    float x, float y,
+    ImVec2 const& tmax, ImVec2 const& tmin,
+    AxisAlignment align,
+    bool reverse, auto color
+) {
+    float crossArrowStart = y;
+    float crossArrowLength = (tmax.y - tmin.y) / 2;
+    if (align == AxisAlignment::Even) {
+        crossArrowLength = tmax.y - tmin.y;
+    }
+    if (align == AxisAlignment::End) {
+        crossArrowStart -= crossArrowLength;
+    }
+    if (align == AxisAlignment::Center && !reverse) {
+        crossArrowStart -= crossArrowLength;
+    }
+    if (reverse) {
+        foreground.AddLine(
+            ImVec2(x, crossArrowStart),
+            ImVec2(x, crossArrowStart + crossArrowLength + 5.f),
+            color, 4.f
+        );
+        foreground.AddTriangleFilled(
+            ImVec2(x + 10.f, crossArrowStart + crossArrowLength + 15.f),
+            ImVec2(x - 10.f, crossArrowStart + crossArrowLength + 15.f),
+            ImVec2(x, crossArrowStart + crossArrowLength),
+            color
+        );
+    }
+    else {
+        crossArrowStart += crossArrowLength;
+        foreground.AddLine(
+            ImVec2(x, crossArrowStart),
+            ImVec2(x, crossArrowStart - crossArrowLength - 10.f),
+            color, 4.f
+        );
+        foreground.AddTriangleFilled(
+            ImVec2(x + 10.f, crossArrowStart - crossArrowLength - 15.f),
+            ImVec2(x - 10.f, crossArrowStart - crossArrowLength - 15.f),
+            ImVec2(x, crossArrowStart - crossArrowLength),
+            color
+        );
+    }
+}
+
+void drawLayoutArrows(
+    ImDrawList& foreground,
+    AxisLayout* layout,
+    ImVec2 const& tmax, ImVec2 const& tmin
+) {
+    auto row = layout->getAxis() == Axis::Row;
+
+    float x;
+    float y;
+    switch (row ? layout->getAxisAlignment() : layout->getCrossAxisAlignment()) {
+        case AxisAlignment::Start: x = tmin.x; break;
+        case AxisAlignment::Even: x = tmin.x; break;
+        case AxisAlignment::Center: x = tmin.x + (tmax.x - tmin.x) / 2; break;
+        case AxisAlignment::End: x = tmax.x; break;
+    }
+    switch (row ? layout->getCrossAxisAlignment() : layout->getAxisAlignment()) {
+        case AxisAlignment::Start: y = tmin.y; break;
+        case AxisAlignment::Even: y = tmin.y; break;
+        case AxisAlignment::Center: y = tmin.y + (tmax.y - tmin.y) / 2; break;
+        case AxisAlignment::End: y = tmax.y; break;
+    }
+
+    if (row) {
+        drawRowAxisArrow(
+            foreground,
+            x, y, tmax, tmin,
+            layout->getAxisAlignment(),
+            layout->getAxisReverse(),
+            IM_COL32(255, 55, 55, 255)
+        );
+        if (layout->getGrowCrossAxis()) {
+            drawColAxisArrow(
+                foreground,
+                x, y, tmax, tmin,
+                layout->getCrossAxisAlignment(),
+                layout->getCrossAxisReverse(),
+                IM_COL32(55, 55, 255, 255)
+            );
+        }
+    }
+    else {
+        drawColAxisArrow(
+            foreground,
+            x, y, tmax, tmin,
+            layout->getAxisAlignment(),
+            !layout->getAxisReverse(),
+            IM_COL32(255, 55, 55, 255)
+        );
+        if (layout->getGrowCrossAxis()) {
+            drawRowAxisArrow(
+                foreground,
+                x, y, tmax, tmin,
+                layout->getCrossAxisAlignment(),
+                layout->getCrossAxisReverse(),
+                IM_COL32(55, 55, 255, 255)
+            );
+        }
+    }
+    
+    foreground.AddCircleFilled(
+        ImVec2(x, y), 6.f, IM_COL32(255, 55, 55, 255)
+    );
+}
+
 void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 	auto& foreground = *ImGui::GetWindowDrawList();
 	auto parent = node->getParent();
@@ -56,6 +213,20 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
             foreground.AddCircleFilled(
                 anchor, 5.f, IM_COL32(255, 255, 255, 255)
             );
+            if (auto layout = typeinfo_cast<AxisLayout*>(node->getLayout())) {
+                drawLayoutArrows(foreground, layout, tmax, tmin);
+            }
+        } break;
+
+        case HighlightMode::Layout: {
+            foreground.AddRect(
+                tmin, tmax, IM_COL32(255, 155, 55, 255),
+                0.f, 0, 4.f
+            );
+            // built-in Geode layouts get special extra markings
+            if (auto layout = typeinfo_cast<AxisLayout*>(node->getLayout())) {
+                drawLayoutArrows(foreground, layout, tmax, tmin);
+            }
         } break;
 
         default:
@@ -64,6 +235,15 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
                 tmin, tmax, IM_COL32(0, 255, 55, 70)
             );
         } break;
+    }
+}
+
+void DevTools::drawLayoutHighlights(CCNode* node) {
+    for (auto child : CCArrayExt<CCNode>(node->getChildren())) {
+        if (child->getLayout()) {
+            this->drawHighlight(child, HighlightMode::Layout);
+        }
+        this->drawLayoutHighlights(child);
     }
 }
 
@@ -107,6 +287,10 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
                 ImGui::IsWindowHovered() &&
                 getGDWindowRect().Contains(ImGui::GetMousePos());
             
+            if (m_highlightLayouts) {
+                this->drawLayoutHighlights(CCDirector::get()->getRunningScene());
+            }
+
             for (auto& [node, mode] : m_toHighlight) {
                 this->drawHighlight(node, mode);
             }

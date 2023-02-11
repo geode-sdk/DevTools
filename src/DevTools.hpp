@@ -12,6 +12,7 @@ USE_GEODE_NAMESPACE();
 enum class HighlightMode {
     Selected,
     Hovered,
+    Layout,
 };
 
 class DevTools {
@@ -23,6 +24,7 @@ protected:
     bool m_attributesInTree = false;
     bool m_alwaysHighlight = true;
     bool m_shouldRelayout = false;
+    bool m_highlightLayouts = false;
     std::string m_theme = DARK_THEME;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
@@ -40,9 +42,10 @@ protected:
     void drawSettings();
     void drawNodeAttributes(CCNode* node);
     void drawAttributes();
-    void drawLayout();
-    void drawNodeLayout(CCNode* node);
+    void drawPreview();
+    void drawNodePreview(CCNode* node);
     void drawHighlight(CCNode* node, HighlightMode mode);
+    void drawLayoutHighlights(CCNode* node);
     void drawGD(GLRenderCtx* ctx);
     void drawPage(const char* name, void(DevTools::* fun)());
     void drawPages();

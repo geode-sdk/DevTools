@@ -26,6 +26,12 @@ void DevTools::drawSettings() {
             "When disabled, you can highlight by pressing Shift."
         );
     }
+    ImGui::Checkbox("Highlight Layouts", &m_highlightLayouts);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Highlights the borders of all layouts applied to nodes"
+        );
+    }
     ImGui::PopStyleVar();
 
     ImGui::Separator();

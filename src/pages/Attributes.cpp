@@ -2,6 +2,7 @@
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
 #include <misc/cpp/imgui_stdlib.h>
+#include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 
 USE_GEODE_NAMESPACE();
 
@@ -58,18 +59,27 @@ void DevTools::drawNodeAttributes(CCNode* node) {
 
     auto contentSize = node->getContentSize();
     ImGui::DragFloat2("Content Size", &contentSize.width);
-    if (contentSize != node->getContentSize())
+    if (contentSize != node->getContentSize()) {
         node->setContentSize(contentSize);
+    }
 
     int zOrder = node->getZOrder();
     ImGui::InputInt("Z Order", &zOrder);
-    if (node->getZOrder() != zOrder)
+    if (node->getZOrder() != zOrder) {
         node->setZOrder(zOrder);
+    }
     
     auto visible = node->isVisible();
     ImGui::Checkbox("Visible", &visible);
-    if (visible != node->isVisible())
+    if (visible != node->isVisible()) {
         node->setVisible(visible);
+    }
+    
+    auto ignoreAnchor = node->isIgnoreAnchorPointForPosition();
+    ImGui::Checkbox("Ignore Anchor Point for Position", &ignoreAnchor);
+    if (ignoreAnchor != node->isIgnoreAnchorPointForPosition()) {
+        node->ignoreAnchorPointForPosition(ignoreAnchor);
+    }
 
     if (auto rgbaNode = dynamic_cast<CCRGBAProtocol*>(node)) {
         auto color = rgbaNode->getColor();
@@ -87,6 +97,140 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         std::string str = labelNode->getString();
         if (ImGui::InputText("Text", &str, 256)) {
             labelNode->setString(str.c_str());
+        }
+    }
+
+    if (node->getLayout()) {
+        if (auto layout = node->getLayout()) {
+            ImGui::Text("Layout: %s", typeid(*layout).name());
+        }
+        
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+        if (ImGui::Button(U8STR(FEATHER_REFRESH_CW " Update Layout"))) {
+            node->updateLayout();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button(U8STR(FEATHER_PLUS " Add Test Child"))) {
+            auto spr = CCSprite::create("GJ_button_01.png");
+            auto btn = CCMenuItemSpriteExtra::create(spr, node, nullptr);
+            node->addChild(btn);
+            node->updateLayout();
+        }
+        if (auto layout = typeinfo_cast<AxisLayout*>(node->getLayout())) {
+            bool updateLayout = false;
+
+            auto axis = static_cast<int>(layout->getAxis());
+            ImGui::Text("Axis");
+            auto updateAxis = false;
+            updateAxis |= ImGui::RadioButton("Row",    &axis, static_cast<int>(Axis::Row));
+            ImGui::SameLine();
+            updateAxis |= ImGui::RadioButton("Column", &axis, static_cast<int>(Axis::Column));
+            if (updateAxis) {
+                if (layout->getAxis() != static_cast<Axis>(axis)) {
+                    node->setContentSize({
+                        node->getContentSize().height,
+                        node->getContentSize().width
+                    });
+                }
+                layout->setAxis(static_cast<Axis>(axis));
+                updateLayout = true;
+            }
+
+            auto axisReverse = layout->getAxisReverse();
+            if (ImGui::Checkbox("Flip Axis Direction", &axisReverse)) {
+                layout->setAxisReverse(axisReverse);
+                updateLayout = true;
+            }
+            axisReverse = layout->getCrossAxisReverse();
+            if (ImGui::Checkbox("Flip Cross Axis Direction", &axisReverse)) {
+                layout->setCrossAxisReverse(axisReverse);
+                updateLayout = true;
+            }
+
+            {
+                auto align = static_cast<int>(layout->getAxisAlignment());
+                ImGui::Text("Axis Alignment");
+                bool updateAlign = false;
+                updateAlign |= ImGui::RadioButton(
+                    "Start", &align, static_cast<int>(AxisAlignment::Start)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Center", &align, static_cast<int>(AxisAlignment::Center)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "End", &align, static_cast<int>(AxisAlignment::End)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Even", &align, static_cast<int>(AxisAlignment::Even)
+                );
+                if (updateAlign) {
+                    layout->setAxisAlignment(static_cast<AxisAlignment>(align));
+                    updateLayout = true;
+                }
+            }
+
+            {
+                auto align = static_cast<int>(layout->getCrossAxisAlignment());
+                ImGui::Text("Cross Axis Alignment");
+                bool updateAlign = false;
+                updateAlign |= ImGui::RadioButton(
+                    "Start##cross0", &align, static_cast<int>(AxisAlignment::Start)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Center##cross1", &align, static_cast<int>(AxisAlignment::Center)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "End##cross2", &align, static_cast<int>(AxisAlignment::End)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Even##cross3", &align, static_cast<int>(AxisAlignment::Even)
+                );
+                if (updateAlign) {
+                    layout->setCrossAxisAlignment(static_cast<AxisAlignment>(align));
+                    updateLayout = true;
+                }
+            }
+
+            auto gap = layout->getGap();
+            if (ImGui::DragFloat("Gap", &gap)) {
+                layout->setGap(gap);
+                updateLayout = true;
+            }
+
+            auto autoScale = layout->getAutoScale();
+            if (ImGui::Checkbox("Auto Scale", &autoScale)) {
+                layout->setAutoScale(autoScale);
+                updateLayout = true;
+            }
+
+            auto grow = layout->getGrowCrossAxis();
+            if (ImGui::Checkbox("Grow Cross Axis", &grow)) {
+                layout->setGrowCrossAxis(grow);
+                updateLayout = true;
+            }
+
+            auto overflow = layout->getCrossAxisOverflow();
+            if (ImGui::Checkbox("Allow Cross Axis Overflow", &overflow)) {
+                layout->setCrossAxisOverflow(overflow);
+                updateLayout = true;
+            }
+
+            if (updateLayout) {
+                node->updateLayout();
+            }
+        }
+    }
+    else {
+        if (ImGui::Button(U8STR(FEATHER_PLUS " Add AxisLayout"))) {
+            node->setLayout(AxisLayout::create());
         }
     }
 }
