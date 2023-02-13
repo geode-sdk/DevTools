@@ -1,6 +1,6 @@
 {
-	"geode": "v1.0.0-alpha",
-	"version": "v1.0.0",
+	"geode": "v1.0.0",
+	"version": "v1.1.0",
 	"id": "geode.devtools",
 	"name": "DevTools",
 	"developer": "Geode Team",

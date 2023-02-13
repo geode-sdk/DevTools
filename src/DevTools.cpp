@@ -55,32 +55,32 @@ void DevTools::drawPages() {
 
         auto bottomLeftTopHalfDock = ImGui::DockBuilderSplitNode(leftDock, ImGuiDir_Up, 0.6f, nullptr, &leftDock);
 
-        ImGui::DockBuilderDockWindow(U8STR(FEATHER_GIT_MERGE " Tree"), topLeftDock);
-        ImGui::DockBuilderDockWindow(U8STR(FEATHER_SETTINGS " Settings"), topLeftDock);
-        ImGui::DockBuilderDockWindow(U8STR(FEATHER_TOOL " Attributes"), bottomLeftTopHalfDock);
-        ImGui::DockBuilderDockWindow(U8STR(FEATHER_DATABASE " Preview"), leftDock);
-        ImGui::DockBuilderDockWindow("Geometry Dash", id);
+        ImGui::DockBuilderDockWindow("###devtools/tree", topLeftDock);
+        ImGui::DockBuilderDockWindow("###devtools/settings", topLeftDock);
+        ImGui::DockBuilderDockWindow("###devtools/attributes", bottomLeftTopHalfDock);
+        ImGui::DockBuilderDockWindow("###devtools/preview", leftDock);
+        ImGui::DockBuilderDockWindow("###devtools/geometry-dash", id);
 
         ImGui::DockBuilderFinish(id);
     }
 
     this->drawPage(
-        U8STR(FEATHER_GIT_MERGE " Tree"),
+        U8STR(FEATHER_GIT_MERGE " Tree###devtools/tree"),
         &DevTools::drawTree
     );
 
     this->drawPage(
-        U8STR(FEATHER_SETTINGS " Settings"),
+        U8STR(FEATHER_SETTINGS " Settings###devtools/settings"),
         &DevTools::drawSettings
     );
 
     this->drawPage(
-        U8STR(FEATHER_TOOL " Attributes"),
+        U8STR(FEATHER_TOOL " Attributes###devtools/attributes"),
         &DevTools::drawAttributes
     );
 
     this->drawPage(
-        U8STR(FEATHER_DATABASE " Preview"),
+        U8STR(FEATHER_DATABASE " Preview###devtools/preview"),
         &DevTools::drawPreview
     );
 }

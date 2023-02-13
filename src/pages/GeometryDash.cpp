@@ -1,6 +1,8 @@
 #include "../platform/platform.hpp"
 #include "../DevTools.hpp"
 #include "../ImGui.hpp"
+#include <Windows.h>
+#include <psapi.h>
 
 void drawRowAxisArrow(
     ImDrawList& foreground,
@@ -249,7 +251,12 @@ void DevTools::drawLayoutHighlights(CCNode* node) {
 
 void DevTools::drawGD(GLRenderCtx* gdCtx) {
     if (gdCtx) {
-        if (ImGui::Begin("Geometry Dash")) {
+        auto winSize = CCDirector::get()->getWinSize();
+        auto title = fmt::format(
+            "Geometry Dash ({}x{})###devtools/geometry-dash",
+            winSize.width, winSize.height
+        );
+        if (ImGui::Begin(title.c_str())) {
             auto list = ImGui::GetWindowDrawList();
             auto ratio = gdCtx->size().x / gdCtx->size().y;
 
