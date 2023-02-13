@@ -242,6 +242,7 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 
 void DevTools::drawLayoutHighlights(CCNode* node) {
     for (auto child : CCArrayExt<CCNode>(node->getChildren())) {
+        if (!child->isVisible()) continue;
         if (child->getLayout()) {
             this->drawHighlight(child, HighlightMode::Layout);
         }
