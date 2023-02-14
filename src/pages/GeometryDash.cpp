@@ -150,7 +150,7 @@ void drawLayoutArrows(
                 foreground,
                 x, y, tmax, tmin,
                 layout->getCrossAxisAlignment(),
-                layout->getCrossAxisReverse(),
+                !layout->getCrossAxisReverse(),
                 IM_COL32(55, 55, 255, 255)
             );
         }
