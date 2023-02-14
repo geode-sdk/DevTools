@@ -3,6 +3,9 @@
 #include "../ImGui.hpp"
 #include <Windows.h>
 #include <psapi.h>
+#include <Geode/utils/ranges.hpp>
+#include <Geode/binding/FLAlertLayer.hpp>
+#include <Geode/binding/GJDropDownLayer.hpp>
 
 void drawRowAxisArrow(
     ImDrawList& foreground,
@@ -241,12 +244,19 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 }
 
 void DevTools::drawLayoutHighlights(CCNode* node) {
-    for (auto child : CCArrayExt<CCNode>(node->getChildren())) {
+    for (auto child : ranges::reverse(CCArrayExt<CCNode>(node->getChildren()))) {
         if (!child->isVisible()) continue;
         if (child->getLayout()) {
             this->drawHighlight(child, HighlightMode::Layout);
         }
         this->drawLayoutHighlights(child);
+        if (
+            typeinfo_cast<FLAlertLayer*>(child) || 
+            typeinfo_cast<GJDropDownLayer*>(child) ||
+            typeinfo_cast<EditorPauseLayer*>(child)
+        ) {
+            break;
+        }
     }
 }
 
