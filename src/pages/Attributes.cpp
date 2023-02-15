@@ -6,6 +6,30 @@
 
 USE_GEODE_NAMESPACE();
 
+#define AXIS_GET(Name_) \
+    &AxisLayoutOptions::get##Name_, \
+    &AxisLayoutOptions::set##Name_
+
+template <class T, class R>
+bool checkbox(const char* text, T* ptr, bool(T::* get)(), R(T::* set)(bool)) {
+    bool value = (ptr->*get)();
+    if (ImGui::Checkbox(text, &value)) {
+        (ptr->*set)(value);
+        return true;
+    }
+    return false;
+}
+
+template <class T, class R>
+bool checkbox(const char* text, T* ptr, bool(T::* get)() const, R(T::* set)(bool)) {
+    bool value = (ptr->*get)();
+    if (ImGui::Checkbox(text, &value)) {
+        (ptr->*set)(value);
+        return true;
+    }
+    return false;
+}
+
 void DevTools::drawNodeAttributes(CCNode* node) {
     if (ImGui::Button("Deselect")) {
         return this->selectNode(nullptr);
@@ -70,18 +94,14 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         node->setZOrder(zOrder);
     }
     
-    auto visible = node->isVisible();
-    ImGui::Checkbox("Visible", &visible);
-    if (visible != node->isVisible()) {
-        node->setVisible(visible);
-    }
+    checkbox("Visible", node, &CCNode::isVisible, &CCNode::setVisible);
+    checkbox(
+        "Ignore Anchor Point for Position",
+        node,
+        &CCNode::isIgnoreAnchorPointForPosition,
+        &CCNode::ignoreAnchorPointForPosition
+    );
     
-    auto ignoreAnchor = node->isIgnoreAnchorPointForPosition();
-    ImGui::Checkbox("Ignore Anchor Point for Position", &ignoreAnchor);
-    if (ignoreAnchor != node->isIgnoreAnchorPointForPosition()) {
-        node->ignoreAnchorPointForPosition(ignoreAnchor);
-    }
-
     if (auto rgbaNode = dynamic_cast<CCRGBAProtocol*>(node)) {
         auto color = rgbaNode->getColor();
         float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
@@ -101,14 +121,75 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
 
-    if (node->getLayout()) {
-        if (auto layout = node->getLayout()) {
-            ImGui::Text("Layout: %s", typeid(*layout).name());
+    ImGui::NewLine();
+    ImGui::Separator();
+    ImGui::NewLine();
+    
+    if (auto rawOpts = node->getLayoutOptions()) {
+        ImGui::Text("Layout options: %s", typeid(*rawOpts).name());
+
+        if (ImGui::Button(U8STR(FEATHER_REFRESH_CW " Update Parent Layout"))) {
+            if (auto parent = node->getParent()) {
+                parent->updateLayout();
+            }
         }
+        if (auto opts = typeinfo_cast<AxisLayoutOptions*>(rawOpts)) {
+            bool updateLayout = false;
+
+            ImGui::Text("Auto Scale");
+            auto updateAxis = false;
+            int autoScale = opts->getAutoScale() ? opts->getAutoScale().value() + 1 : 0;
+            updateAxis |= ImGui::RadioButton("Default", &autoScale, 0);
+            ImGui::SameLine();
+            updateAxis |= ImGui::RadioButton("Enable", &autoScale, 1);
+            ImGui::SameLine();
+            updateAxis |= ImGui::RadioButton("Disable", &autoScale, 2);
+            if (updateAxis) {
+                switch (autoScale) {
+                    case 0: opts->setAutoScale(std::nullopt); break;
+                    case 1: opts->setAutoScale(true); break;
+                    case 2: opts->setAutoScale(false); break;
+                }
+                updateLayout = true;
+            }
+
+            if (autoScale == 0) {
+                ImGui::BeginDisabled();
+            }
+            if (checkbox("Break Line", opts, AXIS_GET(BreakLine))) {
+                updateLayout = true;
+            }
+            if (checkbox("Same Line", opts, AXIS_GET(SameLine))) {
+                updateLayout = true;
+            }
+            if (autoScale == 0) {
+                ImGui::EndDisabled();
+            }
+
+            auto prio = opts->getScalePriority();
+            if (ImGui::DragInt("Scale Priority", &prio)) {
+                opts->setScalePriority(prio);
+                updateLayout = true;
+            }
+
+            if (updateLayout && node->getParent()) {
+                node->getParent()->updateLayout();
+            }
+        }
+    }
+    else {
+        if (ImGui::Button(U8STR(FEATHER_PLUS " Add AxisLayoutOptions"))) {
+            node->setLayoutOptions(AxisLayoutOptions::create());
+        }
+    }
+
+    ImGui::NewLine();
+    ImGui::Separator();
+    ImGui::NewLine();
+
+    if (auto rawLayout = node->getLayout()) {
+        ImGui::Text("Layout: %s", typeid(*rawLayout).name());
         
-        ImGui::NewLine();
-        ImGui::Separator();
-        ImGui::NewLine();
         if (ImGui::Button(U8STR(FEATHER_REFRESH_CW " Update Layout"))) {
             node->updateLayout();
         }
@@ -119,7 +200,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             node->addChild(btn);
             node->updateLayout();
         }
-        if (auto layout = typeinfo_cast<AxisLayout*>(node->getLayout())) {
+        if (auto layout = typeinfo_cast<AxisLayout*>(rawLayout)) {
             bool updateLayout = false;
 
             auto axis = static_cast<int>(layout->getAxis());
