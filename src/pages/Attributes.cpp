@@ -153,21 +153,15 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 updateLayout = true;
             }
 
-            if (autoScale == 0) {
-                ImGui::BeginDisabled();
-            }
             if (checkbox("Break Line", opts, AXIS_GET(BreakLine))) {
                 updateLayout = true;
             }
             if (checkbox("Same Line", opts, AXIS_GET(SameLine))) {
                 updateLayout = true;
             }
-            if (autoScale == 0) {
-                ImGui::EndDisabled();
-            }
 
             auto prio = opts->getScalePriority();
-            if (ImGui::DragInt("Scale Priority", &prio)) {
+            if (ImGui::DragInt("Scale Priority", &prio, .03f)) {
                 opts->setScalePriority(prio);
                 updateLayout = true;
             }
