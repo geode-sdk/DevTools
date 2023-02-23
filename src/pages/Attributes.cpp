@@ -275,6 +275,31 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 }
             }
 
+            {
+                auto align = static_cast<int>(layout->getCrossAxisLineAlignment());
+                ImGui::Text("Cross Axis Line Alignment");
+                bool updateAlign = false;
+                updateAlign |= ImGui::RadioButton(
+                    "Start##crossline0", &align, static_cast<int>(AxisAlignment::Start)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Center##crossline1", &align, static_cast<int>(AxisAlignment::Center)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "End##crossline2", &align, static_cast<int>(AxisAlignment::End)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Even##crossline3", &align, static_cast<int>(AxisAlignment::Even)
+                );
+                if (updateAlign) {
+                    layout->setCrossAxisLineAlignment(static_cast<AxisAlignment>(align));
+                    updateLayout = true;
+                }
+            }
+
             auto gap = layout->getGap();
             if (ImGui::DragFloat("Gap", &gap)) {
                 layout->setGap(gap);
