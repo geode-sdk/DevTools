@@ -1,11 +1,29 @@
 #include "../fonts/FeatherIcons.hpp"
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
+#ifndef GEODE_IS_WINDOWS
+#include <cxxabi.h>
+#endif
 
 USE_GEODE_NAMESPACE();
 
-const char* getNodeName(CCObject* node) {
+std::string getNodeName(CCObject* node) {
+#ifdef GEODE_IS_WINDOWS
     return typeid(*node).name() + 6;
+#else 
+    {
+        std::string ret;
+
+        auto status = int();
+        auto demangle = abi::__cxa_demangle(typeid(*node).name(), 0, 0, &status);
+        if (status == 0) {
+            ret = demangle;
+        }
+        free(demangle);
+
+        return ret;
+    }
+#endif
 }
 
 void DevTools::drawTreeBranch(CCNode* node, size_t index) {

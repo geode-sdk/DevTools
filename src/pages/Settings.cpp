@@ -139,7 +139,7 @@ void DevTools::drawSettings() {
         hue += 0.04f;
         ImGui::SameLine(0.f, 0.f);
         ImGui::ColorConvertHSVtoRGB(hue, .5f, 1.f, color.x, color.y, color.z);
-        ImGui::TextColored(color, "%c", c);
+        ImGui::TextColored(color, std::string(1, c).c_str());
     }
 
     ImGui::TextWrapped(
