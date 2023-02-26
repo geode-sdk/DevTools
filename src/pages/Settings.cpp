@@ -135,11 +135,11 @@ void DevTools::drawSettings() {
 
     ImVec4 color;
     color.w = 1.f;
-    for (auto c : "Geode Team") {
+    for (auto c : std::string("Geode Team")) {
         hue += 0.04f;
         ImGui::SameLine(0.f, 0.f);
         ImGui::ColorConvertHSVtoRGB(hue, .5f, 1.f, color.x, color.y, color.z);
-        ImGui::TextColored(color, std::string(1, c).c_str());
+        ImGui::TextColored(color, "%c", c);
     }
 
     ImGui::TextWrapped(

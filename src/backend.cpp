@@ -1,5 +1,6 @@
 #include <cocos2d.h>
 #include <Geode/modify/CCTouchDispatcher.hpp>
+#include <Geode/modify/CCMouseDispatcher.hpp>
 #include <Geode/modify/CCIMEDispatcher.hpp>
 #include "platform/platform.hpp"
 #include "DevTools.hpp"
@@ -45,7 +46,7 @@ void DevTools::setupPlatform() {
     // TODO: not leak this :-)
     tex2d->retain();
 
-    io.Fonts->SetTexID((ImTextureID)tex2d->getName());
+    io.Fonts->SetTexID(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(tex2d->getName())));
 }
 
 void DevTools::newFrame() {
@@ -101,8 +102,7 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
         auto* idxBuffer = list->IdxBuffer.Data;
         auto* vtxBuffer = list->VtxBuffer.Data;
         for (auto& cmd : list->CmdBuffer) {
-            // TODO: not gonna work on 64 bit
-            ccGLBindTexture2D(reinterpret_cast<GLuint>(cmd.GetTexID()));
+            ccGLBindTexture2D(static_cast<GLuint>(reinterpret_cast<intptr_t>(cmd.GetTexID())));
 
             const auto rect = cmd.ClipRect;
             const auto orig = toCocos(ImVec2(rect.x, rect.y));
@@ -149,6 +149,21 @@ enum TouchMessageType : unsigned int {
     Moved = 1,
     Ended = 2,
     Cancelled = 3
+};
+
+static float SCROLL_SENSITIVITY = 5;
+
+class $modify(CCMouseDispatcher) {
+    bool dispatchScrollMSG(float y, float x) {
+        auto& io = ImGui::GetIO();
+        io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, y / SCROLL_SENSITIVITY);
+
+        if (!io.WantCaptureMouse || shouldPassEventsToGDButTransformed()) {
+            return CCMouseDispatcher::dispatchScrollMSG(y, x);
+        }
+
+        return true;
+    }
 };
 
 class $modify(CCTouchDispatcher) {
