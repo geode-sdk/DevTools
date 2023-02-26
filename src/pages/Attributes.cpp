@@ -38,9 +38,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_COPY " Copy"))) {
         clipboard::write(
-            CCString::createWithFormat(
-                "%X", reinterpret_cast<uintptr_t>(node)
-            )->getCString()
+            utils::intToHex(reinterpret_cast<uintptr_t>(node))
         );
     }
     if (node->getUserData()) {
