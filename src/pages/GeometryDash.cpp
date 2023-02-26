@@ -1,8 +1,6 @@
 #include "../platform/platform.hpp"
 #include "../DevTools.hpp"
 #include "../ImGui.hpp"
-#include <Windows.h>
-#include <psapi.h>
 #include <Geode/utils/ranges.hpp>
 #include <Geode/binding/FLAlertLayer.hpp>
 #include <Geode/binding/GJDropDownLayer.hpp>

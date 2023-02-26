@@ -8,6 +8,8 @@ on:
 
 env:
   GEODE_SDK: ${{ github.workspace }}/sdk
+  GEODE_VERSION: v1.0.0-beta.7
+  CLI_VERSION: v1.0.7
   MOD_NAME: DevTools
   MOD_ID: geode.devtools
 
@@ -56,7 +58,7 @@ jobs:
         mkdir bin
         mkdir bin/nightly
         cd bin/nightly
-        curl -L https://github.com/geode-sdk/geode/releases/download/Nightly/geode-nightly-${{ matrix.config.platform_suffix }}.zip -o geode-sdk.zip
+        curl -L https://github.com/geode-sdk/geode/releases/download/${{ env.GEODE_VERSION }}/geode-${{ env.GEODE_VERSION }}-${{ matrix.config.platform_suffix }}.zip -o geode-sdk.zip
         tar -xf geode-sdk.zip
 
     - name: Configure CMake
@@ -88,7 +90,7 @@ jobs:
       
       - name: Download and Unzip CLI
         run: |
-          curl -L https://github.com/geode-sdk/cli/releases/download/v1.0.7/geode-cli-v1.0.7-win.zip -o geode-cli.zip
+          curl -L https://github.com/geode-sdk/cli/releases/download/${{ env.CLI_VERSION }}/geode-cli-${{ env.CLI_VERSION }}-win.zip -o geode-cli.zip
           tar -xf geode-cli.zip
 
       - uses: actions/download-artifact@v3

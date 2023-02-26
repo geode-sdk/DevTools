@@ -58,6 +58,9 @@ void DevTools::drawSettings() {
 
     if (ImGui::Combo("##devtools/resolution", &selectedResolution, text.c_str())) {
         GameManager::get()->m_resolution = selectedResolution;
+
+        // TODO: idk how to do this on macos
+    #ifdef GEODE_IS_WINDOWS
         if (selectedResolution != 0) {
             auto size = GameManager::get()->resolutionForKey(selectedResolution);
             CCEGLView::get()->resizeWindow(size.width, size.height);
@@ -66,6 +69,7 @@ void DevTools::drawSettings() {
             CCEGLView::get()->resizeWindow(customResolution.width, customResolution.height);
         }
         CCEGLView::get()->centerWindow();
+    #endif
     }
 
     if (selectedResolution == 0) {
@@ -74,15 +78,17 @@ void DevTools::drawSettings() {
             static_cast<int>(customResolution.height),
         };
         if (ImGui::DragInt2("Size", size)) {
-            size[0] = fabsf(size[0]);
-            size[1] = fabsf(size[1]);
+            size[0] = std::fabs(size[0]);
+            size[1] = std::fabs(size[1]);
             customResolution = CCSizeMake(size[0], size[1]);
         }
+    #ifdef GEODE_IS_WINDOWS
         if (ImGui::Button("Apply##size-apply")) {
             GameManager::get()->m_resolution = 0;
             CCEGLView::get()->resizeWindow(customResolution.width, customResolution.height);
             CCEGLView::get()->centerWindow();
         }
+    #endif
     }
 
     ImGui::TextWrapped(
@@ -133,7 +139,7 @@ void DevTools::drawSettings() {
         hue += 0.04f;
         ImGui::SameLine(0.f, 0.f);
         ImGui::ColorConvertHSVtoRGB(hue, .5f, 1.f, color.x, color.y, color.z);
-        ImGui::TextColored(color, std::string(1, c).c_str());
+        ImGui::TextColored(color, "%c", c);
     }
 
     ImGui::TextWrapped(
