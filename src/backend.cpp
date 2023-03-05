@@ -5,6 +5,7 @@
 #include "platform/platform.hpp"
 #include "DevTools.hpp"
 #include "ImGui.hpp"
+#include <array>
 
 using namespace cocos2d;
 
@@ -178,7 +179,7 @@ class $modify(CCTouchDispatcher) {
             if (shouldPassEventsToGDButTransformed()) {
                 auto win = ImGui::GetMainViewport()->Size;
                 const auto gdRect = getGDWindowRect();
-                if (gdRect.Contains(pos)) {
+                if (gdRect.Contains(pos) && !DevTools::get()->pausedGame()) {
                     auto relativePos = ImVec2(
                         pos.x - gdRect.Min.x,
                         pos.y - gdRect.Min.y

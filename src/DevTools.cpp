@@ -20,6 +20,10 @@ bool DevTools::shouldPopGame() const {
     return m_visible && m_GDInWindow;
 }
 
+bool DevTools::pausedGame() const {
+    return m_pauseGame;
+}
+
 CCNode* DevTools::getSelectedNode() const {
     return m_selectedNode;
 }

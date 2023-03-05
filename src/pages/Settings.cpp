@@ -4,6 +4,10 @@
 #include <Geode/loader/Loader.hpp>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/utils/ranges.hpp>
+#include <Geode/binding/GameSoundManager.hpp>
+#include <Geode/binding/FMODAudioEngine.hpp>
+#include <Geode/modify/AppDelegate.hpp>
+#include <fmod.hpp>
 #include <numeric>
 
 USE_GEODE_NAMESPACE();
@@ -108,6 +112,19 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.height / ratio)
     );
 
+    static Ref<CCSet> PAUSED_TARGETS = nullptr;
+    if (ImGui::Button(m_pauseGame ? "Resume Game" : "Pause Game")) {
+        m_pauseGame ^= 1;
+        if (m_pauseGame) {
+            FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(true);
+            PAUSED_TARGETS = CCDirector::get()->getScheduler()->pauseAllTargets();
+        }
+        else if (PAUSED_TARGETS) {
+            FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(false);
+            CCDirector::get()->getScheduler()->resumeTargets(PAUSED_TARGETS);
+        }
+    }
+
     ImGui::Separator();
 
     ImGui::Text("Theme");
@@ -152,3 +169,12 @@ void DevTools::drawSettings() {
         m_shouldRelayout = true;
     }
 }
+
+class $modify(AppDelegate) {
+    void applicationWillEnterForeground() override {
+        AppDelegate::applicationWillEnterForeground();
+        if (DevTools::get()->pausedGame()) {
+            FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(true);
+        }
+    }
+};

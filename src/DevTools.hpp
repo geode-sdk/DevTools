@@ -25,6 +25,7 @@ protected:
     bool m_alwaysHighlight = true;
     bool m_shouldRelayout = false;
     bool m_highlightLayouts = false;
+    bool m_pauseGame = false;
     std::string m_theme = DARK_THEME;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
@@ -58,6 +59,7 @@ public:
     static DevTools* get();
 
     bool shouldPopGame() const;
+    bool pausedGame() const;
 
     CCNode* getSelectedNode() const;
     void selectNode(CCNode* node);
