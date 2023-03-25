@@ -14,7 +14,7 @@ std::string getNodeName(CCObject* node) {
     {
         std::string ret;
 
-        auto status = int();
+        int status = 0;
         auto demangle = abi::__cxa_demangle(typeid(*node).name(), 0, 0, &status);
         if (status == 0) {
             ret = demangle;
