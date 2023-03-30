@@ -145,13 +145,6 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
     glDisable(GL_SCISSOR_TEST);
 }
 
-enum TouchMessageType : unsigned int {
-    Began = 0,
-    Moved = 1,
-    Ended = 2,
-    Cancelled = 3
-};
-
 static float SCROLL_SENSITIVITY = 5;
 
 class $modify(CCMouseDispatcher) {
@@ -199,14 +192,16 @@ class $modify(CCTouchDispatcher) {
 
             // TODO: dragging out of gd makes it click in imgui
             if (!didGDSwallow) {
-                if (type == TouchMessageType::Began || type == TouchMessageType::Moved) {
+                if (type == CCTOUCHBEGAN || type == CCTOUCHMOVED) {
                     io.AddMouseButtonEvent(0, true);
-                } else {
+                }
+                else {
                     io.AddMouseButtonEvent(0, false);
                 }
             }
-        } else {
-            if (type != TouchMessageType::Moved) {
+        }
+        else {
+            if (type != CCTOUCHMOVED) {
                 io.AddMouseButtonEvent(0, false);
             }
             if (!DevTools::get()->shouldPopGame()) {
