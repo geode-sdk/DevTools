@@ -7,7 +7,7 @@
 #include <imgui.h>
 #include "ImGui.hpp"
 
-USE_GEODE_NAMESPACE();
+using namespace geode::prelude;
 
 // todo: use shortcuts api once Geode has those
 class $modify(CCKeyboardDispatcher) {

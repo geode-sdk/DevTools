@@ -3,7 +3,7 @@
 #include <Geode/utils/general.hpp>
 #include <cocos2d.h>
 
-USE_GEODE_NAMESPACE();
+using namespace geode::prelude;
 
 namespace {
     constexpr float clamp(float v) {

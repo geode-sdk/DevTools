@@ -4,7 +4,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 
-USE_GEODE_NAMESPACE();
+using namespace geode::prelude;
 
 #define AXIS_GET(Name_) \
     &AxisLayoutOptions::get##Name_, \

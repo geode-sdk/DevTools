@@ -3,7 +3,7 @@
 #include <Geode/loader/Log.hpp>
 #include <Geode/cocos/platform/CCGL.h>
 
-USE_GEODE_NAMESPACE();
+using namespace geode::prelude;
 
 static bool g_shouldPassEventsToGDButTransformed = false;
 static bool g_updateBuffer = false;

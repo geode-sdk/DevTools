@@ -5,7 +5,7 @@
 #include <cxxabi.h>
 #endif
 
-USE_GEODE_NAMESPACE();
+using namespace geode::prelude;
 
 std::string getNodeName(CCObject* node) {
 #ifdef GEODE_IS_WINDOWS

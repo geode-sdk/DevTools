@@ -5,7 +5,7 @@
 #include "../ImGui.hpp"
 #include <Geode/loader/Log.hpp>
 
-USE_GEODE_NAMESPACE();
+using namespace geode::prelude;
 
 void DevTools::drawNodePreview(CCNode* node) {
     // TODO: this creates a new texture every frame and kills my gpu :sob:

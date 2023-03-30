@@ -10,7 +10,7 @@
 #include <fmod.hpp>
 #include <numeric>
 
-USE_GEODE_NAMESPACE();
+using namespace geode::prelude;
 
 static float RAINBOW_HUE = 0.f;
 
