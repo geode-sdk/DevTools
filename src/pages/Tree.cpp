@@ -66,7 +66,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
         }
         size_t i = 0;
         for (auto& child : CCArrayExt<CCNode*>(node->getChildren())) {
-            this->drawTreeBranch(child, i);
+            this->drawTreeBranch(child, i++);
         }
         ImGui::TreePop();
     }
