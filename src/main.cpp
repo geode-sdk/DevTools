@@ -3,6 +3,7 @@
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>
 #include <Geode/modify/CCDirector.hpp>
+#include <Geode/modify/CCEGLView.hpp>
 #include "DevTools.hpp"
 #include <imgui.h>
 #include "ImGui.hpp"
@@ -40,7 +41,6 @@ class $modify(CCDirector) {
             }
             shouldPassEventsToGDButTransformed() = false;
             CCDirector::drawScene();
-            DevTools::get()->render(nullptr);
             return;
         }
 
@@ -75,5 +75,18 @@ class $modify(CCDirector) {
         //     ImGui::RenderPlatformWindowsDefault();
         //     glfwMakeContextCurrent(backup_current_context);
         // }
+    }
+};
+
+class $modify(CCEGLView) {
+    // this is needed for popout mode because we need to render after gd has rendered,
+    // but before the buffers have been swapped, which is not possible with just a
+    // CCDirector::drawScene hook.
+    void swapBuffers() {
+        if (!DevTools::get()->shouldPopGame()) {
+            DevTools::get()->setup();
+            DevTools::get()->render(nullptr);
+        }
+        CCEGLView::swapBuffers();
     }
 };
