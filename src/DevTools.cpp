@@ -116,13 +116,13 @@ void DevTools::setupFonts() {
     static const ImWchar* def_ranges   = ImGui::GetIO().Fonts->GetGlyphRangesDefault();
     
     static constexpr auto add_font = [](
-        void* font, float size, const ImWchar* range
+        void* font, size_t realSize, float size, const ImWchar* range
     ) {
         auto& io = ImGui::GetIO();
         ImFontConfig config;
         config.MergeMode = true;
         auto* result = io.Fonts->AddFontFromMemoryTTF(
-            font, sizeof(font), size, nullptr, range
+            font, realSize, size, nullptr, range
         );
         io.Fonts->AddFontFromMemoryTTF(
             Font_FeatherIcons, sizeof(Font_FeatherIcons), size - 4.f, &config, icon_ranges
@@ -131,10 +131,10 @@ void DevTools::setupFonts() {
         return result;
     };
 
-    m_defaultFont = add_font(Font_OpenSans, 18.f, def_ranges);
-    m_smallFont = add_font(Font_OpenSans, 10.f, def_ranges);
-    m_monoFont = add_font(Font_RobotoMono, 18.f, def_ranges);
-    m_boxFont = add_font(Font_SourceCodeProLight, 23.f, box_ranges);
+    m_defaultFont = add_font(Font_OpenSans, sizeof(Font_OpenSans), 18.f, def_ranges);
+    m_smallFont = add_font(Font_OpenSans, sizeof(Font_OpenSans), 10.f, def_ranges);
+    m_monoFont = add_font(Font_RobotoMono, sizeof(Font_RobotoMono), 18.f, def_ranges);
+    m_boxFont = add_font(Font_SourceCodeProLight, sizeof(Font_SourceCodeProLight), 23.f, box_ranges);
 }
 
 void DevTools::setup() {
