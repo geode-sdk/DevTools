@@ -38,7 +38,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 )
 
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} opengl32 ${CMAKE_CURRENT_SOURCE_DIR}/GLEW/glew32.lib)
+    target_link_libraries(${PROJECT_NAME} opengl32)
 elseif(APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 elseif(ANDROID)
