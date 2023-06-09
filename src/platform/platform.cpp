@@ -106,6 +106,6 @@ bool GLRenderCtx::begin() {
 
 void GLRenderCtx::end() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(0x4100);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glFlush();
 }
