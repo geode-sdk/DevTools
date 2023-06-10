@@ -140,12 +140,12 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
     glDisable(GL_SCISSOR_TEST);
 }
 
-static float SCROLL_SENSITIVITY = 5;
+static float SCROLL_SENSITIVITY = 10;
 
 class $modify(CCMouseDispatcher) {
     bool dispatchScrollMSG(float y, float x) {
         auto& io = ImGui::GetIO();
-        io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, y / SCROLL_SENSITIVITY);
+        io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, y / SCROLL_SENSITIVITY GEODE_WINDOWS(* -1.f));
 
         if (!io.WantCaptureMouse || shouldPassEventsToGDButTransformed()) {
             return CCMouseDispatcher::dispatchScrollMSG(y, x);
