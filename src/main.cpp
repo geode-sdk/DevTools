@@ -13,7 +13,7 @@ using namespace geode::prelude;
 // todo: use shortcuts api once Geode has those
 class $modify(CCKeyboardDispatcher) {
     bool dispatchKeyboardMSG(enumKeyCodes key, bool down) {
-        if (down && key == KEY_F11) {
+        if (down && (key == KEY_F11 GEODE_MACOS(|| key == KEY_F10))) {
             DevTools::get()->toggle();
             return true;
         }
