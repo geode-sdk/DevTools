@@ -49,11 +49,8 @@ void DevTools::newFrame() {
     );
     io.DeltaTime = director->getDeltaTime();
 
-#ifdef GEODE_IS_WINDOWS
-    // not in cocos coords!! frame coords instead
-    const auto mouse_pos = director->getOpenGLView()->getMousePosition();
-    io.AddMousePosEvent(mouse_pos.x, mouse_pos.y);
-#endif
+    const auto mousePos = toVec2(geode::cocos::getMousePos());
+    io.AddMousePosEvent(mousePos.x, mousePos.y);
 
     // TODO: text input
 
