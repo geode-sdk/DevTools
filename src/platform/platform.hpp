@@ -27,4 +27,6 @@ public:
     void end();
 };
 
+std::string formatAddressIntoOffsetImpl(uintptr_t addr);
+
 std::string formatAddressIntoOffset(uintptr_t addr);

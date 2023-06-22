@@ -46,7 +46,7 @@ class $modify(CCEGLView) {
     }
 };
 
-std::string formatAddressIntoOffset(uintptr_t addr) {
+std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
     HMODULE mod;
 
     if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
