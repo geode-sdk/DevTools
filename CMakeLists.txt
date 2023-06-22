@@ -8,7 +8,7 @@ file(GLOB_RECURSE SOURCES
     src/*.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES} src/platform/Mac.mm)
 
 # This must be precompiled or cocos2d's glew.h takes over
 # target_precompile_headers(${PROJECT_NAME} PUBLIC GLEW/glew.h)
