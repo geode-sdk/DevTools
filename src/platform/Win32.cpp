@@ -46,4 +46,20 @@ class $modify(CCEGLView) {
     }
 };
 
+std::string formatAddressIntoOffset(uintptr_t addr) {
+    HMODULE mod;
+
+    if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+        reinterpret_cast<char*>(addr), &mod)
+    ) {
+        mod = nullptr;
+    }
+
+    wchar_t buffer[MAX_PATH];
+    std::string const module_name = (!mod || !GetModuleFileNameW(mod, buffer, MAX_PATH)) ? "Unknown" : ghc::filesystem::path(buffer).filename().string();
+
+    return fmt::format("{} + {:#x}", module_name, addr - reinterpret_cast<uintptr_t>(mod));
+}
+
 #endif

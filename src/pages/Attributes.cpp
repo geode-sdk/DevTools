@@ -45,6 +45,16 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::Text("User data: 0x%p", node->getUserData());
     }
 
+    if (auto menuItemNode = typeinfo_cast<CCMenuItem*>(node)) {
+        const auto selector = menuItemNode->m_pfnSelector;
+        const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector));
+        ImGui::Text("CCMenuItem selector: %s", addr.c_str());
+        ImGui::SameLine();
+        if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copymenuitem"))) {
+            clipboard::write(addr);
+        }
+    }
+
     float pos[2] = {
         node->getPositionX(),
         node->getPositionY()

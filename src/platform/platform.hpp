@@ -26,3 +26,5 @@ public:
     bool begin();
     void end();
 };
+
+std::string formatAddressIntoOffset(uintptr_t addr);
