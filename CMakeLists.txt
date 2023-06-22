@@ -10,8 +10,7 @@ file(GLOB_RECURSE SOURCES
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} src/platform/Mac.mm)
 
-# This must be precompiled or cocos2d's glew.h takes over
-# target_precompile_headers(${PROJECT_NAME} PUBLIC GLEW/glew.h)
+set_source_files_properties(src/platform/Mac.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
