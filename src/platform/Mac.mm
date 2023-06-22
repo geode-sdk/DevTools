@@ -2,7 +2,7 @@
 
 #ifdef GEODE_IS_MACOS
 
-#include "platform.hpp"
+#include "utils.hpp"
 
 #include <Geode/utils/string.hpp>
 #include <array>
@@ -12,6 +12,7 @@
 #include <dlfcn.h>
 #include <cxxabi.h>
 #include <algorithm>
+#include <fmt/core.h>
 
 #include <mach-o/dyld_images.h>
 #include <mach-o/dyld.h>

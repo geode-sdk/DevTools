@@ -46,6 +46,8 @@ class $modify(CCEGLView) {
     }
 };
 
+#include "utils.hpp"
+
 std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
     HMODULE mod;
 

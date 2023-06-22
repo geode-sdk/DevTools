@@ -3,6 +3,7 @@
 #include "../DevTools.hpp"
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
+#include "../platform/utils.hpp"
 
 using namespace geode::prelude;
 
