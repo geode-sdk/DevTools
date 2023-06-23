@@ -82,7 +82,7 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
         imageName = getImageName(image);
     }
 
-    return fmt::format("{} + {:#x}", imageName, base);
+    return fmt::format("{} + {:#x}", imageName, addr - base);
 }
 
 #endif
