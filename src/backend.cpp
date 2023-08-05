@@ -105,7 +105,7 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
         auto* list = draw_data->CmdLists[i];
 
         // convert vertex coords to cocos space
-        for(size_t j = 0; j < list->VtxBuffer.size(); j++) {
+        for(int j = 0; j < list->VtxBuffer.size(); j++) {
             auto point = toCocos(list->VtxBuffer[j].pos);
             list->VtxBuffer[j].pos = ImVec2(point.x, point.y);
         }
