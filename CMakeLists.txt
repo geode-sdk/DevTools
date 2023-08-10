@@ -44,6 +44,7 @@ elseif(ANDROID)
     target_link_libraries(${PROJECT_NAME} GLESv2)
 endif()
 
+target_compile_definitions(geode-sdk INTERFACE GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
 
 target_link_libraries(${PROJECT_NAME} geode-sdk)
 create_geode_file(${PROJECT_NAME})

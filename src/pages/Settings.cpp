@@ -1,10 +1,7 @@
-
-#include "../fonts/FeatherIcons.hpp"
 #include "../DevTools.hpp"
 #include <Geode/loader/Loader.hpp>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/utils/ranges.hpp>
-#include <Geode/binding/GameSoundManager.hpp>
 #include <Geode/binding/FMODAudioEngine.hpp>
 #include <Geode/modify/AppDelegate.hpp>
 #include <fmod.hpp>
@@ -35,6 +32,12 @@ void DevTools::drawSettings() {
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
             "Highlights the borders of all layouts applied to nodes"
+        );
+    }
+    ImGui::Checkbox("Advanced Settings", &m_advancedSettings);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Shows advanced settings. Mostly useful only for development of Geode itself."
         );
     }
     ImGui::PopStyleVar();
