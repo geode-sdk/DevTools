@@ -61,7 +61,7 @@ namespace {
     }
 
     std::optional<ModMetadata::IssuesInfo> inputIssues(std::optional<ModMetadata::IssuesInfo> x) {
-        ModMetadata::IssuesInfo a = x ? *x : ModMetadata::IssuesInfo("");
+        ModMetadata::IssuesInfo a = x ? *x : ModMetadata::IssuesInfo{"", std::nullopt};
         std::string url = a.url ? *a.url : "";
         bool inputInfo = ImGui::InputText("issues.info", &a.info);
         bool inputUrl = ImGui::InputText("issues.url", &url);
