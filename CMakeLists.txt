@@ -41,5 +41,8 @@ elseif(ANDROID)
     target_link_libraries(${PROJECT_NAME} GLESv2)
 endif()
 
+# i still dont like this (alk)
+target_compile_definitions(geode-sdk INTERFACE GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
+
 # Set up dependencies, resources, link Geode
 setup_geode_mod(${PROJECT_NAME})
