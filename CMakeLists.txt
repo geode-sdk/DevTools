@@ -18,10 +18,7 @@ else()
     message(STATUS "Found Geode: $ENV{GEODE_SDK}")
 endif()
 
-set(GEODE_LINK_NIGHTLY ON)
-add_subdirectory($ENV{GEODE_SDK} $ENV{GEODE_SDK}/build)
-
-include(cmake/CPM.cmake)
+add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 CPMAddPackage("gh:ocornut/imgui#c191faf")
 
@@ -44,7 +41,8 @@ elseif(ANDROID)
     target_link_libraries(${PROJECT_NAME} GLESv2)
 endif()
 
+# i still dont like this (alk)
 target_compile_definitions(geode-sdk INTERFACE GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
 
-target_link_libraries(${PROJECT_NAME} geode-sdk)
-create_geode_file(${PROJECT_NAME})
+# Set up dependencies, resources, link Geode
+setup_geode_mod(${PROJECT_NAME})
