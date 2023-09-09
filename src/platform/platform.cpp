@@ -26,9 +26,9 @@ GLRenderCtx::~GLRenderCtx() {
 }
 
 void GLRenderCtx::cleanup() {
-    if (m_depth) {
-        glDeleteRenderbuffers(1, &m_depth);
-        m_depth = 0;
+    if (m_depthStencil) {
+        glDeleteRenderbuffers(1, &m_depthStencil);
+        m_depthStencil = 0;
     }
     if (m_texture) {
         log::info("deleting texture {}", m_texture);
@@ -80,15 +80,15 @@ bool GLRenderCtx::begin() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
-    if (!m_depth) {
-        glGenRenderbuffers(1, &m_depth);
-        glBindRenderbuffer(GL_RENDERBUFFER, m_depth);
+    if (!m_depthStencil) {
+        glGenRenderbuffers(1, &m_depthStencil);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencil);
         glRenderbufferStorage(
-            GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
+            GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
             static_cast<GLsizei>(m_size.x),
             static_cast<GLsizei>(m_size.y)
         );
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencil);
 
         glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture, 0);
     }
@@ -106,7 +106,7 @@ bool GLRenderCtx::begin() {
 
 void GLRenderCtx::end() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glFlush();
 }
 
