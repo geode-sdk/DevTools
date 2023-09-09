@@ -9,10 +9,13 @@ bool& shouldUpdateGDRenderBuffer();
 
 class GLRenderCtx final {
 private:
-    GLuint m_buffer       = 0;
-    GLuint m_texture      = 0;
+    GLuint m_buffer = 0;
+    GLuint m_texture = 0;
     GLuint m_depthStencil = 0;
     ImVec2 m_size;
+
+    GLint m_prevDrawBuffer = 0;
+    GLint m_prevReadBuffer = 0;
 
     void cleanup();
 

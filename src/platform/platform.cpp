@@ -53,6 +53,10 @@ ImVec2 GLRenderCtx::size() const {
 }
 
 bool GLRenderCtx::begin() {
+    // save currently bound fbo
+    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_prevDrawBuffer);
+    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevReadBuffer);
+
     if (!m_buffer) {
         glGenFramebuffers(1, &m_buffer);
         glBindFramebuffer(GL_FRAMEBUFFER, m_buffer);
@@ -99,14 +103,17 @@ bool GLRenderCtx::begin() {
         return false;
     }
 
+    // bind our framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer);
 
     return true;
 }
 
 void GLRenderCtx::end() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // bind the framebuffer that was bound before us
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_prevDrawBuffer);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_prevReadBuffer);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    glFlush();
+    //glFlush();
 }
 
