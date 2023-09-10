@@ -343,6 +343,14 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             node->setLayout(AxisLayout::create());
         }
     }
+
+    ImGui::NewLine();
+    ImGui::Separator();
+    ImGui::NewLine();
+
+    static int size = 0x200;
+    ImGui::DragInt("Struct size", &size, .03f);
+    ImGui::Text("%s", formatStructRTTIs(reinterpret_cast<uintptr_t>(node), 0, size).c_str());
 }
 
 void DevTools::drawAttributes() {
