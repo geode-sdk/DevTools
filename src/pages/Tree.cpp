@@ -33,6 +33,10 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     if (selected) {
         flags |= ImGuiTreeNodeFlags_Selected;
     }
+    if (!node->getChildrenCount())
+    {
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    }
     std::stringstream name;
     name << "[" << index << "] " << getNodeName(node) << " ";
     if (node->getTag() != -1) {
