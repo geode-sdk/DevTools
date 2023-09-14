@@ -26,6 +26,7 @@ protected:
     bool m_alwaysHighlight = true;
     bool m_shouldRelayout = false;
     bool m_highlightLayouts = false;
+    bool m_arrowExpand = false;
     bool m_advancedSettings = false;
     bool m_showModGraph = false;
     bool m_showModIndex = false;

@@ -34,6 +34,13 @@ void DevTools::drawSettings() {
             "Highlights the borders of all layouts applied to nodes"
         );
     }
+    ImGui::Checkbox("Arrow to Expand", &m_arrowExpand);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "If enabled, expanding nodes in the Tree only works with the arrow. "
+            "Makes selecting nodes less annoying."
+        );
+    }
     ImGui::Checkbox("Advanced Settings", &m_advancedSettings);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(

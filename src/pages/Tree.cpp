@@ -37,6 +37,10 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     {
         flags |= ImGuiTreeNodeFlags_Leaf;
     }
+    if (m_arrowExpand)
+    {
+        flags |= ImGuiTreeNodeFlags_OpenOnArrow;
+    }
     std::stringstream name;
     name << "[" << index << "] " << getNodeName(node) << " ";
     if (node->getTag() != -1) {
@@ -51,7 +55,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     if (ImGui::TreeNodeEx(
         node, flags, "%s", name.str().c_str()
     )) {
-        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
+        if (ImGui::IsItemHovered() && (ImGui::IsMouseDoubleClicked(0))) {
             if (selected) {
                 DevTools::get()->selectNode(nullptr);
                 selected = false;
