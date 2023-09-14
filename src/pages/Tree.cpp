@@ -46,7 +46,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
         name << "\"" << node->getID() << "\" ";
     }
     if (node->getChildrenCount()) {
-        name << "{" << node->getChildrenCount() << "} ";
+        name << "<" << node->getChildrenCount() << "> ";
     }
     if (ImGui::TreeNodeEx(
         node, flags, "%s", name.str().c_str()
