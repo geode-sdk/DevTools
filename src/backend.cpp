@@ -156,6 +156,14 @@ class $modify(CCTouchDispatcher) {
     void touches(CCSet* touches, CCEvent* event, unsigned int type) {
         auto& io = ImGui::GetIO();
         auto* touch = static_cast<CCTouch*>(touches->anyObject());
+
+        // for some reason mac can filter out out of touches i think?
+        if (touch == nullptr) {
+            // i am very lazy to find ccset count
+            // i don't even know if the std set in gnustl and libc++ are the same struct
+            return;
+        }
+
         const auto pos = toVec2(touch->getLocation());
         io.AddMousePosEvent(pos.x, pos.y);
         if (io.WantCaptureMouse) {
