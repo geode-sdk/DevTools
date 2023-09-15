@@ -12,5 +12,7 @@ Source/Geode/pkg/uber-apk-signer.jar
 **/.vscode
 **/.idea
 
+**/.idea
+
 imgui/**
 imgui
