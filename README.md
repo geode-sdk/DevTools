@@ -2,7 +2,7 @@
 
 Browser-like developer tools for Geode.
 
-Press `F11` to open up the dev tools.
+Press `F11` (`F10` for MacOS) to open up the dev tools.
 
 ## Features
 
