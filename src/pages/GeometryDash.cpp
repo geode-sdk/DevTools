@@ -199,6 +199,15 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
         max.y / wsize.y * rect.GetHeight() + rect.Min.y
     );
 
+    if (
+        isnan(tmax.x) ||
+        isnan(tmax.y) ||
+        isnan(tmin.x) ||
+        isnan(tmin.y)
+    ) {
+        return;
+    }
+
     auto anchor = ImVec2(
         node->getAnchorPoint().x * (tmax.x - tmin.x) + tmin.x,
         node->getAnchorPoint().y * (tmax.y - tmin.y) + tmin.y
