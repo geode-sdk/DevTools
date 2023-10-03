@@ -48,11 +48,16 @@ void DevTools::drawNodeAttributes(CCNode* node) {
 
     if (auto menuItemNode = typeinfo_cast<CCMenuItem*>(node)) {
         const auto selector = menuItemNode->m_pfnSelector;
-        const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector));
-        ImGui::Text("CCMenuItem selector: %s", addr.c_str());
-        ImGui::SameLine();
-        if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copymenuitem"))) {
-            clipboard::write(addr);
+        if (!selector) {
+            std::string addr = "N/A";
+            ImGui::Text("CCMenuItem selector: %s", addr.c_str());
+        } else {
+            const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector));
+            ImGui::Text("CCMenuItem selector: %s", addr.c_str());
+            ImGui::SameLine();
+            if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copymenuitem"))) {
+                clipboard::write(addr);
+            }
         }
     }
 
