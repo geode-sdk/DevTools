@@ -119,13 +119,15 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     if (auto rgbaNode = dynamic_cast<CCRGBAProtocol*>(node)) {
         auto color = rgbaNode->getColor();
         float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
-        ImGui::ColorEdit4("Color", _color);
-        rgbaNode->setColor({
-            static_cast<GLubyte>(_color[0] * 255),
-            static_cast<GLubyte>(_color[1] * 255),
-            static_cast<GLubyte>(_color[2] * 255)
-        });
-        rgbaNode->setOpacity(static_cast<GLubyte>(_color[3] * 255));
+        if (ImGui::ColorEdit4("Color", _color)) {
+            rgbaNode->setColor({
+                static_cast<GLubyte>(_color[0] * 255),
+                static_cast<GLubyte>(_color[1] * 255),
+                static_cast<GLubyte>(_color[2] * 255)
+            });
+
+            rgbaNode->setOpacity(static_cast<GLubyte>(_color[3] * 255));
+        }
     }
     
     if (auto labelNode = dynamic_cast<CCLabelProtocol*>(node)) {
