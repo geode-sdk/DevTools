@@ -24,6 +24,10 @@ bool DevTools::pausedGame() const {
     return m_pauseGame;
 }
 
+bool DevTools::isSetup() const {
+    return m_setup;
+}
+
 CCNode* DevTools::getSelectedNode() const {
     return m_selectedNode;
 }

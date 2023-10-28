@@ -71,6 +71,7 @@ public:
 
     bool shouldPopGame() const;
     bool pausedGame() const;
+    bool isSetup() const;
 
     CCNode* getSelectedNode() const;
     void selectNode(CCNode* node);

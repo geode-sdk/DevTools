@@ -141,6 +141,8 @@ static float SCROLL_SENSITIVITY = 10;
 
 class $modify(CCMouseDispatcher) {
     bool dispatchScrollMSG(float y, float x) {
+        if(!DevTools::get()->isSetup()) return true;
+
         auto& io = ImGui::GetIO();
         io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, -y / SCROLL_SENSITIVITY);
 
