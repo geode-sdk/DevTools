@@ -28,6 +28,10 @@ bool DevTools::isSetup() const {
     return m_setup;
 }
 
+bool DevTools::shouldOrderChildren() const {
+    return m_orderChildren;
+}
+
 CCNode* DevTools::getSelectedNode() const {
     return m_selectedNode;
 }

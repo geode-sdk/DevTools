@@ -4,11 +4,20 @@
 #include <Geode/modify/AchievementNotifier.hpp>
 #include <Geode/modify/CCDirector.hpp>
 #include <Geode/modify/CCEGLView.hpp>
+#include <Geode/modify/CCNode.hpp>
 #include "DevTools.hpp"
 #include <imgui.h>
 #include "ImGui.hpp"
 
 using namespace geode::prelude;
+
+class $modify(CCNode) {
+    void sortAllChildren() override {
+        if (DevTools::get()->shouldOrderChildren()) {
+            CCNode::sortAllChildren();
+        }
+    }
+};
 
 // todo: use shortcuts api once Geode has those
 class $modify(CCKeyboardDispatcher) {

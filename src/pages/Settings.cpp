@@ -41,6 +41,14 @@ void DevTools::drawSettings() {
             "Makes selecting nodes less annoying."
         );
     }
+    ImGui::Checkbox("Order Node Children", &m_orderChildren);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "When enabled (default behavior) node children are sorted by Z Order.\n"
+            "When disabled, children have the same order they do during init functions (maybe).\n"
+            "As a side effect to disabling this, things may render incorrectly."
+        );
+    }
     ImGui::Checkbox("Advanced Settings", &m_advancedSettings);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
