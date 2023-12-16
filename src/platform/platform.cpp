@@ -31,7 +31,6 @@ void GLRenderCtx::cleanup() {
         m_depthStencil = 0;
     }
     if (m_texture) {
-        log::info("deleting texture {}", m_texture);
         glDeleteTextures(1, &m_texture);
         m_texture = 0;
     }
@@ -68,7 +67,6 @@ bool GLRenderCtx::begin() {
 
         static int texture_count = 0;
         texture_count++;
-        log::info("new texture is {}", m_texture);
         if (texture_count > 100) {
             exit(1);
         }
