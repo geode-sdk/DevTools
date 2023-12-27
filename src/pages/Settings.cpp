@@ -2,7 +2,7 @@
 #include <Geode/loader/Loader.hpp>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/utils/ranges.hpp>
-#include <Geode/binding/FMODAudioEngine.hpp>
+// #include <Geode/binding/FMODAudioEngine.hpp>
 #include <Geode/modify/AppDelegate.hpp>
 #include <fmod.hpp>
 #include <numeric>
@@ -61,6 +61,8 @@ void DevTools::drawSettings() {
 
     ImGui::Text("GD Window");
 
+    // TODO: undo later
+#if 0
     auto winSize = CCDirector::get()->getWinSize();
     auto frameSize = GameManager::get()->resolutionForKey(GameManager::get()->m_resolution);
     auto fps = roundf(1 / CCDirector::get()->getAnimationInterval());
@@ -142,6 +144,7 @@ void DevTools::drawSettings() {
             CCDirector::get()->getScheduler()->resumeTargets(PAUSED_TARGETS);
         }
     }
+#endif
 
     ImGui::Separator();
 
@@ -192,7 +195,8 @@ class $modify(AppDelegate) {
     void applicationWillEnterForeground() override {
         AppDelegate::applicationWillEnterForeground();
         if (DevTools::get()->pausedGame()) {
-            FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(true);
+            // TODO: undo later
+            // FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(true);
         }
     }
 };

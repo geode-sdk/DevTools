@@ -214,10 +214,10 @@ class $modify(CCTouchDispatcher) {
 };
 
 class $modify(CCIMEDispatcher) {
-    void dispatchInsertText(const char* text, int len) {
+    void dispatchInsertText(const char* text, int len, enumKeyCodes key) {
         auto& io = ImGui::GetIO();
         if (!io.WantCaptureKeyboard) {
-            CCIMEDispatcher::dispatchInsertText(text, len);
+            CCIMEDispatcher::dispatchInsertText(text, len, key);
         }
         std::string str(text, len);
         io.AddInputCharactersUTF8(str.c_str());

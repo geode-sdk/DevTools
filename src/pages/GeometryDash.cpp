@@ -251,6 +251,8 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 }
 
 void DevTools::drawLayoutHighlights(CCNode* node) {
+    // TODO: undo later
+    #if 0
     for (auto child : ranges::reverse(CCArrayExt<CCNode>(node->getChildren()))) {
         if (!child->isVisible()) continue;
         if (child->getLayout()) {
@@ -265,6 +267,7 @@ void DevTools::drawLayoutHighlights(CCNode* node) {
             break;
         }
     }
+    #endif
 }
 
 void DevTools::drawGD(GLRenderCtx* gdCtx) {

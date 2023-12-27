@@ -21,12 +21,12 @@ class $modify(CCNode) {
 
 // todo: use shortcuts api once Geode has those
 class $modify(CCKeyboardDispatcher) {
-    bool dispatchKeyboardMSG(enumKeyCodes key, bool down) {
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool arr) {
         if (down && (key == KEY_F11 GEODE_MACOS(|| key == KEY_F10))) {
             DevTools::get()->toggle();
             return true;
         }
-        return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down);
+        return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr);
     }
 };
 
