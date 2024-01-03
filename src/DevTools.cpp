@@ -186,6 +186,11 @@ void DevTools::setup() {
         
     this->setupFonts();
     this->setupPlatform();
+
+#ifdef GEODE_IS_MOBILE
+    ImGui::GetIO().FontGlobalScale = 3.f;
+    ImGui::GetStyle().ScrollbarSize = 60.f;
+#endif
 }
 
 void DevTools::show(bool visible) {
