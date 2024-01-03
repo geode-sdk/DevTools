@@ -137,6 +137,19 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
 
+    if (auto spriteNode = typeinfo_cast<CCTextureProtocol*>(node)) {
+        if (auto tex = spriteNode->getTexture()) {
+            auto* texture_cache = CCTextureCache::sharedTextureCache();
+            auto* cached_textures = texture_cache->m_pTextures;
+            for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D>(cached_textures)) {
+                if (obj == tex) {
+                    ImGui::TextWrapped("Texture name: %s", key.c_str());
+                    break;
+                }
+            }
+        }
+    }
+
     ImGui::NewLine();
     ImGui::Separator();
     ImGui::NewLine();
