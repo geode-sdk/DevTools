@@ -35,7 +35,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     if (ImGui::Button("Deselect")) {
         return this->selectNode(nullptr);
     }
-    ImGui::Text("Address: 0x%p", node);
+    ImGui::Text("Address: %s", fmt::to_string(fmt::ptr(node)).c_str());
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_COPY " Copy"))) {
         clipboard::write(
@@ -116,7 +116,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         &CCNode::ignoreAnchorPointForPosition
     );
     
-    if (auto rgbaNode = dynamic_cast<CCRGBAProtocol*>(node)) {
+    if (auto rgbaNode = typeinfo_cast<CCRGBAProtocol*>(node)) {
         auto color = rgbaNode->getColor();
         float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
         if (ImGui::ColorEdit4("Color", _color)) {
@@ -130,23 +130,34 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
     
-    if (auto labelNode = dynamic_cast<CCLabelProtocol*>(node)) {
+    if (auto labelNode = typeinfo_cast<CCLabelProtocol*>(node)) {
         std::string str = labelNode->getString();
         if (ImGui::InputText("Text", &str, 256)) {
             labelNode->setString(str.c_str());
         }
     }
 
-    if (auto spriteNode = typeinfo_cast<CCTextureProtocol*>(node)) {
-        if (auto tex = spriteNode->getTexture()) {
-            auto* texture_cache = CCTextureCache::sharedTextureCache();
-            auto* cached_textures = texture_cache->m_pTextures;
-            for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D>(cached_textures)) {
-                if (obj == tex) {
+    if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
+        if (auto texture = textureProtocol->getTexture()) {
+            auto* cachedTextures = CCTextureCache::sharedTextureCache()->m_pTextures;
+            for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D>(cachedTextures)) {
+                if (obj == texture) {
                     ImGui::TextWrapped("Texture name: %s", key.c_str());
                     break;
                 }
             }
+
+            if (auto spriteNode = typeinfo_cast<CCSprite*>(node)) {
+                auto* cachedFrames = CCSpriteFrameCache::sharedSpriteFrameCache()->m_pSpriteFrames;
+                const auto rect = spriteNode->getTextureRect();
+                for (auto [key, frame] : CCDictionaryExt<std::string, CCSpriteFrame>(cachedFrames)) {
+                    if (frame->getTexture() == texture && frame->getRect() == rect) {
+                        ImGui::Text("Frame name: %s", key.c_str());
+                        break;
+                    }
+                }
+            }
+
         }
     }
 
