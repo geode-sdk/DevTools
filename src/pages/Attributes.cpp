@@ -137,7 +137,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
 
-    if (auto spriteNode = dynamic_cast<CCTextureProtocol*>(node)) {
+    if (auto spriteNode = typeinfo_cast<CCTextureProtocol*>(node)) {
         if (auto tex = spriteNode->getTexture()) {
             auto* texture_cache = CCTextureCache::sharedTextureCache();
             auto* cached_textures = texture_cache->m_pTextures;
