@@ -11,6 +11,20 @@ using namespace geode::prelude;
     &AxisLayoutOptions::get##Name_, \
     &AxisLayoutOptions::set##Name_
 
+#define public_cast(value, member) [](auto* v) { \
+class b; \
+using t = std::remove_pointer<decltype(v)>::type; \
+class a: public t { \
+protected: \
+    friend b; \
+}; \
+class b { \
+public: \
+    auto& get(a* v) { return v->member; } \
+} c; \
+return c.get((a*)v); \
+}(value)
+
 template <class T, class R>
 bool checkbox(const char* text, T* ptr, bool(T::* get)(), R(T::* set)(bool)) {
     bool value = (ptr->*get)();
