@@ -11,20 +11,6 @@ using namespace geode::prelude;
     &AxisLayoutOptions::get##Name_, \
     &AxisLayoutOptions::set##Name_
 
-#define public_cast(value, member) [](auto* v) { \
-class b; \
-using t = std::remove_pointer<decltype(v)>::type; \
-class a: public t { \
-protected: \
-    friend b; \
-}; \
-class b { \
-public: \
-    auto& get(a* v) { return v->member; } \
-} c; \
-return c.get((a*)v); \
-}(value)
-
 template <class T, class R>
 bool checkbox(const char* text, T* ptr, bool(T::* get)(), R(T::* set)(bool)) {
     bool value = (ptr->*get)();
@@ -152,18 +138,16 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     }
 
     if (auto spriteNode = dynamic_cast<CCTextureProtocol*>(node)) {
-    	if (auto tex = spriteNode->getTexture())
-	{
-		auto* texture_cache = CCTextureCache::sharedTextureCache();
-		auto* cached_textures = public_cast(texture_cache, m_pTextures);
-		CCDictElement* el;
-		CCDICT_FOREACH(cached_textures, el) {
-			if (el->getObject() == tex) {
-				ImGui::TextWrapped("Texture name: %s", el->getStrKey());
-				break;
-			}
-		}
-	}
+        if (auto tex = spriteNode->getTexture()) {
+            auto* texture_cache = CCTextureCache::sharedTextureCache();
+            auto* cached_textures = texture_cache->m_pTextures;
+            for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D>(cached_textures)) {
+                if (obj == tex) {
+                    ImGui::TextWrapped("Texture name: %s", key.c_str());
+                    break;
+                }
+            }
+        }
     }
 
     ImGui::NewLine();
