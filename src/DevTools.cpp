@@ -77,6 +77,8 @@ void DevTools::drawPages() {
         ImGui::DockBuilderDockWindow("###devtools/advanced/mod-index", topLeftDock);
 
         ImGui::DockBuilderFinish(id);
+
+        ImGui::GetIO().WantSaveIniSettings = true;
     }
 
     this->drawPage(

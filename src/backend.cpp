@@ -49,8 +49,10 @@ void DevTools::newFrame() {
     );
     io.DeltaTime = director->getDeltaTime();
 
+#ifdef GEODE_IS_DESKTOP
     const auto mousePos = toVec2(geode::cocos::getMousePos());
     io.AddMousePosEvent(mousePos.x, mousePos.y);
+#endif
 
     // TODO: text input
 

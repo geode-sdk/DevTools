@@ -29,6 +29,12 @@ class $modify(CCKeyboardDispatcher) {
         return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr);
     }
 };
+#include <Geode/modify/MenuLayer.hpp>
+class $modify(MenuLayer) {
+    void onMoreGames(CCObject*) {
+        DevTools::get()->toggle();
+    }
+};
 
 class $modify(AchievementNotifier) {
     void willSwitchToScene(CCScene* scene) {

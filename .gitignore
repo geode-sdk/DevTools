@@ -16,3 +16,5 @@ Source/Geode/pkg/uber-apk-signer.jar
 
 imgui/**
 imgui
+
+.cache/
