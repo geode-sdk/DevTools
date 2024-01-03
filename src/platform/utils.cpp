@@ -8,8 +8,7 @@ std::string formatAddressIntoOffset(uintptr_t addr) {
     if (it != formatted.end()) {
         return it->second;
     } else {
-        // auto const txt = formatAddressIntoOffsetImpl(addr);
-        auto const txt = "hi";
+        auto const txt = formatAddressIntoOffsetImpl(addr);
         formatted.insert({ addr, txt });
         return txt;
     }

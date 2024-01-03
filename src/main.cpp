@@ -29,12 +29,17 @@ class $modify(CCKeyboardDispatcher) {
         return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr);
     }
 };
+
+#ifdef GEODE_IS_MOBILE
+// lol
 #include <Geode/modify/MenuLayer.hpp>
 class $modify(MenuLayer) {
     void onMoreGames(CCObject*) {
         DevTools::get()->toggle();
     }
 };
+
+#endif
 
 class $modify(AchievementNotifier) {
     void willSwitchToScene(CCScene* scene) {
