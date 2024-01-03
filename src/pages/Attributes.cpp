@@ -140,7 +140,15 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     if (auto spriteNode = dynamic_cast<CCTextureProtocol*>(node)) {
     	if (auto tex = spriteNode->getTexture())
 	{
-		ImGui::Text("Frame name: %s", tex->description());
+		auto* texture_cache = CCTextureCache::sharedTextureCache();
+		auto* cached_textures = public_cast(texture_cache, m_pTextures);
+		CCDictElement* el;
+		CCDICT_FOREACH(cached_textures, el) {
+			if (el->getObject() == tex) {
+				ImGui::TextWrapped("Texture name: %s", el->getStrKey());
+				break;
+			}
+		}
 	}
     }
 
