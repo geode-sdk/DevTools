@@ -137,6 +137,31 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
 
+    if (auto spriteNode = dynamic_cast<CCTextureProtocol*>(node)) {
+        
+        auto* texture_cache = CCTextureCache::sharedTextureCache();
+		auto* cached_textures = public_cast(texture_cache, m_pTextures);
+		CCDictElement* el;
+		CCDICT_FOREACH(cached_textures, el) {
+			if (el->getObject() == texture) {
+				ImGui::TextWrapped("Texture name: %s", el->getStrKey());
+				break;
+			}
+		}
+
+		auto* frame_cache = CCSpriteFrameCache::sharedSpriteFrameCache();
+		auto* cached_frames = public_cast(frame_cache, m_pSpriteFrames);
+		const auto rect = spriteNode->getTextureRect();
+		CCDICT_FOREACH(cached_frames, el) {
+			auto* frame = static_cast<CCSpriteFrame*>(el->getObject());
+			if (frame->getTexture() == texture && frame->getRect() == rect) {
+				ImGui::Text("Frame name: %s", el->getStrKey());
+				break;
+			}
+		}
+        
+    }
+
     ImGui::NewLine();
     ImGui::Separator();
     ImGui::NewLine();
