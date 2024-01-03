@@ -138,7 +138,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     }
 
     if (auto spriteNode = dynamic_cast<CCTextureProtocol*>(node)) {
-	ImGui::Text("Frame name: %s", spriteNode->getTexture()->getName());
+    	if (auto tex = spriteNode->getTexture())
+	{
+		ImGui::Text("Frame name: %s", tex->description());
+	}
     }
 
     ImGui::NewLine();
