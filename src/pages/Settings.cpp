@@ -13,10 +13,13 @@ static float RAINBOW_HUE = 0.f;
 
 void DevTools::drawSettings() {
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 1.f, 1.f });
+    // TODO: fix this option as it hasnt worked in a while lol
+#if 0
     ImGui::Checkbox("GD in Window", &m_GDInWindow);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show GD inside a window when DevTools are open");
     }
+#endif
     ImGui::Checkbox("Attributes in Tree", &m_attributesInTree);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show node attributes in the Tree");
