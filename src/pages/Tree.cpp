@@ -33,6 +33,14 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     if (selected) {
         flags |= ImGuiTreeNodeFlags_Selected;
     }
+    if (!node->getChildrenCount())
+    {
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    }
+    if (m_arrowExpand)
+    {
+        flags |= ImGuiTreeNodeFlags_OpenOnArrow;
+    }
     std::stringstream name;
     name << "[" << index << "] " << getNodeName(node) << " ";
     if (node->getTag() != -1) {
@@ -42,25 +50,18 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
         name << "\"" << node->getID() << "\" ";
     }
     if (node->getChildrenCount()) {
-        name << "{" << node->getChildrenCount() << "} ";
+        name << "<" << node->getChildrenCount() << "> ";
     }
-    if (ImGui::TreeNodeEx(
-        node, flags, "%s", name.str().c_str()
-    )) {
-        if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0)) {
-            if (selected) {
-                DevTools::get()->selectNode(nullptr);
-                selected = false;
-            } else {
-                DevTools::get()->selectNode(node);
-                selected = true;
-            }
-        }
-        if (ImGui::IsItemHovered() && (
-            m_alwaysHighlight || ImGui::IsKeyDown(ImGuiKey_ModShift)
-        )) {
-            DevTools::get()->highlightNode(node, HighlightMode::Hovered);
-        }
+    // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
+    bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.str().c_str());
+    if (ImGui::IsItemClicked()) { 
+        DevTools::get()->selectNode(node);
+        selected = true;
+    }
+    if (ImGui::IsItemHovered() && (m_alwaysHighlight || ImGui::IsKeyDown(ImGuiKey_ModShift))) {
+        DevTools::get()->highlightNode(node, HighlightMode::Hovered);
+    }
+    if (expanded) {
         if (m_attributesInTree) {
             this->drawNodeAttributes(node);
         }
@@ -69,11 +70,6 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
             this->drawTreeBranch(child, i++);
         }
         ImGui::TreePop();
-    }
-    else if (ImGui::IsItemHovered() && (
-        m_alwaysHighlight || ImGui::IsKeyDown(ImGuiKey_ModShift)
-    )) {
-        DevTools::get()->highlightNode(node, HighlightMode::Hovered);
     }
 }
 

@@ -13,11 +13,11 @@ ImRect& getGDWindowRect() {
     return g_GDWindowRect;
 }
 
-bool& ::shouldPassEventsToGDButTransformed() {
+bool& shouldPassEventsToGDButTransformed() {
     return g_shouldPassEventsToGDButTransformed;
 }
 
-bool& ::shouldUpdateGDRenderBuffer() {
+bool& shouldUpdateGDRenderBuffer() {
     return g_updateBuffer;
 }
 
@@ -26,12 +26,11 @@ GLRenderCtx::~GLRenderCtx() {
 }
 
 void GLRenderCtx::cleanup() {
-    if (m_depth) {
-        glDeleteRenderbuffers(1, &m_depth);
-        m_depth = 0;
+    if (m_depthStencil) {
+        glDeleteRenderbuffers(1, &m_depthStencil);
+        m_depthStencil = 0;
     }
     if (m_texture) {
-        log::info("deleting texture {}", m_texture);
         glDeleteTextures(1, &m_texture);
         m_texture = 0;
     }
@@ -53,6 +52,9 @@ ImVec2 GLRenderCtx::size() const {
 }
 
 bool GLRenderCtx::begin() {
+    // save currently bound fbo
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_prevDrawBuffer);
+
     if (!m_buffer) {
         glGenFramebuffers(1, &m_buffer);
         glBindFramebuffer(GL_FRAMEBUFFER, m_buffer);
@@ -64,7 +66,6 @@ bool GLRenderCtx::begin() {
 
         static int texture_count = 0;
         texture_count++;
-        log::info("new texture is {}", m_texture);
         if (texture_count > 100) {
             exit(1);
         }
@@ -80,17 +81,17 @@ bool GLRenderCtx::begin() {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
 
-    if (!m_depth) {
-        glGenRenderbuffers(1, &m_depth);
-        glBindRenderbuffer(GL_RENDERBUFFER, m_depth);
+    if (!m_depthStencil) {
+        glGenRenderbuffers(1, &m_depthStencil);
+        glBindRenderbuffer(GL_RENDERBUFFER, m_depthStencil);
         glRenderbufferStorage(
-            GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
+            GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,
             static_cast<GLsizei>(m_size.x),
             static_cast<GLsizei>(m_size.y)
         );
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depth);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencil);
 
-        glFramebufferTextureEXT(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_texture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -99,14 +100,16 @@ bool GLRenderCtx::begin() {
         return false;
     }
 
+    // bind our framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer);
-
     return true;
 }
 
 void GLRenderCtx::end() {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glFlush();
+
+    // bind the framebuffer that was bound before us
+    glBindFramebuffer(GL_FRAMEBUFFER, m_prevDrawBuffer);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    //glFlush();
 }
 

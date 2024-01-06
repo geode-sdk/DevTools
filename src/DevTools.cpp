@@ -24,6 +24,14 @@ bool DevTools::pausedGame() const {
     return m_pauseGame;
 }
 
+bool DevTools::isSetup() const {
+    return m_setup;
+}
+
+bool DevTools::shouldOrderChildren() const {
+    return m_orderChildren;
+}
+
 CCNode* DevTools::getSelectedNode() const {
     return m_selectedNode;
 }
@@ -61,9 +69,12 @@ void DevTools::drawPages() {
 
         ImGui::DockBuilderDockWindow("###devtools/tree", topLeftDock);
         ImGui::DockBuilderDockWindow("###devtools/settings", topLeftDock);
+        ImGui::DockBuilderDockWindow("###devtools/advanced/settings", topLeftDock);
         ImGui::DockBuilderDockWindow("###devtools/attributes", bottomLeftTopHalfDock);
         ImGui::DockBuilderDockWindow("###devtools/preview", leftDock);
         ImGui::DockBuilderDockWindow("###devtools/geometry-dash", id);
+        ImGui::DockBuilderDockWindow("###devtools/advanced/mod-graph", topLeftDock);
+        ImGui::DockBuilderDockWindow("###devtools/advanced/mod-index", topLeftDock);
 
         ImGui::DockBuilderFinish(id);
     }
@@ -78,6 +89,13 @@ void DevTools::drawPages() {
         &DevTools::drawSettings
     );
 
+    if (m_advancedSettings) {
+        this->drawPage(
+                U8STR(FEATHER_SETTINGS " Advanced Settings###devtools/advanced/settings"),
+                &DevTools::drawAdvancedSettings
+        );
+    }
+
     this->drawPage(
         U8STR(FEATHER_TOOL " Attributes###devtools/attributes"),
         &DevTools::drawAttributes
@@ -87,6 +105,20 @@ void DevTools::drawPages() {
         U8STR(FEATHER_DATABASE " Preview###devtools/preview"),
         &DevTools::drawPreview
     );
+
+    if (m_showModGraph) {
+        this->drawPage(
+            U8STR(FEATHER_SHARE_2 " Mod Graph###devtools/advanced/mod-graph"),
+            &DevTools::drawModGraph
+        );
+    }
+
+    if (m_showModIndex) {
+        this->drawPage(
+            U8STR(FEATHER_LIST " Mod Index###devtools/advanced/mod-index"),
+            &DevTools::drawModIndex
+        );
+    }
 }
 
 void DevTools::draw(GLRenderCtx* ctx) {
@@ -154,6 +186,11 @@ void DevTools::setup() {
         
     this->setupFonts();
     this->setupPlatform();
+
+#ifdef GEODE_IS_MOBILE
+    ImGui::GetIO().FontGlobalScale = 3.f;
+    ImGui::GetStyle().ScrollbarSize = 60.f;
+#endif
 }
 
 void DevTools::show(bool visible) {

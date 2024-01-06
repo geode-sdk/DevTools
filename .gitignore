@@ -10,6 +10,11 @@ Source/Geode/pkg/uber-apk-signer.jar
 
 # ILY vscode
 **/.vscode
+**/.idea
+
+**/.idea
 
 imgui/**
 imgui
+
+.cache/
