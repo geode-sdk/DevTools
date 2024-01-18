@@ -176,7 +176,7 @@ void DevTools::drawModGraphNode(Mod* node) {
 
     node->setMetadata(this->inputMetadata(node, node->getMetadata()));
 
-    ImGui::Text("supportsDisabling: %s", node->supportsDisabling() ? "true" : "false");
+    ImGui::Text("isInternal: %s", node->isInternal() ? "true" : "false");
     ImGui::Text("early: %s", node->needsEarlyLoad() ? "true" : "false");
     ImGui::Text("hasUnresolvedDependencies: %s", node->hasUnresolvedDependencies() ? "true" : "false");
     ImGui::Text("hasUnresolvedIncompatibilities: %s", node->hasUnresolvedIncompatibilities() ? "true" : "false");
