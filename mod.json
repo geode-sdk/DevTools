@@ -1,7 +1,7 @@
 {
 	"geode": "v2.0.0",
 	"version": "v1.3.0",
-	"gd": "2.204",
+	"gd": "*",
 	"id": "geode.devtools",
 	"name": "DevTools",
 	"developer": "Geode Team",
