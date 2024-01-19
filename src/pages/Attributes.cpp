@@ -140,7 +140,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
         if (auto texture = textureProtocol->getTexture()) {
             auto* cachedTextures = CCTextureCache::sharedTextureCache()->m_pTextures;
-            for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D>(cachedTextures)) {
+            for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D*>(cachedTextures)) {
                 if (obj == texture) {
                     ImGui::TextWrapped("Texture name: %s", key.c_str());
                     break;
@@ -150,7 +150,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             if (auto spriteNode = typeinfo_cast<CCSprite*>(node)) {
                 auto* cachedFrames = CCSpriteFrameCache::sharedSpriteFrameCache()->m_pSpriteFrames;
                 const auto rect = spriteNode->getTextureRect();
-                for (auto [key, frame] : CCDictionaryExt<std::string, CCSpriteFrame>(cachedFrames)) {
+                for (auto [key, frame] : CCDictionaryExt<std::string, CCSpriteFrame*>(cachedFrames)) {
                     if (frame->getTexture() == texture && frame->getRect() == rect) {
                         ImGui::Text("Frame name: %s", key.c_str());
                         break;
