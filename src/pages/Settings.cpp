@@ -62,6 +62,10 @@ void DevTools::drawSettings() {
 
     ImGui::Separator();
 
+    ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 0.01f, 1.0f, 3.0f);
+
+    ImGui::Separator();
+
     ImGui::Text("GD Window");
 
     // TODO: undo later
