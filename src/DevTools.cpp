@@ -45,7 +45,7 @@ void DevTools::highlightNode(CCNode* node, HighlightMode mode) {
 }
 
 void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
-    if (ImGui::Begin(name)) {
+    if (ImGui::Begin(name, nullptr, ImGuiWindowFlags_HorizontalScrollbar)) {
         (this->*pageFun)();
     }
     ImGui::End();
