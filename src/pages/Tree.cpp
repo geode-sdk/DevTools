@@ -54,15 +54,10 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     }
     // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
     bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.str().c_str());
-    if (ImGui::IsItemHovered() && (ImGui::IsMouseDoubleClicked(0))) { 
-            if (selected) {
-                DevTools::get()->selectNode(nullptr);
-                selected = false;
-            } else {
-                DevTools::get()->selectNode(node);
-                selected = true;
-            }
-        }
+    if (ImGui::IsItemClicked()) { 
+        DevTools::get()->selectNode(node);
+        selected = true;
+    }
     if (ImGui::IsItemHovered() && (m_alwaysHighlight || ImGui::IsKeyDown(ImGuiKey_ModShift))) {
         DevTools::get()->highlightNode(node, HighlightMode::Hovered);
     }

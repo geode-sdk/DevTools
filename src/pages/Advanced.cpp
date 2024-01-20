@@ -164,8 +164,6 @@ void DevTools::drawModGraphNode(Mod* node) {
     ImColor color = ImColor(1.f, 1.f, 1.f);
     if (node->isUninstalled())
         color = ImColor(0.1f, 0.1f, 0.1f);
-    else if (!node->isLoaded())
-        color = ImColor(1.f, 0.f, 0.f);
     else if (!node->isEnabled())
         color = ImColor(0.7f, 0.7f, 0.7f);
 
@@ -178,10 +176,8 @@ void DevTools::drawModGraphNode(Mod* node) {
 
     node->setMetadata(this->inputMetadata(node, node->getMetadata()));
 
-    ImGui::Text("supportsDisabling: %s", node->supportsDisabling() ? "true" : "false");
+    ImGui::Text("isInternal: %s", node->isInternal() ? "true" : "false");
     ImGui::Text("early: %s", node->needsEarlyLoad() ? "true" : "false");
-    ImGui::Text("canEnable: %s", node->canEnable() ? "true" : "false");
-    ImGui::Text("canDisable: %s", node->canDisable() ? "true" : "false");
     ImGui::Text("hasUnresolvedDependencies: %s", node->hasUnresolvedDependencies() ? "true" : "false");
     ImGui::Text("hasUnresolvedIncompatibilities: %s", node->hasUnresolvedIncompatibilities() ? "true" : "false");
 

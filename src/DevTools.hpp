@@ -31,6 +31,7 @@ protected:
     bool m_showModGraph = false;
     bool m_showModIndex = false;
     bool m_pauseGame = false;
+    bool m_orderChildren = true;
     std::string m_theme = DARK_THEME;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
@@ -71,6 +72,8 @@ public:
 
     bool shouldPopGame() const;
     bool pausedGame() const;
+    bool isSetup() const;
+    bool shouldOrderChildren() const;
 
     CCNode* getSelectedNode() const;
     void selectNode(CCNode* node);

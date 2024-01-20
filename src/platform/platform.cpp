@@ -13,11 +13,11 @@ ImRect& getGDWindowRect() {
     return g_GDWindowRect;
 }
 
-bool& ::shouldPassEventsToGDButTransformed() {
+bool& shouldPassEventsToGDButTransformed() {
     return g_shouldPassEventsToGDButTransformed;
 }
 
-bool& ::shouldUpdateGDRenderBuffer() {
+bool& shouldUpdateGDRenderBuffer() {
     return g_updateBuffer;
 }
 
@@ -31,7 +31,6 @@ void GLRenderCtx::cleanup() {
         m_depthStencil = 0;
     }
     if (m_texture) {
-        log::info("deleting texture {}", m_texture);
         glDeleteTextures(1, &m_texture);
         m_texture = 0;
     }
@@ -54,8 +53,7 @@ ImVec2 GLRenderCtx::size() const {
 
 bool GLRenderCtx::begin() {
     // save currently bound fbo
-    glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_prevDrawBuffer);
-    glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_prevReadBuffer);
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_prevDrawBuffer);
 
     if (!m_buffer) {
         glGenFramebuffers(1, &m_buffer);
@@ -68,7 +66,6 @@ bool GLRenderCtx::begin() {
 
         static int texture_count = 0;
         texture_count++;
-        log::info("new texture is {}", m_texture);
         if (texture_count > 100) {
             exit(1);
         }
@@ -92,9 +89,9 @@ bool GLRenderCtx::begin() {
             static_cast<GLsizei>(m_size.x),
             static_cast<GLsizei>(m_size.y)
         );
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencil);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_depthStencil);
 
-        glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D, m_texture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_texture, 0);
     }
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -105,14 +102,13 @@ bool GLRenderCtx::begin() {
 
     // bind our framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer);
-
     return true;
 }
 
 void GLRenderCtx::end() {
+
     // bind the framebuffer that was bound before us
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_prevDrawBuffer);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, m_prevReadBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_prevDrawBuffer);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     //glFlush();
 }

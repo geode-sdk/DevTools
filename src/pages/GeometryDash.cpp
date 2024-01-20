@@ -199,6 +199,15 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
         max.y / wsize.y * rect.GetHeight() + rect.Min.y
     );
 
+    if (
+        isnan(tmax.x) ||
+        isnan(tmax.y) ||
+        isnan(tmin.x) ||
+        isnan(tmin.y)
+    ) {
+        return;
+    }
+
     auto anchor = ImVec2(
         node->getAnchorPoint().x * (tmax.x - tmin.x) + tmin.x,
         node->getAnchorPoint().y * (tmax.y - tmin.y) + tmin.y
@@ -242,7 +251,9 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 }
 
 void DevTools::drawLayoutHighlights(CCNode* node) {
-    for (auto child : ranges::reverse(CCArrayExt<CCNode>(node->getChildren()))) {
+    // TODO: undo later
+    #if 0
+    for (auto child : ranges::reverse(CCArrayExt<CCNode*>(node->getChildren()))) {
         if (!child->isVisible()) continue;
         if (child->getLayout()) {
             this->drawHighlight(child, HighlightMode::Layout);
@@ -256,6 +267,7 @@ void DevTools::drawLayoutHighlights(CCNode* node) {
             break;
         }
     }
+    #endif
 }
 
 void DevTools::drawGD(GLRenderCtx* gdCtx) {

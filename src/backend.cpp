@@ -49,8 +49,10 @@ void DevTools::newFrame() {
     );
     io.DeltaTime = director->getDeltaTime();
 
+#ifdef GEODE_IS_DESKTOP
     const auto mousePos = toVec2(geode::cocos::getMousePos());
     io.AddMousePosEvent(mousePos.x, mousePos.y);
+#endif
 
     // TODO: text input
 
@@ -141,6 +143,8 @@ static float SCROLL_SENSITIVITY = 10;
 
 class $modify(CCMouseDispatcher) {
     bool dispatchScrollMSG(float y, float x) {
+        if(!DevTools::get()->isSetup()) return true;
+
         auto& io = ImGui::GetIO();
         io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, -y / SCROLL_SENSITIVITY);
 
@@ -212,10 +216,10 @@ class $modify(CCTouchDispatcher) {
 };
 
 class $modify(CCIMEDispatcher) {
-    void dispatchInsertText(const char* text, int len) {
+    void dispatchInsertText(const char* text, int len, enumKeyCodes key) {
         auto& io = ImGui::GetIO();
         if (!io.WantCaptureKeyboard) {
-            CCIMEDispatcher::dispatchInsertText(text, len);
+            CCIMEDispatcher::dispatchInsertText(text, len, key);
         }
         std::string str(text, len);
         io.AddInputCharactersUTF8(str.c_str());

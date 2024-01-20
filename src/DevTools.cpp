@@ -24,6 +24,14 @@ bool DevTools::pausedGame() const {
     return m_pauseGame;
 }
 
+bool DevTools::isSetup() const {
+    return m_setup;
+}
+
+bool DevTools::shouldOrderChildren() const {
+    return m_orderChildren;
+}
+
 CCNode* DevTools::getSelectedNode() const {
     return m_selectedNode;
 }
@@ -178,6 +186,11 @@ void DevTools::setup() {
         
     this->setupFonts();
     this->setupPlatform();
+
+#ifdef GEODE_IS_MOBILE
+    ImGui::GetIO().FontGlobalScale = 3.f;
+    ImGui::GetStyle().ScrollbarSize = 60.f;
+#endif
 }
 
 void DevTools::show(bool visible) {

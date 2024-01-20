@@ -2,7 +2,7 @@
 #include <Geode/loader/Loader.hpp>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/utils/ranges.hpp>
-#include <Geode/binding/FMODAudioEngine.hpp>
+// #include <Geode/binding/FMODAudioEngine.hpp>
 #include <Geode/modify/AppDelegate.hpp>
 #include <fmod.hpp>
 #include <numeric>
@@ -13,10 +13,13 @@ static float RAINBOW_HUE = 0.f;
 
 void DevTools::drawSettings() {
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 1.f, 1.f });
+    // TODO: fix this option as it hasnt worked in a while lol
+#if 0
     ImGui::Checkbox("GD in Window", &m_GDInWindow);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show GD inside a window when DevTools are open");
     }
+#endif
     ImGui::Checkbox("Attributes in Tree", &m_attributesInTree);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show node attributes in the Tree");
@@ -41,6 +44,14 @@ void DevTools::drawSettings() {
             "Makes selecting nodes less annoying."
         );
     }
+    ImGui::Checkbox("Order Node Children", &m_orderChildren);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "When enabled (default behavior) node children are sorted by Z Order.\n"
+            "When disabled, children have the same order they do during init functions (maybe).\n"
+            "As a side effect to disabling this, things may render incorrectly."
+        );
+    }
     ImGui::Checkbox("Advanced Settings", &m_advancedSettings);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
@@ -53,6 +64,8 @@ void DevTools::drawSettings() {
 
     ImGui::Text("GD Window");
 
+    // TODO: undo later
+#if 0
     auto winSize = CCDirector::get()->getWinSize();
     auto frameSize = GameManager::get()->resolutionForKey(GameManager::get()->m_resolution);
     auto fps = roundf(1 / CCDirector::get()->getAnimationInterval());
@@ -134,6 +147,7 @@ void DevTools::drawSettings() {
             CCDirector::get()->getScheduler()->resumeTargets(PAUSED_TARGETS);
         }
     }
+#endif
 
     ImGui::Separator();
 
@@ -184,7 +198,8 @@ class $modify(AppDelegate) {
     void applicationWillEnterForeground() override {
         AppDelegate::applicationWillEnterForeground();
         if (DevTools::get()->pausedGame()) {
-            FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(true);
+            // TODO: undo later
+            // FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(true);
         }
     }
 };

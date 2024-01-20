@@ -4,22 +4,42 @@
 #include <Geode/modify/AchievementNotifier.hpp>
 #include <Geode/modify/CCDirector.hpp>
 #include <Geode/modify/CCEGLView.hpp>
+#include <Geode/modify/CCNode.hpp>
 #include "DevTools.hpp"
 #include <imgui.h>
 #include "ImGui.hpp"
 
 using namespace geode::prelude;
 
+class $modify(CCNode) {
+    void sortAllChildren() override {
+        if (DevTools::get()->shouldOrderChildren()) {
+            CCNode::sortAllChildren();
+        }
+    }
+};
+
 // todo: use shortcuts api once Geode has those
 class $modify(CCKeyboardDispatcher) {
-    bool dispatchKeyboardMSG(enumKeyCodes key, bool down) {
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool arr) {
         if (down && (key == KEY_F11 GEODE_MACOS(|| key == KEY_F10))) {
             DevTools::get()->toggle();
             return true;
         }
-        return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down);
+        return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr);
     }
 };
+
+#ifdef GEODE_IS_MOBILE
+// lol
+#include <Geode/modify/MenuLayer.hpp>
+class $modify(MenuLayer) {
+    void onMoreGames(CCObject*) {
+        DevTools::get()->toggle();
+    }
+};
+
+#endif
 
 class $modify(AchievementNotifier) {
     void willSwitchToScene(CCScene* scene) {
