@@ -45,7 +45,7 @@ void DevTools::highlightNode(CCNode* node, HighlightMode mode) {
 }
 
 void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
-    if (ImGui::Begin(name)) {
+    if (ImGui::Begin(name, nullptr, ImGuiWindowFlags_HorizontalScrollbar)) {
         (this->*pageFun)();
     }
     ImGui::End();
@@ -188,8 +188,9 @@ void DevTools::setup() {
     this->setupPlatform();
 
 #ifdef GEODE_IS_MOBILE
-    ImGui::GetIO().FontGlobalScale = 3.f;
+    ImGui::GetIO().FontGlobalScale = 2.f;
     ImGui::GetStyle().ScrollbarSize = 60.f;
+    // ImGui::GetStyle().TabBarBorderSize = 60.f;
 #endif
 }
 
@@ -199,6 +200,10 @@ void DevTools::show(bool visible) {
 
 void DevTools::toggle() {
     this->show(!m_visible);
+    if (!m_visible) {
+        ImGui::GetIO().WantCaptureMouse = false;
+        ImGui::GetIO().WantCaptureKeyboard = false;
+    }
 }
 
 void DevTools::sceneChanged() {

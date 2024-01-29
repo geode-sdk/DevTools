@@ -74,5 +74,9 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
 }
 
 void DevTools::drawTree() {
+#ifdef GEODE_IS_MOBILE
+    ImGui::Dummy({0.f, 60.f});
+#endif
+
     this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0);
 }

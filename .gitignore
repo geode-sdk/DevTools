@@ -1,5 +1,6 @@
 
 # Workspace files are user-specific
+*.sublime-project
 *.sublime-workspace
 
 # I need to find a way to automatically remove this
@@ -17,4 +18,5 @@ Source/Geode/pkg/uber-apk-signer.jar
 imgui/**
 imgui
 
+**/.DS_Store
 .cache/

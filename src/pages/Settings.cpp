@@ -13,17 +13,22 @@ static float RAINBOW_HUE = 0.f;
 
 void DevTools::drawSettings() {
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 1.f, 1.f });
+
+#ifdef GEODE_IS_MOBILE
+    ImGui::Dummy({0.f, 60.f});
+#endif
+
     // TODO: fix this option as it hasnt worked in a while lol
 #if 0
     ImGui::Checkbox("GD in Window", &m_GDInWindow);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show GD inside a window when DevTools are open");
     }
-#endif
     ImGui::Checkbox("Attributes in Tree", &m_attributesInTree);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show node attributes in the Tree");
     }
+#endif
     ImGui::Checkbox("Highlight Nodes", &m_alwaysHighlight);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
@@ -59,6 +64,10 @@ void DevTools::drawSettings() {
         );
     }
     ImGui::PopStyleVar();
+
+    ImGui::Separator();
+
+    ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 0.01f, 1.0f, 3.0f);
 
     ImGui::Separator();
 

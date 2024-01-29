@@ -221,6 +221,21 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     ImGui::Separator();
     ImGui::NewLine();
 
+    if (auto delegate = typeinfo_cast<CCTouchDelegate*>(node)) {
+        if (auto handler = CCTouchDispatcher::get()->findHandler(delegate)) {
+            auto priority = handler->getPriority();
+
+            if (ImGui::DragInt("Touch Priority", &priority, .03f)) {
+                CCTouchDispatcher::get()->setPriority(priority, handler->getDelegate());
+            }
+        }
+    }
+    
+
+    ImGui::NewLine();
+    ImGui::Separator();
+    ImGui::NewLine();
+
     if (auto rawLayout = node->getLayout()) {
         ImGui::Text("Layout: %s", typeid(*rawLayout).name());
         
