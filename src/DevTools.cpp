@@ -101,10 +101,13 @@ void DevTools::drawPages() {
         &DevTools::drawAttributes
     );
 
+    // TODO: fix preview tab
+#if 0
     this->drawPage(
         U8STR(FEATHER_DATABASE " Preview###devtools/preview"),
         &DevTools::drawPreview
     );
+#endif
 
     if (m_showModGraph) {
         this->drawPage(
@@ -119,6 +122,8 @@ void DevTools::drawPages() {
             &DevTools::drawModIndex
         );
     }
+
+    this->drawPage("Memory viewer", &DevTools::drawMemory);
 }
 
 void DevTools::draw(GLRenderCtx* ctx) {

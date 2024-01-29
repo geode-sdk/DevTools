@@ -62,6 +62,7 @@ protected:
     void drawIndexItem(IndexItemHandle const& node);
     void drawPage(const char* name, void(DevTools::* fun)());
     void drawPages();
+    void drawMemory();
     void draw(GLRenderCtx* ctx);
 
     void newFrame();
