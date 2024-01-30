@@ -154,6 +154,37 @@ struct RttiInfo {
     }
 };
 
+std::optional<std::string_view> findStdString(SafePtr ptr) {
+#if defined(GEODE_IS_WINDOWS)
+    // scan for std::string (msvc)
+    auto size = (ptr + 16).read<size_t>();
+    auto capacity = (ptr + 20).read<size_t>();
+    if (size > capacity || capacity < 15) return {};
+    // dont care about ridiculous sizes (> 100mb)
+    if (capacity > 1e8) return {};
+    char* data = nullptr;
+    if (capacity == 15) {
+        data = reinterpret_cast<char*>(ptr.as_ptr());
+    } else {
+        data = reinterpret_cast<char*>(ptr.read_ptr().as_ptr());
+    }
+#elif defined(GEODE_IS_ANDROID)
+    auto internalData = ptr.read_ptr();
+    if (!internalData.addr) return {};
+    auto size = (internalData - (3 * sizeof(void*))).read<size_t>();
+    auto capacity = (internalData - (2 * sizeof(void*))).read<size_t>();
+    auto refCount = (internalData - (1 * sizeof(void*))).read<int>();
+    if (size > capacity || refCount < 0) return {};
+    if (capacity > 1e8) return {};
+    char* data = reinterpret_cast<char*>(internalData.as_ptr());
+#endif
+    if (data == nullptr || !SafePtr(data).is_safe(capacity)) return {};
+    // quick null term check
+    if (data[size] != 0) return {};
+    if (strlen(data) != size) return {};
+    return std::string_view(data, size);
+}
+
 void DevTools::drawMemory() {
     using namespace std::chrono_literals;
     static auto lastRender = std::chrono::high_resolution_clock::now();
@@ -192,37 +223,13 @@ void DevTools::drawMemory() {
             if (name) {
                 texts.push_back(fmt::format("[{:04x}] {}", offset, *name));
             } else {
-            #if defined(GEODE_IS_WINDOWS)
-                // scan for std::string (msvc)
-                auto size = (ptr + 16).read<size_t>();
-                auto capacity = (ptr + 20).read<size_t>();
-                // log::debug("Looking for string at {:x} - {} {}", ptr);
-                if (size > capacity || capacity < 15) continue;
-                // dont care about ridiculous sizes (> 100mb)
-                if (capacity > 1e8) continue;
-                char* data = nullptr;
-                if (capacity == 15) {
-                    data = reinterpret_cast<char*>(ptr.as_ptr());
-                } else {
-                    data = reinterpret_cast<char*>(ptr.read_ptr().as_ptr());
+                auto maybeStr = findStdString(ptr);
+                if (maybeStr) {
+                    auto str = maybeStr->substr(0, 30);
+                    // escapes new lines and stuff for me :3
+                    auto fmted = matjson::Value(std::string(str)).dump(0);
+                    texts.push_back(fmt::format("[{:04x}] maybe std::string {}, {}", offset, maybeStr->size(), fmted));
                 }
-            #elif defined(GEODE_IS_ANDROID)
-                auto internalData = ptr.read_ptr();
-                if (!internalData.addr) continue;
-                auto size = (internalData - (3 * sizeof(void*))).read<size_t>();
-                auto capacity = (internalData - (2 * sizeof(void*))).read<size_t>();
-                auto refCount = (internalData - (1 * sizeof(void*))).read<int>();
-                if (size > capacity || refCount < 0) continue;
-                if (capacity > 1e8) continue;
-                char* data = reinterpret_cast<char*>(internalData.as_ptr());
-            #endif
-                if (data == nullptr || !SafePtr(data).is_safe(capacity)) continue;
-                // quick null term check
-                if (data[size] != 0) continue;
-                if (strlen(data) != size) continue;
-                auto str = std::string_view(data).substr(0, 30);
-                auto fmted = matjson::Value(std::string(str)).dump(0);
-                texts.push_back(fmt::format("[{:04x}] maybe std::string {} > {}, {}", offset, size, capacity, fmted));
             }
         }
     }
