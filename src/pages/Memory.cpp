@@ -3,6 +3,8 @@
 #include "../ImGui.hpp"
 #include <chrono>
 #include <algorithm>
+#include <span>
+#include <fmt/chrono.h>
 
 using namespace geode::prelude;
 
@@ -35,7 +37,7 @@ auto getReadableAddresses() {
         }
     }
     return cache;
-} 
+}
 
 bool canReadAddr(uintptr_t addr, size_t size) {
     if (addr <= 0x10000) return false;
@@ -86,6 +88,13 @@ struct SafePtr {
         return result;
     }
 
+    template <class T>
+    std::optional<T> read_opt() {
+        T result;
+        if (!read_into(&result, sizeof(result))) return std::nullopt;
+        return result;
+    }
+
     SafePtr read_ptr() {
         return SafePtr(this->read<uintptr_t>());
     }
@@ -113,6 +122,9 @@ std::string_view demangle(std::string_view mangled) {
     auto it = cached.find(mangled);
     if (it != cached.end()) {
         return it->second;
+    }
+    if (mangled.size() <= 4) {
+        return mangled;
     }
     auto parts = utils::string::split(std::string(mangled.substr(4)), "@");
     std::string result;
@@ -142,6 +154,8 @@ struct RttiInfo {
         auto rttiDescriptor = (rttiObj + 12).read_ptr();
         if (!rttiDescriptor.addr) return {};
         return demangle((rttiDescriptor + 8).read_c_str());
+        // pretty sure its a valid object at this point, so this shouldnt crash :-)
+        // return typeid(*reinterpret_cast<CCObject*>(ptr.as_ptr())).name();
     #else
         auto vtable = ptr.read_ptr();
         if (!vtable.addr) return {};
@@ -196,12 +210,16 @@ void DevTools::drawMemory() {
     if (size < 4) {
         size = 4;
     }
+    static bool showRawBytes = false;
+    changed |= ImGui::Checkbox("Show raw bytes", &showRawBytes);
 
     if (ImGui::Button("Selected Node")) {
         auto str = fmt::format("{}", fmt::ptr(m_selectedNode.data()));
         std::memcpy(buffer, str.c_str(), str.size() + 1);
         changed = true;
     }
+    ImGui::SameLine();
+    changed |= ImGui::Button("Refresh");
 
     auto const timeNow = std::chrono::high_resolution_clock::now();
 
@@ -213,23 +231,39 @@ void DevTools::drawMemory() {
         addr = std::stoull(buffer, nullptr, 16);
     } catch (...) {}
 
+    static std::vector<std::string> textSaving;
+    if (ImGui::Button("Save to file")) {
+        auto timeEpoch = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        auto name = fmt::format("Memory Dump {:%d %b %H.%M.%S}.txt", fmt::localtime(timeEpoch));
+        (void) utils::file::writeString(Mod::get()->getSaveDir() / name, fmt::to_string(fmt::join(textSaving, "\n")));
+    }
+
     static std::vector<std::string> texts;
     if (changed) {
         texts.clear();
+        textSaving.clear();
         for (int offset = 0; offset < size; offset += sizeof(void*)) {
             SafePtr ptr = addr + offset;
             RttiInfo info(ptr.read_ptr());
             auto name = info.class_name();
             if (name) {
                 texts.push_back(fmt::format("[{:04x}] {}", offset, *name));
-            } else {
-                auto maybeStr = findStdString(ptr);
-                if (maybeStr) {
-                    auto str = maybeStr->substr(0, 30);
-                    // escapes new lines and stuff for me :3
-                    auto fmted = matjson::Value(std::string(str)).dump(0);
-                    texts.push_back(fmt::format("[{:04x}] maybe std::string {}, {}", offset, maybeStr->size(), fmted));
-                }
+                textSaving.push_back(fmt::format("{:x}: p {}", offset, *name));
+                // if (typeinfo_cast<CCArray*>(ptr.as_ptr())) {
+                //     // look at types..
+                // }
+            } else if (auto maybeStr = findStdString(ptr); maybeStr) {
+                auto str = maybeStr->substr(0, 30);
+                // escapes new lines and stuff for me :3
+                auto fmted = matjson::Value(std::string(str)).dump(0);
+                texts.push_back(fmt::format("[{:04x}] maybe std::string {}, {}", offset, maybeStr->size(), fmted));
+                textSaving.push_back(fmt::format("{:x}: s {}", offset, fmted));
+            } else if (auto valueOpt = ptr.read_opt<uintptr_t>()) {
+                auto value = *valueOpt;
+                auto data = std::span(reinterpret_cast<uint8_t*>(&value), sizeof(void*));
+                if (showRawBytes)
+                    texts.push_back(fmt::format("[{:04x}] raw {:02x}", offset, fmt::join(data, " ")));
+                textSaving.push_back(fmt::format("{:x}: r {:02x}", offset, fmt::join(data, " ")));
             }
         }
     }
