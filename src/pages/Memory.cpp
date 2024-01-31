@@ -13,6 +13,7 @@ using namespace geode::prelude;
 #include <Windows.h>
 
 bool canReadAddr(uintptr_t addr, size_t size) {
+    if (addr <= 0x10000) return false;
     return !IsBadReadPtr(reinterpret_cast<void*>(addr), size);
 }
 
@@ -123,6 +124,7 @@ std::string_view demangle(std::string_view mangled) {
     if (it != cached.end()) {
         return it->second;
     }
+#if defined(GEODE_IS_WINDOWS)
     if (mangled.size() <= 4) {
         return mangled;
     }
@@ -135,6 +137,19 @@ std::string_view demangle(std::string_view mangled) {
         result += part;
     }
     return cached[mangled] = result;
+#else
+    std::string result;
+    int status = 0;
+    auto demangle = abi::__cxa_demangle(mangled.data(), 0, 0, &status);
+    if (status == 0) {
+        result = demangle;
+    } else {
+        result = std::string(mangled);
+    }
+    free(demangle);
+
+    return cached[mangled] = result;
+#endif
 }
 
 struct RttiInfo {
@@ -163,7 +178,7 @@ struct RttiInfo {
         if (!typeinfo.addr) return {};
         auto typeinfoName = (typeinfo + sizeof(void*)).read_ptr();
         if (!typeinfoName.addr) return {};
-        return typeinfoName.read_c_str();
+        return demangle(typeinfoName.read_c_str());
     #endif
     }
 };
