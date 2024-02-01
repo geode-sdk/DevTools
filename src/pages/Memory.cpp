@@ -198,6 +198,7 @@ std::optional<std::string_view> findStdString(SafePtr ptr) {
         data = reinterpret_cast<char*>(ptr.read_ptr().as_ptr());
     }
 #elif defined(GEODE_IS_ANDROID)
+    static gd::string emptyStdString;
     auto internalData = ptr.read_ptr();
     if (!internalData.addr) return {};
     auto size = (internalData - (3 * sizeof(void*))).read<size_t>();
@@ -206,6 +207,9 @@ std::optional<std::string_view> findStdString(SafePtr ptr) {
     if (size > capacity || refCount < 0) return {};
     if (capacity > 1e8) return {};
     char* data = reinterpret_cast<char*>(internalData.as_ptr());
+    if (size == 0 && capacity == 0 && data != emptyStdString.data()) return {};
+#else
+    return {};
 #endif
     if (data == nullptr || !SafePtr(data).is_safe(capacity)) return {};
     // quick null term check
