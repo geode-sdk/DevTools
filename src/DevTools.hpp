@@ -66,6 +66,9 @@ protected:
 
     void newFrame();
     void renderDrawData(ImDrawData*);
+    void renderDrawDataFallback(ImDrawData*);
+
+    bool hasExtension(const std::string& ext) const;
 
 public:
     static DevTools* get();
