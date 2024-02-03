@@ -77,16 +77,13 @@ void DevTools::render(GLRenderCtx* ctx) {
 }
 
 bool DevTools::hasExtension(const std::string& ext) const {
-    GLint extensionCount = 0;
-    glGetIntegerv(GL_NUM_EXTENSIONS, &extensionCount);
-
-    for (GLint i = 0; i < extensionCount; i++) {
-        const char* extension = reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS, i));
-        if (ext == extension) {
-            return true;
-        }
+    auto exts = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    if (exts == nullptr) {
+        return false;
     }
-    return false;
+
+    std::string extsStr(exts);
+    return extsStr.find(ext) != std::string::npos;
 }
 
 namespace {
