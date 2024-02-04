@@ -19,7 +19,7 @@ bool canReadAddr(uintptr_t addr, size_t size) {
 
 #elif defined(GEODE_IS_ANDROID)
 
-auto getReadableAddresses() {
+auto const& getReadableAddresses() {
     using namespace std::chrono_literals;
     static std::vector<std::pair<uintptr_t, uintptr_t>> cache;
     // static auto lastCheck = std::chrono::high_resolution_clock::now();
@@ -45,6 +45,8 @@ bool canReadAddr(uintptr_t addr, size_t size) {
 #ifdef GEODE_IS_ANDROID64
     // if ((addr & 0xFF00000000000000) == 0) return false;
     addr = addr & ~(0xFF00000000000000);
+#elif defined(GEODE_IS_ANDROID32)
+    if (addr == 0xFFFFFFFF) return false;
 #endif
     auto const& mappings = getReadableAddresses();
     auto value = std::make_pair(addr, addr + size);
