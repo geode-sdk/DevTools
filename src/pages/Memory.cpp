@@ -55,10 +55,12 @@ bool canReadAddr(uintptr_t addr, size_t size) {
     // check with msync first
 
     // get page size
-    static size_t pageSize = sysconf(_SC_PAGESIZE);
+    static const size_t pageSize = sysconf(_SC_PAGESIZE);
     // find the page base
-    void *base = (void *)((((size_t)addr) / pageSize) * pageSize);
-    if (msync(base, pageSize, MS_ASYNC) != 0) return false;
+    // god this is nasty
+    void* base = (void*)((((size_t)addr) / pageSize) * pageSize);
+    if (msync(base, pageSize, MS_ASYNC) != 0)
+        return false;
 
     // sometimes msync can return success even on an invalid address,
     // we hope that map parsing will catch that.
