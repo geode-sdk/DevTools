@@ -19,6 +19,9 @@ bool canReadAddr(uintptr_t addr, size_t size) {
 
 #elif defined(GEODE_IS_ANDROID)
 
+#include <sys/mman.h>
+#include <unistd.h>
+
 auto const& getReadableAddresses() {
     using namespace std::chrono_literals;
     static std::vector<std::pair<uintptr_t, uintptr_t>> cache;
@@ -48,6 +51,18 @@ bool canReadAddr(uintptr_t addr, size_t size) {
 #elif defined(GEODE_IS_ANDROID32)
     if (addr >= 0xFFFFF000) return false;
 #endif
+
+    // check with msync first
+
+    // get page size
+    static size_t pageSize = sysconf(_SC_PAGESIZE);
+    // find the page base
+    void *base = (void *)((((size_t)addr) / pageSize) * pageSize);
+    if (msync(base, pageSize, MS_ASYNC) != 0) return false;
+
+    // sometimes msync can return success even on an invalid address,
+    // we hope that map parsing will catch that.
+
     auto const& mappings = getReadableAddresses();
     auto value = std::make_pair(addr, addr + size);
     // get the largest start which is <= addr
@@ -74,7 +89,7 @@ struct SafePtr {
     void* as_ptr() const { return reinterpret_cast<void*>(addr); }
 
     bool is_safe(int size) {
-        return canReadAddr(addr, size);
+        return addr % 4 == 0 && canReadAddr(addr, size);
     }
 
     bool read_into(void* buffer, int size) {
