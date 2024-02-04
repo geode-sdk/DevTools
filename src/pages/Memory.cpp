@@ -46,7 +46,7 @@ bool canReadAddr(uintptr_t addr, size_t size) {
     // if ((addr & 0xFF00000000000000) == 0) return false;
     addr = addr & ~(0xFF00000000000000);
 #elif defined(GEODE_IS_ANDROID32)
-    if (addr == 0xFFFFFFFF) return false;
+    if (addr >= 0xFFFFF000) return false;
 #endif
     auto const& mappings = getReadableAddresses();
     auto value = std::make_pair(addr, addr + size);
