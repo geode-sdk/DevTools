@@ -72,7 +72,7 @@ class $modify(CCDirector) {
             shouldUpdateGDRenderBuffer() = false;
         }
 
-        auto winSize = this->getOpenGLView()->getViewPortRect();
+        auto winSize = this->getOpenGLView()->getViewPortRect() * DevTools::retinaFactor();
         if (!gdTexture) {
             gdTexture = new GLRenderCtx({ winSize.size.width, winSize.size.height });
         }

@@ -74,7 +74,7 @@ namespace {
 ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
     metadata.setVersion(inputVersion(metadata.getVersion()));
     metadata.setName(inputText("name", metadata.getName()));
-    metadata.setDeveloper(inputText("developer", metadata.getDeveloper()));
+    metadata.setDeveloper(inputText("developer", metadata.getDevelopers()[0]));
     metadata.setDescription(inputTextMultiline("description", metadata.getDescription()));
     metadata.setDetails(inputTextMultiline("details", metadata.getDetails()));
     metadata.setChangelog(inputTextMultiline("changelog", metadata.getChangelog()));

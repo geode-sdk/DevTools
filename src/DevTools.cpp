@@ -51,6 +51,14 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
     ImGui::End();
 }
 
+#ifndef __APPLE__
+
+float DevTools::retinaFactor() {
+    return 1.f;
+}
+
+#endif
+
 void DevTools::drawPages() {
     const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
 
