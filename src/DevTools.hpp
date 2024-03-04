@@ -83,6 +83,7 @@ public:
     void highlightNode(CCNode* node, HighlightMode mode);
 
     void sceneChanged();
+    static float retinaFactor();
 
     void render(GLRenderCtx* ctx);
 

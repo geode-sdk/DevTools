@@ -8,9 +8,10 @@ file(GLOB_RECURSE SOURCES
     src/*.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES} src/platform/Mac.mm)
+add_library(${PROJECT_NAME} SHARED ${SOURCES} src/platform/Mac.mm src/platform/retina.mm)
 
 set_source_files_properties(src/platform/Mac.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+set_source_files_properties(src/platform/retina.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
