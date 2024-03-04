@@ -1,5 +1,10 @@
+#include <Geode/platform/platform.hpp>
+
+#ifdef GEODE_IS_MACOS
+
 #include "../DevTools.hpp"
 
+#include <OpenGL/gl.h>
 #define CommentType CommentTypeDummy
 #import "Cocoa/Cocoa.h"
 #undef CommentType
@@ -16,3 +21,5 @@ float DevTools::retinaFactor() {
     }
     return displayScale;
 }
+
+#endif
