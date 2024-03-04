@@ -51,7 +51,7 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
     ImGui::End();
 }
 
-#ifndef __APPLE__
+#ifndef GEODE_IS_MACOS
 
 float DevTools::retinaFactor() {
     return 1.f;
