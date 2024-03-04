@@ -1,7 +1,11 @@
 {
-	"geode": "v2.0.0",
-	"version": "v1.5.0",
-	"gd": "*",
+	"geode": "v2.0.0-beta.21",
+	"version": "v1.5.1",
+	"gd": {
+		"win": "*",
+		"android": "*",
+		"mac": "2.200"
+	},
 	"id": "geode.devtools",
 	"name": "DevTools",
 	"developer": "Geode Team",
