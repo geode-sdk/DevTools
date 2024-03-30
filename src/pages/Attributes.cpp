@@ -253,6 +253,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         if (ImGui::Button(U8STR(FEATHER_PLUS " Add AxisLayoutOptions"))) {
             node->setLayoutOptions(AxisLayoutOptions::create());
         }
+        if (ImGui::Button(U8STR(FEATHER_PLUS " Add AnchorLayoutOptions"))) {
+            node->setLayoutOptions(AnchorLayoutOptions::create());
+        }
     }
 
     ImGui::NewLine();
@@ -425,6 +428,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     else {
         if (ImGui::Button(U8STR(FEATHER_PLUS " Add AxisLayout"))) {
             node->setLayout(AxisLayout::create());
+        }
+        if (ImGui::Button(U8STR(FEATHER_PLUS " Add AnchorLayout"))) {
+            node->setLayout(AnchorLayout::create());
         }
     }
 }
