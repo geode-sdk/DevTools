@@ -1,6 +1,6 @@
 {
 	"geode": "v2.0.0-beta.21",
-	"version": "v1.5.1",
+	"version": "v1.6.0",
 	"gd": {
 		"win": "*",
 		"android": "*",
@@ -14,5 +14,13 @@
 	"issues": {
 		"url": "https://github.com/geode-sdk/DevTools/issues",
 		"info": "If you encounter an issue using DevTools, please report it to the GitHub issues page."
+	},
+	"settings": {
+		"should-use-gd-window": {
+			"type": "bool",
+			"name": "Use GD window",
+			"description": "Determines if the DevTools should use a custom GD window or not. Required to disable for some exotic configurations (MacOS Wine).",
+			"default": true
+		}
 	}
 }

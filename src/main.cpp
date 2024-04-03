@@ -50,6 +50,10 @@ class $modify(AchievementNotifier) {
 
 class $modify(CCDirector) {
     void drawScene() {
+        if (!DevTools::get()->shouldUseGDWindow()) {
+            return CCDirector::drawScene();
+        }
+        
         DevTools::get()->setup();
 
         static GLRenderCtx* gdTexture = nullptr;
@@ -103,7 +107,7 @@ class $modify(CCEGLView) {
     // but before the buffers have been swapped, which is not possible with just a
     // CCDirector::drawScene hook.
     void swapBuffers() {
-        if (!DevTools::get()->shouldPopGame()) {
+        if (!DevTools::get()->shouldUseGDWindow() || !DevTools::get()->shouldPopGame()) {
             DevTools::get()->setup();
             DevTools::get()->render(nullptr);
         }

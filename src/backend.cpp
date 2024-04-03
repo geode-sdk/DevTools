@@ -83,6 +83,7 @@ bool DevTools::hasExtension(const std::string& ext) const {
     }
 
     std::string extsStr(exts);
+    log::debug("{}", extsStr);
     return extsStr.find(ext) != std::string::npos;
 }
 
@@ -258,7 +259,7 @@ class $modify(CCTouchDispatcher) {
         if (io.WantCaptureMouse) {
             bool didGDSwallow = false;
 
-            if (shouldPassEventsToGDButTransformed()) {
+            if (DevTools::get()->shouldUseGDWindow() && shouldPassEventsToGDButTransformed()) {
                 auto win = ImGui::GetMainViewport()->Size;
                 const auto gdRect = getGDWindowRect();
                 if (gdRect.Contains(pos) && !DevTools::get()->pausedGame()) {
@@ -293,7 +294,7 @@ class $modify(CCTouchDispatcher) {
             if (type != CCTOUCHMOVED) {
                 io.AddMouseButtonEvent(0, false);
             }
-            if (!DevTools::get()->shouldPopGame()) {
+            if (!DevTools::get()->shouldUseGDWindow() || !DevTools::get()->shouldPopGame()) {
                 CCTouchDispatcher::touches(touches, event, type);
             }
         }

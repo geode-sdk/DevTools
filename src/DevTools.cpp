@@ -61,8 +61,8 @@ float DevTools::retinaFactor() {
 
 void DevTools::drawPages() {
     const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
-
-    if (!Mod::get()->setSavedValue("layout-loaded", true) || m_shouldRelayout) {
+    
+    if ((!Mod::get()->setSavedValue("layout-loaded", true) || m_shouldRelayout)) {
         m_shouldRelayout = false;
 
         auto id = m_dockspaceID;
@@ -145,7 +145,7 @@ void DevTools::draw(GLRenderCtx* ctx) {
         if (m_selectedNode) {
             this->highlightNode(m_selectedNode, HighlightMode::Selected);
         }
-        this->drawGD(ctx);
+        if (this->shouldUseGDWindow()) this->drawGD(ctx);
         ImGui::PopFont();
     }
 }
@@ -216,4 +216,8 @@ void DevTools::toggle() {
 
 void DevTools::sceneChanged() {
     m_selectedNode = nullptr;
+}
+
+bool DevTools::shouldUseGDWindow() const {
+    return Mod::get()->getSettingValue<bool>("should-use-gd-window");
 }

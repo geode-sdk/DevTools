@@ -73,6 +73,8 @@ protected:
 public:
     static DevTools* get();
 
+    bool shouldUseGDWindow() const;
+
     bool shouldPopGame() const;
     bool pausedGame() const;
     bool isSetup() const;
