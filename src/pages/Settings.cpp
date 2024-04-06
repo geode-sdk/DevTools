@@ -203,6 +203,7 @@ void DevTools::drawSettings() {
     }
 }
 
+/*
 class $modify(AppDelegate) {
     void applicationWillEnterForeground() override {
         AppDelegate::applicationWillEnterForeground();
@@ -212,3 +213,4 @@ class $modify(AppDelegate) {
         }
     }
 };
+*/
