@@ -41,12 +41,13 @@ class $modify(MenuLayer) {
 
 #endif
 
-class $modify(AchievementNotifier) {
+// commenting this out causes no crashes, i've tried everything and it won't crash
+/*class $modify(AchievementNotifier) {
     void willSwitchToScene(CCScene* scene) {
         AchievementNotifier::willSwitchToScene(scene);
         DevTools::get()->sceneChanged();
     }
-};
+};*/
 
 class $modify(CCDirector) {
     void drawScene() {
