@@ -34,14 +34,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
 )
 
-if(WIN32)
-    target_link_libraries(${PROJECT_NAME} opengl32)
-elseif(APPLE)
-    target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
-elseif(ANDROID)
-    target_link_libraries(${PROJECT_NAME} GLESv2)
-endif()
-
 # i still dont like this (alk)
 target_compile_definitions(geode-sdk INTERFACE GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
 
