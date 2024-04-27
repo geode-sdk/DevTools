@@ -164,6 +164,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 for (auto [key, frame] : CCDictionaryExt<std::string, CCSpriteFrame*>(cachedFrames)) {
                     if (frame->getTexture() == texture && frame->getRect() == rect) {
                         ImGui::Text("Frame name: %s", key.c_str());
+                        ImGui::SameLine();
+                        if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copysprframename"))) {
+                            clipboard::write(key);
+                        }
                         break;
                     }
                 }
