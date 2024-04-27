@@ -46,6 +46,16 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::Text("User data: 0x%p", node->getUserData());
     }
 
+    if (!node->getID().empty()) {
+        ImGui::Text("Node ID: %s", node->getID().c_str());
+        ImGui::SameLine();
+        if (ImGui::Button(U8STR(FEATHER_COPY " Copy"))) {
+            clipboard::write(node->getID());
+        }
+    } else {
+        ImGui::Text("Node ID: N/A");
+    }
+
     if (auto menuItemNode = typeinfo_cast<CCMenuItem*>(node)) {
         const auto selector = menuItemNode->m_pfnSelector;
         if (!selector) {
