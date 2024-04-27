@@ -47,10 +47,11 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     }
 
     if (!node->getID().empty()) {
-        ImGui::Text("Node ID: %s", node->getID().c_str());
+        std::string nodeID = node->getID();
+        ImGui::Text("Node ID: %s", nodeID.c_str());
         ImGui::SameLine();
-        if (ImGui::Button(U8STR(FEATHER_COPY " Copy"))) {
-            clipboard::write(node->getID());
+        if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copynodeid"))) {
+            clipboard::write(nodeID);
         }
     } else {
         ImGui::Text("Node ID: N/A");
