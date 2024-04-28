@@ -46,6 +46,17 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::Text("User data: 0x%p", node->getUserData());
     }
 
+    if (!node->getID().empty()) {
+        std::string nodeID = node->getID();
+        ImGui::Text("Node ID: %s", nodeID.c_str());
+        ImGui::SameLine();
+        if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copynodeid"))) {
+            clipboard::write(nodeID);
+        }
+    } else {
+        ImGui::Text("Node ID: N/A");
+    }
+
     if (auto menuItemNode = typeinfo_cast<CCMenuItem*>(node)) {
         const auto selector = menuItemNode->m_pfnSelector;
         if (!selector) {
@@ -153,6 +164,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 for (auto [key, frame] : CCDictionaryExt<std::string, CCSpriteFrame*>(cachedFrames)) {
                     if (frame->getTexture() == texture && frame->getRect() == rect) {
                         ImGui::Text("Frame name: %s", key.c_str());
+                        ImGui::SameLine();
+                        if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copysprframename"))) {
+                            clipboard::write(key);
+                        }
                         break;
                     }
                 }
