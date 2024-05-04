@@ -8,9 +8,10 @@ file(GLOB_RECURSE SOURCES
     src/*.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES} src/platform/Mac.mm)
+add_library(${PROJECT_NAME} SHARED ${SOURCES} src/platform/Mac.mm src/platform/retina.mm)
 
 set_source_files_properties(src/platform/Mac.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+set_source_files_properties(src/platform/retina.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
@@ -32,14 +33,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${imgui_SOURCE_DIR}/imgui_demo.cpp
     ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
 )
-
-if(WIN32)
-    target_link_libraries(${PROJECT_NAME} opengl32)
-elseif(APPLE)
-    target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
-elseif(ANDROID)
-    target_link_libraries(${PROJECT_NAME} GLESv2)
-endif()
 
 # i still dont like this (alk)
 target_compile_definitions(geode-sdk INTERFACE GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
