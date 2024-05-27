@@ -29,7 +29,6 @@ protected:
     bool m_arrowExpand = false;
     bool m_advancedSettings = false;
     bool m_showModGraph = false;
-    bool m_showModIndex = false;
     bool m_pauseGame = false;
     bool m_orderChildren = true;
     std::string m_theme = DARK_THEME;
@@ -58,8 +57,6 @@ protected:
     void drawModGraph();
     void drawModGraphNode(Mod* node);
     ModMetadata inputMetadata(void* treePtr, ModMetadata metadata);
-    void drawModIndex();
-    void drawIndexItem(IndexItemHandle const& node);
     void drawPage(const char* name, void(DevTools::* fun)());
     void drawPages();
     void draw(GLRenderCtx* ctx);
