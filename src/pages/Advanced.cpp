@@ -125,6 +125,7 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
             switch (item.importance) {
                 case geode::ModMetadata::Incompatibility::Importance::Breaking: importance = "breaking"; break;
                 case geode::ModMetadata::Incompatibility::Importance::Conflicting: importance = "conflicting"; break;
+                case geode::ModMetadata::Incompatibility::Importance::Superseded: importance = "superseded"; break;
             }
             ImGui::Text("importance: %s", importance);
             ImGui::Text("isResolved: %s", item.isResolved() ? "true" : "false");
