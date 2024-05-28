@@ -31,10 +31,33 @@ bool checkbox(const char* text, T* ptr, bool(T::* get)() const, R(T::* set)(bool
     return false;
 }
 
+std::vector<GLenum> blendModes = {
+    GL_ZERO,
+    GL_ONE,
+    GL_SRC_COLOR,
+    GL_ONE_MINUS_SRC_COLOR,
+    GL_DST_COLOR,
+    GL_ONE_MINUS_DST_COLOR,
+    GL_SRC_ALPHA,
+    GL_ONE_MINUS_SRC_ALPHA,
+    GL_DST_ALPHA,
+    GL_ONE_MINUS_DST_ALPHA,
+    GL_CONSTANT_COLOR,
+    GL_ONE_MINUS_CONSTANT_COLOR,
+    GL_CONSTANT_ALPHA,
+    GL_ONE_MINUS_CONSTANT_ALPHA,
+    GL_SRC_ALPHA_SATURATE
+};
+
+const char* blendDropdown = "GL_ZERO\0GL_ONE\0GL_SRC_COLOR\0GL_ONE_MINUS_SRC_COLOR\0GL_DST_COLOR\0GL_ONE_MINUS_DST_COLOR\0GL_SRC_ALPHA\0GL_ONE_MINUS_SRC_ALPHA\0GL_DST_ALPHA\0GL_ONE_MINUS_DST_ALPHA\0GL_CONSTANT_COLOR\0GL_ONE_MINUS_CONSTANT_COLOR\0GL_CONSTANT_ALPHA\0GL_ONE_MINUS_CONSTANT_ALPHA\0GL_SRC_ALPHA_SATURATE\0";
+
 void DevTools::drawNodeAttributes(CCNode* node) {
     if (ImGui::Button("Deselect")) {
         return this->selectNode(nullptr);
     }
+    
+    ImGui::NewLine();
+
     ImGui::Text("Address: %s", fmt::to_string(fmt::ptr(node)).c_str());
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_COPY " Copy"))) {
@@ -128,6 +151,13 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     );
     
     if (auto rgbaNode = typeinfo_cast<CCRGBAProtocol*>(node)) {
+        checkbox(
+            "Color Affects Children",
+            rgbaNode,
+            &CCRGBAProtocol::isCascadeColorEnabled,
+            &CCRGBAProtocol::setCascadeColorEnabled
+        );
+
         auto color = rgbaNode->getColor();
         float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
         if (ImGui::ColorEdit4("Color", _color)) {
@@ -148,7 +178,19 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
 
+    if (auto bitmaplabel = typeinfo_cast<CCLabelBMFont*>(node))
+    {
+        std::string fnt = std::string(bitmaplabel->getFntFile());
+        if (ImGui::InputText("Font", &fnt, 256) && CCFileUtils::sharedFileUtils()->isFileExist(CCFileUtils::sharedFileUtils()->fullPathForFilename(fnt.c_str(), false))) {
+            bitmaplabel->setFntFile(fnt.c_str());
+        }
+    }
+
     if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+
         if (auto texture = textureProtocol->getTexture()) {
             auto* cachedTextures = CCTextureCache::sharedTextureCache()->m_pTextures;
             for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D*>(cachedTextures)) {
@@ -163,7 +205,13 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 const auto rect = spriteNode->getTextureRect();
                 for (auto [key, frame] : CCDictionaryExt<std::string, CCSpriteFrame*>(cachedFrames)) {
                     if (frame->getTexture() == texture && frame->getRect() == rect) {
-                        ImGui::Text("Frame name: %s", key.c_str());
+                        std::string frame = key;
+                        if (ImGui::InputText("##", &frame, 256)) {
+                            if (auto newFrame = CCSpriteFrameCache::get()->spriteFrameByName(frame.c_str()))
+                            {
+                                spriteNode->setDisplayFrame(newFrame);
+                            }
+                        }
                         ImGui::SameLine();
                         if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copysprframename"))) {
                             clipboard::write(key);
@@ -171,9 +219,53 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                         break;
                     }
                 }
+
+                bool flipX = spriteNode->isFlipX();
+                if (ImGui::Checkbox("Flip X", &flipX))
+                    spriteNode->setFlipX(flipX);
+
+                bool flipY = spriteNode->isFlipY();
+                if (ImGui::Checkbox("Flip Y", &flipY))
+                    spriteNode->setFlipX(flipY);
             }
 
         }
+    }
+
+    if (auto blendProtocol = typeinfo_cast<CCBlendProtocol*>(node)) {
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+
+        auto itSrc = std::find(blendModes.begin(), blendModes.end(), blendProtocol->getBlendFunc().src);
+        auto itDst = std::find(blendModes.begin(), blendModes.end(), blendProtocol->getBlendFunc().dst);
+        int indexSrc = 0;
+        int indexDst = 0;
+        bool shouldSet = false;
+
+        if (itSrc != blendModes.end())
+            indexSrc = std::distance(blendModes.begin(), itSrc);
+
+        if (itDst != blendModes.end())
+            indexDst = std::distance(blendModes.begin(), itDst);
+
+        shouldSet = shouldSet || ImGui::Combo("Blend Mode (src)", &indexSrc, blendDropdown);
+        shouldSet = shouldSet || ImGui::Combo("Blend Mode (dst)", &indexDst, blendDropdown);
+        
+        if (shouldSet)
+            blendProtocol->setBlendFunc({ blendModes[indexSrc], blendModes[indexDst] });
+
+        if (ImGui::Button("Default"))
+            blendProtocol->setBlendFunc({ GL_ONE, GL_ONE_MINUS_SRC_ALPHA });
+        ImGui::SameLine();
+        if (ImGui::Button("Additive"))
+            blendProtocol->setBlendFunc({ GL_SRC_ALPHA, GL_ONE });
+        ImGui::SameLine();
+        if (ImGui::Button("Multiply"))
+            blendProtocol->setBlendFunc({ GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA });
+        ImGui::SameLine();
+        if (ImGui::Button("Invert"))
+            blendProtocol->setBlendFunc({ GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_COLOR });
     }
 
     ImGui::NewLine();
