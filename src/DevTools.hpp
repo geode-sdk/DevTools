@@ -6,7 +6,6 @@
 #include <cocos2d.h>
 #include <Geode/utils/cocos.hpp>
 #include <unordered_map>
-#include <Geode/loader/Index.hpp>
 
 using namespace geode::prelude;
 
