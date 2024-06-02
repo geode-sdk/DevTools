@@ -41,7 +41,7 @@ class $modify(MenuLayer) {
 
 #endif
 
-// this is unnecessary
+// commenting this out causes no crashes, i've tried everything and it won't crash
 /*class $modify(AchievementNotifier) {
     void willSwitchToScene(CCScene* scene) {
         AchievementNotifier::willSwitchToScene(scene);
