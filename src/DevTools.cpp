@@ -120,13 +120,6 @@ void DevTools::drawPages() {
             &DevTools::drawModGraph
         );
     }
-
-    if (m_showModIndex) {
-        this->drawPage(
-            U8STR(FEATHER_LIST " Mod Index###devtools/advanced/mod-index"),
-            &DevTools::drawModIndex
-        );
-    }
 }
 
 void DevTools::draw(GLRenderCtx* ctx) {

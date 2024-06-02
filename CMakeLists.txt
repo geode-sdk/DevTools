@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_OSX_ARCHITECTURES "x86_64")
 
 project(DevTools VERSION 1.0.0)
 
@@ -33,14 +34,6 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${imgui_SOURCE_DIR}/imgui_demo.cpp
     ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
 )
-
-if(WIN32)
-    target_link_libraries(${PROJECT_NAME} opengl32)
-elseif(APPLE)
-    target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
-elseif(ANDROID)
-    target_link_libraries(${PROJECT_NAME} GLESv2)
-endif()
 
 # i still dont like this (alk)
 target_compile_definitions(geode-sdk INTERFACE GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
