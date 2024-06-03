@@ -60,7 +60,7 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
     }
 
     wchar_t buffer[MAX_PATH];
-    std::string const module_name = (!mod || !GetModuleFileNameW(mod, buffer, MAX_PATH)) ? "Unknown" : ghc::filesystem::path(buffer).filename().string();
+    std::string const module_name = (!mod || !GetModuleFileNameW(mod, buffer, MAX_PATH)) ? "Unknown" : std::filesystem::path(buffer).filename().string();
 
     return fmt::format("{} + {:#x}", module_name, addr - reinterpret_cast<uintptr_t>(mod));
 }
