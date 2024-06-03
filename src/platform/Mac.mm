@@ -7,6 +7,7 @@
 #include <Geode/utils/string.hpp>
 #include <array>
 #include <thread>
+#include <filesystem>
 #include <execinfo.h>
 #include <dlfcn.h>
 #include <cxxabi.h>
