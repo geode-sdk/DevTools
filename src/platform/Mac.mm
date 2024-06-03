@@ -70,7 +70,7 @@ static std::string getImageName(struct dyld_image_info const* image) {
     return ghc::filesystem::path(imageName).filename().string();
 }
 
-std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
+std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
     auto image = imageFromAddress(reinterpret_cast<void const*>(addr));
     std::string imageName;
     uintptr_t base;
@@ -82,7 +82,8 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
         imageName = getImageName(image);
     }
 
-    return fmt::format("{} + {:#x}", imageName, addr - base);
+    if(module) return fmt::format("{} + {:#x}", imageName, addr - base);
+    else return fmt::format("{:#x}", addr - base);
 }
 
 #endif
