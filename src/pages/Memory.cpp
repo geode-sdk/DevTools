@@ -119,6 +119,21 @@ struct SafePtr {
         return SafePtr(this->read<uintptr_t>());
     }
 
+    // read offset relative to base as a 32-bit int
+    SafePtr read_ptr32() {
+        auto res = this->read<uint32_t>();
+        if (res == 0) return SafePtr(nullptr);
+
+        // this is pretty dumb but idk how else i'd do it
+        uintptr_t base;
+        if (this->addr - geode::base::getCocos() < 0x200000) {
+            base = geode::base::getCocos();
+        } else {
+            base = geode::base::get();
+        }
+        return SafePtr(base + res);
+    }
+
     SafePtr operator+(intptr_t offset) const {
         return SafePtr(addr + offset);
     }
@@ -180,14 +195,15 @@ struct RttiInfo {
     #if defined(GEODE_IS_WINDOWS)
         auto vtable = ptr.read_ptr();
         if (!vtable.addr) return {};
-        auto rttiObj = (vtable - 4).read_ptr();
+
+        auto rttiObj = (vtable - sizeof(void*)).read_ptr();
         if (!rttiObj.addr) return {};
-        // always 0
+        // always 1 ?
         auto signature = rttiObj.read<int>();
-        if (signature != 0) return {};
-        auto rttiDescriptor = (rttiObj + 12).read_ptr();
+        // if (signature != 1) return {};
+        auto rttiDescriptor = (rttiObj + sizeof(unsigned int) * 3).read_ptr32();
         if (!rttiDescriptor.addr) return {};
-        return demangle((rttiDescriptor + 8).read_c_str());
+        return demangle((rttiDescriptor + sizeof(void*) * 2).read_c_str());
         // pretty sure its a valid object at this point, so this shouldnt crash :-)
         // return typeid(*reinterpret_cast<CCObject*>(ptr.as_ptr())).name();
     #else
