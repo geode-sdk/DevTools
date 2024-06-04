@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_OSX_ARCHITECTURES "x86_64")
 
 project(DevTools VERSION 1.0.0)
 
@@ -8,12 +9,10 @@ file(GLOB_RECURSE SOURCES
     src/*.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${SOURCES} src/platform/Mac.mm src/platform/retina.mm)
 
-if (APPLE)
-    target_sources(${PROJECT_NAME} PRIVATE src/platform/Mac.mm)
-    set_source_files_properties(src/platform/Mac.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
-endif()
+set_source_files_properties(src/platform/Mac.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+set_source_files_properties(src/platform/retina.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")

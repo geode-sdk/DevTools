@@ -39,7 +39,7 @@ void DevTools::newFrame() {
 
     auto* director = CCDirector::sharedDirector();
     const auto winSize = director->getWinSize();
-    const auto frameSize = director->getOpenGLView()->getFrameSize();
+    const auto frameSize = director->getOpenGLView()->getFrameSize() * DevTools::retinaFactor();
 
     // glfw new frame
     io.DisplaySize = ImVec2(frameSize.width, frameSize.height);
@@ -76,7 +76,93 @@ void DevTools::render(GLRenderCtx* ctx) {
     this->renderDrawData(ImGui::GetDrawData());
 }
 
+bool DevTools::hasExtension(const std::string& ext) const {
+    auto exts = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS));
+    if (exts == nullptr) {
+        return false;
+    }
+
+    std::string extsStr(exts);
+    log::debug("{}", extsStr);
+    return extsStr.find(ext) != std::string::npos;
+}
+
+namespace {
+    static void drawTriangle(const std::array<CCPoint, 3>& poli, const std::array<ccColor4F, 3>& colors, const std::array<CCPoint, 3>& uvs) {
+        auto* shader = CCShaderCache::sharedShaderCache()->programForKey(kCCShader_PositionTextureColor);
+        shader->use();
+        shader->setUniformsForBuiltins();
+
+        ccGLEnableVertexAttribs(kCCVertexAttribFlag_PosColorTex);
+
+        static_assert(sizeof(CCPoint) == sizeof(ccVertex2F), "so the cocos devs were right then");
+        
+        glVertexAttribPointer(kCCVertexAttrib_Position, 2, GL_FLOAT, GL_FALSE, 0, poli.data());
+        glVertexAttribPointer(kCCVertexAttrib_Color, 4, GL_FLOAT, GL_FALSE, 0, colors.data());
+        glVertexAttribPointer(kCCVertexAttrib_TexCoords, 2, GL_FLOAT, GL_FALSE, 0, uvs.data());
+
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 3);
+    }
+}
+
+void DevTools::renderDrawDataFallback(ImDrawData* draw_data) {
+    glEnable(GL_SCISSOR_TEST);
+
+    const auto clip_scale = draw_data->FramebufferScale;
+
+    for (int i = 0; i < draw_data->CmdListsCount; ++i) {
+        auto* list = draw_data->CmdLists[i];
+        auto* idxBuffer = list->IdxBuffer.Data;
+        auto* vtxBuffer = list->VtxBuffer.Data;
+        for (auto& cmd : list->CmdBuffer) {
+            ccGLBindTexture2D(static_cast<GLuint>(reinterpret_cast<intptr_t>(cmd.GetTexID())));
+
+            const auto rect = cmd.ClipRect;
+            const auto orig = toCocos(ImVec2(rect.x, rect.y));
+            const auto end = toCocos(ImVec2(rect.z, rect.w));
+            if (end.x <= orig.x || end.y >= orig.y)
+                continue;
+            CCDirector::sharedDirector()->getOpenGLView()->setScissorInPoints(orig.x, end.y, end.x - orig.x, orig.y - end.y);
+
+            for (unsigned int i = 0; i < cmd.ElemCount; i += 3) {
+                const auto a = vtxBuffer[idxBuffer[cmd.IdxOffset + i + 0]];
+                const auto b = vtxBuffer[idxBuffer[cmd.IdxOffset + i + 1]];
+                const auto c = vtxBuffer[idxBuffer[cmd.IdxOffset + i + 2]];
+                std::array<CCPoint, 3> points = {
+                    toCocos(a.pos),
+                    toCocos(b.pos),
+                    toCocos(c.pos),
+                };
+                static constexpr auto ccc4FromImColor = [](const ImColor color) {
+                    // beautiful
+                    return ccc4f(color.Value.x, color.Value.y, color.Value.z, color.Value.w);
+                };
+                std::array<ccColor4F, 3> colors = {
+                    ccc4FromImColor(a.col),
+                    ccc4FromImColor(b.col),
+                    ccc4FromImColor(c.col),
+                };
+
+                std::array<CCPoint, 3> uvs = {
+                    ccp(a.uv.x, a.uv.y),
+                    ccp(b.uv.x, b.uv.y),
+                    ccp(c.uv.x, c.uv.y),
+                };
+
+                drawTriangle(points, colors, uvs);
+            }
+        }
+    }
+
+    glDisable(GL_SCISSOR_TEST);
+}
+
 void DevTools::renderDrawData(ImDrawData* draw_data) {
+    static bool hasVaos = this->hasExtension("GL_ARB_vertex_array_object");
+    if (!hasVaos) {
+        return this->renderDrawDataFallback(draw_data);
+    }
+
     glEnable(GL_SCISSOR_TEST);
 
     GLuint vao = 0;
@@ -173,7 +259,7 @@ class $modify(CCTouchDispatcher) {
         if (io.WantCaptureMouse) {
             bool didGDSwallow = false;
 
-            if (shouldPassEventsToGDButTransformed()) {
+            if (DevTools::get()->shouldUseGDWindow() && shouldPassEventsToGDButTransformed()) {
                 auto win = ImGui::GetMainViewport()->Size;
                 const auto gdRect = getGDWindowRect();
                 if (gdRect.Contains(pos) && !DevTools::get()->pausedGame()) {
@@ -208,7 +294,7 @@ class $modify(CCTouchDispatcher) {
             if (type != CCTOUCHMOVED) {
                 io.AddMouseButtonEvent(0, false);
             }
-            if (!DevTools::get()->shouldPopGame()) {
+            if (!DevTools::get()->shouldUseGDWindow() || !DevTools::get()->shouldPopGame()) {
                 CCTouchDispatcher::touches(touches, event, type);
             }
         }

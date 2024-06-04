@@ -46,6 +46,17 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::Text("User data: 0x%p", node->getUserData());
     }
 
+    if (!node->getID().empty()) {
+        std::string nodeID = node->getID();
+        ImGui::Text("Node ID: %s", nodeID.c_str());
+        ImGui::SameLine();
+        if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copynodeid"))) {
+            clipboard::write(nodeID);
+        }
+    } else {
+        ImGui::Text("Node ID: N/A");
+    }
+
     if (auto menuItemNode = typeinfo_cast<CCMenuItem*>(node)) {
         const auto selector = menuItemNode->m_pfnSelector;
         if (!selector) {
@@ -153,6 +164,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 for (auto [key, frame] : CCDictionaryExt<std::string, CCSpriteFrame*>(cachedFrames)) {
                     if (frame->getTexture() == texture && frame->getRect() == rect) {
                         ImGui::Text("Frame name: %s", key.c_str());
+                        ImGui::SameLine();
+                        if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copysprframename"))) {
+                            clipboard::write(key);
+                        }
                         break;
                     }
                 }
@@ -210,10 +225,51 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 node->getParent()->updateLayout();
             }
         }
+        else if (auto opts = typeinfo_cast<AnchorLayoutOptions*>(rawOpts)) {
+            bool updateLayout = false;
+
+            auto offset = opts->getOffset();
+            ImGui::DragFloat2("Offset", &offset.x);
+            if (opts->getOffset() != offset) {
+                opts->setOffset(offset);
+                updateLayout = true;
+            }
+
+            auto anchor = static_cast<int>(opts->getAnchor());
+            auto updateAnchor = false;
+            ImGui::BeginTable("anchor-table", 3);
+            ImGui::TableNextColumn();
+            updateAnchor |= ImGui::RadioButton("Top Left", &anchor, static_cast<int>(Anchor::TopLeft));
+            updateAnchor |= ImGui::RadioButton("Left", &anchor, static_cast<int>(Anchor::Left));
+            updateAnchor |= ImGui::RadioButton("Bottom Left", &anchor, static_cast<int>(Anchor::BottomLeft));
+            ImGui::TableNextColumn();
+            updateAnchor |= ImGui::RadioButton("Top", &anchor, static_cast<int>(Anchor::Top));
+            updateAnchor |= ImGui::RadioButton("Center", &anchor, static_cast<int>(Anchor::Center));
+            updateAnchor |= ImGui::RadioButton("Bottom", &anchor, static_cast<int>(Anchor::Bottom));
+            ImGui::TableNextColumn();
+            updateAnchor |= ImGui::RadioButton("Top Right", &anchor, static_cast<int>(Anchor::TopRight));
+            updateAnchor |= ImGui::RadioButton("Right", &anchor, static_cast<int>(Anchor::Right));
+            updateAnchor |= ImGui::RadioButton("Bottom Right", &anchor, static_cast<int>(Anchor::BottomRight));
+            ImGui::EndTable();
+
+            if (updateAnchor) {
+                if (opts->getAnchor() != static_cast<Anchor>(anchor)) {
+                    opts->setAnchor(static_cast<Anchor>(anchor));
+                    updateLayout = true;
+                }
+            }
+
+            if (updateLayout && node->getParent()) {
+                node->getParent()->updateLayout();
+            }
+        }
     }
     else {
         if (ImGui::Button(U8STR(FEATHER_PLUS " Add AxisLayoutOptions"))) {
             node->setLayoutOptions(AxisLayoutOptions::create());
+        }
+        if (ImGui::Button(U8STR(FEATHER_PLUS " Add AnchorLayoutOptions"))) {
+            node->setLayoutOptions(AnchorLayoutOptions::create());
         }
     }
 
@@ -387,6 +443,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     else {
         if (ImGui::Button(U8STR(FEATHER_PLUS " Add AxisLayout"))) {
             node->setLayout(AxisLayout::create());
+        }
+        if (ImGui::Button(U8STR(FEATHER_PLUS " Add AnchorLayout"))) {
+            node->setLayout(AnchorLayout::create());
         }
     }
 }

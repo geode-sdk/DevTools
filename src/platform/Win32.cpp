@@ -38,12 +38,13 @@ class $modify(CCEGLView) {
         CCEGLView::updateWindow(width, height);
     }
 
-    void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        auto& io = ImGui::GetIO();
+    //todo: i dont care someone else can figure it out, it completely breaks keyboard support
+    /*void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        //auto& io = ImGui::GetIO();
         CCEGLView::onGLFWKeyCallback(window, key, scancode, action, mods);
         // in practice this is only used for arrow keys
-        io.AddKeyEvent(keyFromGLFW(key), action != GLFW_RELEASE);
-    }
+        //io.AddKeyEvent(keyFromGLFW(key), action != GLFW_RELEASE);
+    }*/
 };
 
 #include "utils.hpp"
@@ -59,7 +60,7 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
     }
 
     wchar_t buffer[MAX_PATH];
-    std::string const module_name = (!mod || !GetModuleFileNameW(mod, buffer, MAX_PATH)) ? "Unknown" : ghc::filesystem::path(buffer).filename().string();
+    std::string const module_name = (!mod || !GetModuleFileNameW(mod, buffer, MAX_PATH)) ? "Unknown" : std::filesystem::path(buffer).filename().string();
 
     return fmt::format("{} + {:#x}", module_name, addr - reinterpret_cast<uintptr_t>(mod));
 }

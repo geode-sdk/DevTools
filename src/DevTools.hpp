@@ -6,7 +6,6 @@
 #include <cocos2d.h>
 #include <Geode/utils/cocos.hpp>
 #include <unordered_map>
-#include <Geode/loader/Index.hpp>
 
 using namespace geode::prelude;
 
@@ -29,7 +28,6 @@ protected:
     bool m_arrowExpand = false;
     bool m_advancedSettings = false;
     bool m_showModGraph = false;
-    bool m_showModIndex = false;
     bool m_pauseGame = false;
     bool m_orderChildren = true;
     std::string m_theme = DARK_THEME;
@@ -58,8 +56,6 @@ protected:
     void drawModGraph();
     void drawModGraphNode(Mod* node);
     ModMetadata inputMetadata(void* treePtr, ModMetadata metadata);
-    void drawModIndex();
-    void drawIndexItem(IndexItemHandle const& node);
     void drawPage(const char* name, void(DevTools::* fun)());
     void drawPages();
     void drawMemory();
@@ -67,9 +63,14 @@ protected:
 
     void newFrame();
     void renderDrawData(ImDrawData*);
+    void renderDrawDataFallback(ImDrawData*);
+
+    bool hasExtension(const std::string& ext) const;
 
 public:
     static DevTools* get();
+
+    bool shouldUseGDWindow() const;
 
     bool shouldPopGame() const;
     bool pausedGame() const;
@@ -81,6 +82,7 @@ public:
     void highlightNode(CCNode* node, HighlightMode mode);
 
     void sceneChanged();
+    static float retinaFactor();
 
     void render(GLRenderCtx* ctx);
 

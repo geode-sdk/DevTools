@@ -3,6 +3,7 @@
 #include <imgui.h>
 #include <iostream>
 #include <cocos2d.h>
+#include "DevTools.hpp"
 
 using namespace cocos2d;
 
