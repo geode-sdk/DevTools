@@ -76,7 +76,7 @@ class $modify(CCDirector) {
             shouldUpdateGDRenderBuffer() = false;
         }
 
-        auto winSize = this->getOpenGLView()->getViewPortRect() * DevTools::retinaFactor();
+        auto winSize = this->getOpenGLView()->getViewPortRect() * geode::utils::getDisplayFactor();
         if (!gdTexture) {
             gdTexture = new GLRenderCtx({ winSize.size.width, winSize.size.height });
         }

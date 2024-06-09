@@ -5,6 +5,7 @@
 #include "themes.hpp"
 #include <cocos2d.h>
 #include <Geode/utils/cocos.hpp>
+#include <Geode/loader/ModMetadata.hpp>
 #include <unordered_map>
 
 using namespace geode::prelude;
@@ -82,7 +83,6 @@ public:
     void highlightNode(CCNode* node, HighlightMode mode);
 
     void sceneChanged();
-    static float retinaFactor();
 
     void render(GLRenderCtx* ctx);
 

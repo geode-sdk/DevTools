@@ -51,14 +51,6 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
     ImGui::End();
 }
 
-#ifndef GEODE_IS_MACOS
-
-float DevTools::retinaFactor() {
-    return 1.f;
-}
-
-#endif
-
 void DevTools::drawPages() {
     const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
 
