@@ -265,6 +265,8 @@ std::optional<std::string_view> findStdString(SafePtr ptr) {
     char* data = reinterpret_cast<char*>(internalData.as_ptr());
     if (size == 0 && capacity == 0 && data != emptyStdString.data()) return {};
 #else
+    char* data;
+    size_t size, capacity;
     return {};
 #endif
     if (data == nullptr || !SafePtr(data).is_safe(capacity)) return {};
