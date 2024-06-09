@@ -125,12 +125,12 @@ struct SafePtr {
         if (res == 0) return SafePtr(nullptr);
 
         // this is pretty dumb but idk how else i'd do it
-        uintptr_t base;
+        uintptr_t base = geode::base::get();
+    #ifdef GEODE_IS_WINDOWS
         if (this->addr - geode::base::getCocos() < 0x200000) {
             base = geode::base::getCocos();
-        } else {
-            base = geode::base::get();
         }
+    #endif
         return SafePtr(base + res);
     }
 
