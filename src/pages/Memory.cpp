@@ -14,7 +14,19 @@ using namespace geode::prelude;
 
 bool canReadAddr(uintptr_t addr, size_t size) {
     if (addr <= 0x10000) return false;
-    return !IsBadReadPtr(reinterpret_cast<void*>(addr), size);
+    // TODO: doesnt check size.. though shouldnt matter most of the time
+    // https://stackoverflow.com/a/35576777/9124836
+    MEMORY_BASIC_INFORMATION mbi = {0};
+    if (VirtualQuery((void*)addr, &mbi, sizeof(mbi))) {
+        DWORD mask = (PAGE_READONLY|PAGE_READWRITE|PAGE_WRITECOPY|PAGE_EXECUTE_READ|PAGE_EXECUTE_READWRITE|PAGE_EXECUTE_WRITECOPY);
+        bool isBadRead = !(mbi.Protect & mask);
+        // check the page is not a guard page
+        if (mbi.Protect & (PAGE_GUARD|PAGE_NOACCESS))
+            isBadRead = true;
+
+        return !isBadRead;
+    }
+    return false;
 }
 
 #elif defined(GEODE_IS_ANDROID)
@@ -75,6 +87,12 @@ bool canReadAddr(uintptr_t addr, size_t size) {
     // it->first is already known to be <= addr,
     // now just check the end
     return value.second < it->second;
+}
+
+#else
+
+bool canReadAddr(uintptr_t addr, size_t size) {
+    return false;
 }
 
 #endif
@@ -221,8 +239,11 @@ struct RttiInfo {
 std::optional<std::string_view> findStdString(SafePtr ptr) {
 #if defined(GEODE_IS_WINDOWS)
     // scan for std::string (msvc)
+    // char inline_data[16];
+    // size_t size; + 16
+    // size_t capacity; + 16 + sizeof(void*)
     auto size = (ptr + 16).read<size_t>();
-    auto capacity = (ptr + 20).read<size_t>();
+    auto capacity = (ptr + 16 + sizeof(void*)).read<size_t>();
     if (size > capacity || capacity < 15) return {};
     // dont care about ridiculous sizes (> 100mb)
     if (capacity > 1e8) return {};
