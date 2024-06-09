@@ -66,7 +66,7 @@ static std::string getImageName(struct dyld_image_info const* image) {
     if (imageName.empty()) {
         return "Unknown";
     }
-    return ghc::filesystem::path(imageName).filename().string();
+    return std::filesystem::path(imageName).filename().string();
 }
 
 std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
