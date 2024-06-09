@@ -31,6 +31,7 @@ protected:
     bool m_showModGraph = false;
     bool m_pauseGame = false;
     bool m_orderChildren = true;
+    bool m_showMemoryViewer = false;
     std::string m_theme = DARK_THEME;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;

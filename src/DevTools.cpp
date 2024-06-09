@@ -116,7 +116,9 @@ void DevTools::drawPages() {
         );
     }
 
-    this->drawPage("Memory viewer", &DevTools::drawMemory);
+    if (m_showMemoryViewer) {
+        this->drawPage("Memory viewer", &DevTools::drawMemory);
+    }
 }
 
 void DevTools::draw(GLRenderCtx* ctx) {
