@@ -63,11 +63,12 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             std::string addr = "N/A";
             ImGui::Text("CCMenuItem selector: %s", addr.c_str());
         } else {
-            const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector));
+            const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector), true);
             ImGui::Text("CCMenuItem selector: %s", addr.c_str());
             ImGui::SameLine();
             if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copymenuitem"))) {
-                clipboard::write(addr);
+                const auto addrNoModule = formatAddressIntoOffset(addresser::getNonVirtual(selector), false);
+                clipboard::write(addrNoModule);
             }
         }
     }

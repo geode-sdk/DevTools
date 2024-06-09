@@ -49,7 +49,7 @@ class $modify(CCEGLView) {
 
 #include "utils.hpp"
 
-std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
+std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
     HMODULE mod;
 
     if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
@@ -62,7 +62,8 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr) {
     wchar_t buffer[MAX_PATH];
     std::string const module_name = (!mod || !GetModuleFileNameW(mod, buffer, MAX_PATH)) ? "Unknown" : std::filesystem::path(buffer).filename().string();
 
-    return fmt::format("{} + {:#x}", module_name, addr - reinterpret_cast<uintptr_t>(mod));
+    if(module) return fmt::format("{} + {:#x}", module_name, addr - reinterpret_cast<uintptr_t>(mod));
+    return fmt::format("{:#x}", addr - reinterpret_cast<uintptr_t>(mod));
 }
 
 #endif
