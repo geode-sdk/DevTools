@@ -5,6 +5,8 @@
 #include "themes.hpp"
 #include <cocos2d.h>
 #include <Geode/utils/cocos.hpp>
+#include <Geode/utils/addresser.hpp>
+#include <Geode/loader/Loader.hpp>
 #include <Geode/loader/ModMetadata.hpp>
 #include <unordered_map>
 

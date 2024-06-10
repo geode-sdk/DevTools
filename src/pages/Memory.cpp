@@ -1,3 +1,4 @@
+#include <Geode/loader/Mod.hpp>
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
 #include "../ImGui.hpp"
