@@ -194,6 +194,15 @@ void DevTools::setup() {
 #endif
 }
 
+void DevTools::destroy() {
+    if (!m_setup) return;
+    m_setup = false;
+    m_visible = false;
+
+    // crashes :(
+    // ImGui::DestroyContext();
+}
+
 void DevTools::show(bool visible) {
     m_visible = visible;
 }

@@ -89,6 +89,7 @@ public:
 
     // setup ImGui & DevTools
     void setup();
+    void destroy();
 
     void show(bool visible);
     void toggle();

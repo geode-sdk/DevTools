@@ -4,6 +4,7 @@
 
 #include <Geode/modify/CCEGLView.hpp>
 #include "platform.hpp"
+#include "../DevTools.hpp"
 
 using namespace cocos2d;
 using namespace geode;
@@ -37,6 +38,15 @@ class $modify(CCEGLView) {
         shouldUpdateGDRenderBuffer() = true;
         CCEGLView::updateWindow(width, height);
     }
+
+    void toggleFullScreen(bool value, bool borderless) {
+		if (!DevTools::get()->isSetup())
+			return CCEGLView::toggleFullScreen(value, borderless);
+
+		DevTools::get()->destroy();
+		CCEGLView::toggleFullScreen(value, borderless);
+		DevTools::get()->setup();
+	}
 
     //todo: i dont care someone else can figure it out, it completely breaks keyboard support
     /*void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
