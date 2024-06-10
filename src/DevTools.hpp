@@ -5,6 +5,7 @@
 #include "themes.hpp"
 #include <cocos2d.h>
 #include <Geode/utils/cocos.hpp>
+#include <Geode/loader/ModMetadata.hpp>
 #include <unordered_map>
 
 using namespace geode::prelude;
@@ -30,6 +31,7 @@ protected:
     bool m_showModGraph = false;
     bool m_pauseGame = false;
     bool m_orderChildren = true;
+    bool m_showMemoryViewer = false;
     std::string m_theme = DARK_THEME;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
@@ -58,6 +60,7 @@ protected:
     ModMetadata inputMetadata(void* treePtr, ModMetadata metadata);
     void drawPage(const char* name, void(DevTools::* fun)());
     void drawPages();
+    void drawMemory();
     void draw(GLRenderCtx* ctx);
 
     void newFrame();
@@ -81,7 +84,6 @@ public:
     void highlightNode(CCNode* node, HighlightMode mode);
 
     void sceneChanged();
-    static float retinaFactor();
 
     void render(GLRenderCtx* ctx);
 

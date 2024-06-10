@@ -63,6 +63,12 @@ void DevTools::drawSettings() {
             "Shows advanced settings. Mostly useful only for development of Geode itself."
         );
     }
+    ImGui::Checkbox("Show Memory Viewer", &m_showMemoryViewer);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Shows the memory viewer window."
+        );
+    }
     ImGui::PopStyleVar();
 
     ImGui::Separator();

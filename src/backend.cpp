@@ -39,7 +39,7 @@ void DevTools::newFrame() {
 
     auto* director = CCDirector::sharedDirector();
     const auto winSize = director->getWinSize();
-    const auto frameSize = director->getOpenGLView()->getFrameSize() * DevTools::retinaFactor();
+    const auto frameSize = director->getOpenGLView()->getFrameSize() * geode::utils::getDisplayFactor();
 
     // glfw new frame
     io.DisplaySize = ImVec2(frameSize.width, frameSize.height);
