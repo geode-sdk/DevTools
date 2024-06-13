@@ -11,13 +11,53 @@
 #include <Geode/loader/Mod.hpp>
 #include "ImGui.hpp"
 
+template<>
+struct matjson::Serialize<Settings> {
+    static Settings from_json(const matjson::Value& value) {
+        return Settings {
+            .GDInWindow = value["game_in_window"].as_bool(),
+            .attributesInTree = value["attributes_in_tree"].as_bool(),
+            .alwaysHighlight = value["always_highlight"].as_bool(),
+            .highlightLayouts = value["highlight_layouts"].as_bool(),
+            .arrowExpand = value["arrow_expand"].as_bool(),
+            .orderChildren = value["order_children"].as_bool(),
+            .advancedSettings = value["advanced_settings"].as_bool(),
+            .showMemoryViewer = value["show_memory_viewer"].as_bool(),
+            .theme = value["theme"].as_string(),
+        };
+    }
+
+    static matjson::Value to_json(const Settings& settings) {
+        auto obj = matjson::Object();
+        obj["game_in_window"] = settings.GDInWindow;
+        obj["attributes_in_tree"] = settings.attributesInTree;
+        obj["always_highlight"] = settings.alwaysHighlight;
+        obj["highlight_layouts"] = settings.highlightLayouts;
+        obj["arrow_expand"] = settings.arrowExpand;
+        obj["order_children"] = settings.orderChildren;
+        obj["advanced_settings"] = settings.advancedSettings;
+        obj["show_memory_viewer"] = settings.showMemoryViewer;
+        obj["theme"] = settings.theme;
+        return obj;
+    }
+
+    static bool is_json(matjson::Value const& val) {
+        return val.is_object();
+    }
+};
+
+$on_mod(DataSaved) { DevTools::get()->saveSettings(); }
+
 DevTools* DevTools::get() {
-    static auto inst = new DevTools;
+    static auto inst = new DevTools();
     return inst;
 }
 
+void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
+void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
+
 bool DevTools::shouldPopGame() const {
-    return m_visible && m_GDInWindow;
+    return m_visible && m_settings.GDInWindow;
 }
 
 bool DevTools::pausedGame() const {
@@ -29,7 +69,7 @@ bool DevTools::isSetup() const {
 }
 
 bool DevTools::shouldOrderChildren() const {
-    return m_orderChildren;
+    return m_settings.orderChildren;
 }
 
 CCNode* DevTools::getSelectedNode() const {
@@ -89,7 +129,7 @@ void DevTools::drawPages() {
         &DevTools::drawSettings
     );
 
-    if (m_advancedSettings) {
+    if (m_settings.advancedSettings) {
         this->drawPage(
                 U8STR(FEATHER_SETTINGS " Advanced Settings###devtools/advanced/settings"),
                 &DevTools::drawAdvancedSettings
@@ -116,7 +156,7 @@ void DevTools::drawPages() {
         );
     }
 
-    if (m_showMemoryViewer) {
+    if (m_settings.showMemoryViewer) {
         this->drawPage("Memory viewer", &DevTools::drawMemory);
     }
 }
@@ -124,7 +164,7 @@ void DevTools::drawPages() {
 void DevTools::draw(GLRenderCtx* ctx) {
     if (m_visible) {
         if (m_reloadTheme) {
-            applyTheme(m_theme);
+            applyTheme(m_settings.theme);
             m_reloadTheme = false;
         }
 

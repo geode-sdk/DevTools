@@ -315,7 +315,7 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
                 ImGui::IsWindowHovered() &&
                 getGDWindowRect().Contains(ImGui::GetMousePos());
             
-            if (m_highlightLayouts) {
+            if (m_settings.highlightLayouts) {
                 this->drawLayoutHighlights(CCDirector::get()->getRunningScene());
             }
 

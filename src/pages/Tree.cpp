@@ -37,7 +37,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     {
         flags |= ImGuiTreeNodeFlags_Leaf;
     }
-    if (m_arrowExpand)
+    if (m_settings.arrowExpand)
     {
         flags |= ImGuiTreeNodeFlags_OpenOnArrow;
     }
@@ -58,11 +58,11 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
         DevTools::get()->selectNode(node);
         selected = true;
     }
-    if (ImGui::IsItemHovered() && (m_alwaysHighlight || ImGui::IsKeyDown(ImGuiKey_ModShift))) {
+    if (ImGui::IsItemHovered() && (m_settings.alwaysHighlight || ImGui::IsKeyDown(ImGuiKey_ModShift))) {
         DevTools::get()->highlightNode(node, HighlightMode::Hovered);
     }
     if (expanded) {
-        if (m_attributesInTree) {
+        if (m_settings.attributesInTree) {
             this->drawNodeAttributes(node);
         }
         size_t i = 0;
