@@ -83,7 +83,6 @@ bool DevTools::hasExtension(const std::string& ext) const {
     }
 
     std::string extsStr(exts);
-    log::debug("{}", extsStr);
     return extsStr.find(ext) != std::string::npos;
 }
 
