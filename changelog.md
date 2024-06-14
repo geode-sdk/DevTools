@@ -1,3 +1,12 @@
+## v1.7.0
+
+* Support for 2.206
+* Bump to Geode `v3.0.0-beta.1`
+* Fixes for 64-bit
+* Make the time format for memory dumps better
+* Remove logs for GL extension string
+* Actually save the settings used
+
 ## v1.6.0
 
 * Adds Node IDs into the Attributes menu, along with a button to copy them
