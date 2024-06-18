@@ -108,13 +108,15 @@ void drawLayoutArrows(
     float x;
     float y;
     switch (row ? layout->getAxisAlignment() : layout->getCrossAxisAlignment()) {
-        case AxisAlignment::Start: x = tmin.x; break;
+        case AxisAlignment::Start:
+        case AxisAlignment::Between:
         case AxisAlignment::Even: x = tmin.x; break;
         case AxisAlignment::Center: x = tmin.x + (tmax.x - tmin.x) / 2; break;
         case AxisAlignment::End: x = tmax.x; break;
     }
     switch (row ? layout->getCrossAxisAlignment() : layout->getAxisAlignment()) {
-        case AxisAlignment::Start: y = tmin.y; break;
+        case AxisAlignment::Start:
+        case AxisAlignment::Between:
         case AxisAlignment::Even: y = tmin.y; break;
         case AxisAlignment::Center: y = tmin.y + (tmax.y - tmin.y) / 2; break;
         case AxisAlignment::End: y = tmax.y; break;

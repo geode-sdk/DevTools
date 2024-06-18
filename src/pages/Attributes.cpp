@@ -356,6 +356,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 updateAlign |= ImGui::RadioButton(
                     "Even", &align, static_cast<int>(AxisAlignment::Even)
                 );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Between", &align, static_cast<int>(AxisAlignment::Between)
+                );
                 if (updateAlign) {
                     layout->setAxisAlignment(static_cast<AxisAlignment>(align));
                     updateLayout = true;
@@ -381,6 +385,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 updateAlign |= ImGui::RadioButton(
                     "Even##cross3", &align, static_cast<int>(AxisAlignment::Even)
                 );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Between##cross4", &align, static_cast<int>(AxisAlignment::Between)
+                );
                 if (updateAlign) {
                     layout->setCrossAxisAlignment(static_cast<AxisAlignment>(align));
                     updateLayout = true;
@@ -405,6 +413,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 ImGui::SameLine();
                 updateAlign |= ImGui::RadioButton(
                     "Even##crossline3", &align, static_cast<int>(AxisAlignment::Even)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Between##crossline4", &align, static_cast<int>(AxisAlignment::Between)
                 );
                 if (updateAlign) {
                     layout->setCrossAxisLineAlignment(static_cast<AxisAlignment>(align));
