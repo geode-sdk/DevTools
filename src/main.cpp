@@ -41,12 +41,13 @@ class $modify(MenuLayer) {
 
 #endif
 
-class $modify(AchievementNotifier) {
+// commenting this out causes no crashes, i've tried everything and it won't crash
+/*class $modify(AchievementNotifier) {
     void willSwitchToScene(CCScene* scene) {
         AchievementNotifier::willSwitchToScene(scene);
         DevTools::get()->sceneChanged();
     }
-};
+};*/
 
 class $modify(CCDirector) {
     void drawScene() {
@@ -102,7 +103,8 @@ class $modify(CCDirector) {
     }
 };
 
-class $modify(CCEGLView) {
+// this hook just crashes on x64
+/*class $modify(CCEGLView) {
     // this is needed for popout mode because we need to render after gd has rendered,
     // but before the buffers have been swapped, which is not possible with just a
     // CCDirector::drawScene hook.
@@ -114,3 +116,4 @@ class $modify(CCEGLView) {
         CCEGLView::swapBuffers();
     }
 };
+*/
