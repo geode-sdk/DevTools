@@ -325,11 +325,17 @@ void DevTools::drawMemory() {
             RttiInfo info(ptr.read_ptr());
             auto name = info.class_name();
             if (name) {
-                texts.push_back(fmt::format("[{:04x}] {}", offset, *name));
-                textSaving.push_back(fmt::format("{:x}: p {}", offset, *name));
-                // if (typeinfo_cast<CCArray*>(ptr.as_ptr())) {
-                //     // look at types..
-                // }
+                auto formattedPtr = fmt::ptr(ptr.as_ptr());
+                if (auto arr = typeinfo_cast<CCArray*>(ptr.as_ptr())) {
+                    texts.push_back(fmt::format("[{:04x}] cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->data->num, fmt::ptr(arr->data->arr)));
+                    textSaving.push_back(fmt::format("{:x}: a cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->data->num, fmt::ptr(arr->data->arr)));
+                } else if (auto dict = typeinfo_cast<CCDictionary*>(ptr.as_ptr())) {
+                    texts.push_back(fmt::format("[{:04x}] cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, HASH_COUNT(dict->m_pElements), fmt::ptr(dict->m_pElements)));
+                    textSaving.push_back(fmt::format("{:x}: a cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, HASH_COUNT(dict->m_pElements), fmt::ptr(dict->m_pElements)));
+                } else {
+                    texts.push_back(fmt::format("[{:04x}] {} ({})", offset, *name));
+                    textSaving.push_back(fmt::format("{:x}: p {} ({})", offset, *name));
+                }
             } else if (auto maybeStr = findStdString(ptr); maybeStr) {
                 auto str = maybeStr->substr(0, 30);
                 // escapes new lines and stuff for me :3
