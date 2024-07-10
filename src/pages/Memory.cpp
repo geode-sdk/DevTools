@@ -325,11 +325,12 @@ void DevTools::drawMemory() {
             RttiInfo info(ptr.read_ptr());
             auto name = info.class_name();
             if (name) {
+                auto objectPtr = reinterpret_cast<CCObject*>(ptr.as_ptr());
                 auto formattedPtr = fmt::ptr(ptr.as_ptr());
-                if (auto arr = typeinfo_cast<CCArray*>(ptr.as_ptr())) {
+                if (auto arr = typeinfo_cast<CCArray*>(objectPtr)) {
                     texts.push_back(fmt::format("[{:04x}] cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->data->num, fmt::ptr(arr->data->arr)));
                     textSaving.push_back(fmt::format("{:x}: a cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->data->num, fmt::ptr(arr->data->arr)));
-                } else if (auto dict = typeinfo_cast<CCDictionary*>(ptr.as_ptr())) {
+                } else if (auto dict = typeinfo_cast<CCDictionary*>(objectPtr)) {
                     texts.push_back(fmt::format("[{:04x}] cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, HASH_COUNT(dict->m_pElements), fmt::ptr(dict->m_pElements)));
                     textSaving.push_back(fmt::format("{:x}: a cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, HASH_COUNT(dict->m_pElements), fmt::ptr(dict->m_pElements)));
                 } else {
