@@ -41,9 +41,9 @@ class $modify(MenuLayer) {
 
 #endif
 
-class $modify(AchievementNotifier) {
+class $modify(AppDelegate) {
     void willSwitchToScene(CCScene* scene) {
-        AchievementNotifier::willSwitchToScene(scene);
+        AppDelegate::willSwitchToScene(scene);
         DevTools::get()->sceneChanged();
     }
 };
