@@ -2,7 +2,6 @@
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
 #include "../ImGui.hpp"
-#include "../fonts/FeatherIcons.hpp"
 #include <chrono>
 #include <algorithm>
 #include <span>
