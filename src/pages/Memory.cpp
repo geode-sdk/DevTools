@@ -439,7 +439,7 @@ void DevTools::drawMemory() {
                 clipboard::write(fmt::format("{}", fmt::ptr(info.ptr)).c_str());
             }
         }
-    
+
         if (info.type == TextType::String && !info.str.empty()) {
             ImGui::SameLine();
             if (ImGui::Button(fmt::format("Copy String##{}", i).c_str())) {
