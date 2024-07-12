@@ -101,7 +101,7 @@ class $modify(CCDirector) {
         // }
     }
 };
-
+/*
 class $modify(CCEGLView) {
     // this is needed for popout mode because we need to render after gd has rendered,
     // but before the buffers have been swapped, which is not possible with just a
@@ -114,3 +114,4 @@ class $modify(CCEGLView) {
         CCEGLView::swapBuffers();
     }
 };
+*/
