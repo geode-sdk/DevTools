@@ -363,7 +363,7 @@ void DevTools::drawMemory() {
                 auto voidPtr = reinterpret_cast<void**>(ptr.as_ptr());
                 auto objectPtr = reinterpret_cast<CCObject*>(*voidPtr);
                 auto formattedPtr = fmt::ptr(*voidPtr);
-                if (*name == "cocos2d::CCArray") {
+                if (typeinfo_cast<CCArray*>(objectPtr)) {
                     auto arr = static_cast<CCArray*>(objectPtr);
                     texts.push_back(fmt::format("[{:04x}] cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->data->num, fmt::ptr(arr->data->arr)));
                     textSaving.push_back(fmt::format("{:x}: a cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->data->num, fmt::ptr(arr->data->arr)));
@@ -372,7 +372,7 @@ void DevTools::drawMemory() {
                         .ptr = ptr.as_ptr(),
                         .arrayPtr = arr->data->arr
                     });
-                } else if (*name == "cocos2d::CCDictionary") {
+                } else if (typeinfo_cast<CCDictionary*>(objectPtr)) {
                     auto dict = static_cast<CCDictionary*>(objectPtr);
                     texts.push_back(fmt::format("[{:04x}] cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, HASH_COUNT(dict->m_pElements), fmt::ptr(dict->m_pElements)));
                     textSaving.push_back(fmt::format("{:x}: d cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, HASH_COUNT(dict->m_pElements), fmt::ptr(dict->m_pElements)));
@@ -430,12 +430,14 @@ void DevTools::drawMemory() {
         if (info.type == TextType::Raw) {
             ImGui::SameLine();
             if (ImGui::Button(fmt::format("Copy Data##{}", i).c_str())) {
+                log::info("{}", info.data);
                 clipboard::write(info.data.c_str());
             }
         }
         else if (info.type != TextType::String) {
             ImGui::SameLine();
             if (ImGui::Button(fmt::format("Copy Pointer##{}", i).c_str())) {
+                log::info("{}", fmt::ptr(info.ptr));
                 clipboard::write(fmt::format("{}", fmt::ptr(info.ptr)).c_str());
             }
         }
@@ -443,18 +445,21 @@ void DevTools::drawMemory() {
         if (info.type == TextType::String && !info.str.empty()) {
             ImGui::SameLine();
             if (ImGui::Button(fmt::format("Copy String##{}", i).c_str())) {
+                log::info("{}", info.str);
                 clipboard::write(info.str.c_str());
             }
         }
         else if (info.type == TextType::Array) {
             ImGui::SameLine();
             if (ImGui::Button(fmt::format("Copy Array Address##{}", i).c_str())) {
+                log::info("{}", fmt::ptr(info.arrayPtr));
                 clipboard::write(fmt::format("{}", fmt::ptr(info.arrayPtr)).c_str());
             }
         }
         else if (info.type == TextType::Dictionary) {
             ImGui::SameLine();
             if (ImGui::Button(fmt::format("Copy Dictionary Address##{}", i).c_str())) {
+                log::info("{}", fmt::ptr(info.dictPtr));
                 clipboard::write(fmt::format("{}", fmt::ptr(info.dictPtr)).c_str());
             }
         }
