@@ -1,5 +1,5 @@
 #include "../DevTools.hpp"
-#include "../ImGui.hpp"
+// #include "../ImGui.hpp"
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/modify/AppDelegate.hpp>
 
@@ -77,7 +77,7 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
     metadata.setDetails(inputTextMultiline("details", metadata.getDetails()));
     metadata.setChangelog(inputTextMultiline("changelog", metadata.getChangelog()));
     metadata.setSupportInfo(inputTextMultiline("supportInfo", metadata.getSupportInfo()));
-    metadata.setRepository(inputTextMultiline("repository", metadata.getRepository()));
+    metadata.setRepository(inputTextMultiline("repository", metadata.getLinks().getSourceURL()));
     metadata.setIssues(inputIssues(metadata.getIssues()));
     metadata.setNeedsEarlyLoad(inputBool("needsEarlyLoad", metadata.needsEarlyLoad()));
     metadata.setIsAPI(inputBool("isAPI", metadata.isAPI()));
