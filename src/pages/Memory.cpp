@@ -412,7 +412,8 @@ void DevTools::drawMemory() {
                     texts.push_back(fmt::format("[{:04x}] raw {:02x}", offset, fmt::join(data, " ")));
                     textInfo.push_back({
                         .type = TextType::Raw,
-                        .data = fmt::format("{:02x}", fmt::join(data, " "))
+                        .data = fmt::format("{:02x}", fmt::join(data, " ")),
+                        .ptr = reinterpret_cast<void*>(value)
                     });
                 }
                 textSaving.push_back(fmt::format("{:x}: r {:02x}", offset, fmt::join(data, " ")));
@@ -429,6 +430,10 @@ void DevTools::drawMemory() {
             ImGui::SameLine();
             if (ImGui::Button(fmt::format("Copy Data##{}", i).c_str())) {
                 clipboard::write(info.data.c_str());
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(fmt::format("Copy As Pointer##{}", i).c_str())) {
+                clipboard::write(fmt::format("{}", fmt::ptr(info.ptr)).c_str());
             }
         }
         else if (info.type != TextType::String) {
