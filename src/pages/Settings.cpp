@@ -5,7 +5,7 @@
 // #include <Geode/binding/FMODAudioEngine.hpp>
 #include <Geode/modify/AppDelegate.hpp>
 #include <fmod.hpp>
-// #include <numeric>
+#include <numeric>
 
 using namespace geode::prelude;
 

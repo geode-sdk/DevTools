@@ -1,7 +1,7 @@
 #include <Geode/loader/Mod.hpp>
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
-// #include "../ImGui.hpp"
+#include "../ImGui.hpp"
 #include <chrono>
 #include <algorithm>
 #include <span>

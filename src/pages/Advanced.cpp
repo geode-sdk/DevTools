@@ -1,5 +1,5 @@
 #include "../DevTools.hpp"
-// #include "../ImGui.hpp"
+#include "../ImGui.hpp"
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/modify/AppDelegate.hpp>
 
