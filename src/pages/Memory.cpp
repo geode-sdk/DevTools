@@ -381,15 +381,14 @@ void DevTools::drawMemory() {
                     });
                 } else {
                     auto nodeID = std::string();
-                    auto foundID = std::string();
                     auto type = "p";
                     if (auto node = typeinfo_cast<CCNode*>(objectPtr)) {
-                        foundID = node->getID();
+                        auto foundID = node->getID();
                         if (!foundID.empty()) nodeID = fmt::format(" \"{}\"", foundID);
                         type = "n";
                     }
-                    texts.push_back(fmt::format("[{:04x}] {} ({}){}", offset, *name, formattedPtr, nodeID.empty() ? "" : nodeID.c_str()));
-                    textSaving.push_back(fmt::format("{:x}: {} {} ({}){}", offset, type, *name, formattedPtr, nodeID.empty() ? "" : nodeID.c_str()));
+                    texts.push_back(fmt::format("[{:04x}] {} ({}){}", offset, *name, formattedPtr, nodeID));
+                    textSaving.push_back(fmt::format("{:x}: {} {} ({}){}", offset, type, *name, formattedPtr, nodeID));
                     textInfo.push_back({
                         .type = TextType::Pointer,
                         .ptr = *voidPtr
