@@ -1,7 +1,7 @@
 
 #include "platform/platform.hpp"
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
-#include <Geode/modify/AchievementNotifier.hpp>
+#include <Geode/modify/AppDelegate.hpp>
 #include <Geode/modify/CCDirector.hpp>
 #include <Geode/modify/CCEGLView.hpp>
 #include <Geode/modify/CCNode.hpp>
@@ -41,9 +41,9 @@ class $modify(MenuLayer) {
 
 #endif
 
-class $modify(AchievementNotifier) {
+class $modify(AppDelegate) {
     void willSwitchToScene(CCScene* scene) {
-        AchievementNotifier::willSwitchToScene(scene);
+        AppDelegate::willSwitchToScene(scene);
         DevTools::get()->sceneChanged();
     }
 };
