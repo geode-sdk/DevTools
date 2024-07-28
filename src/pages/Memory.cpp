@@ -380,6 +380,7 @@ void DevTools::drawMemory() {
     ImGui::PushFont(m_monoFont);
     for (const auto& text : texts) {
         ImGui::TextUnformatted(text.data(), text.data() + text.size());
+        // ImGui::Text("%s", text);
     }
     ImGui::PopFont();
 }
