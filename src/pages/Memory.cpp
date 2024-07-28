@@ -277,23 +277,6 @@ std::optional<std::string_view> findStdString(SafePtr ptr) {
     return std::string_view(data, size);
 }
 
-enum class TextType {
-    Pointer,
-    Array,
-    Dictionary,
-    String,
-    Raw
-};
-
-struct TextInfo {
-    TextType type = TextType::Raw;
-    std::string str = "";
-    std::string data = "";
-    void* ptr = nullptr;
-    CCObject** arrayPtr = nullptr;
-    CCDictElement* dictPtr = nullptr;
-};
-
 void DevTools::drawMemory() {
     using namespace std::chrono_literals;
     static auto lastRender = std::chrono::high_resolution_clock::now();
@@ -350,11 +333,9 @@ void DevTools::drawMemory() {
     }
 
     static std::vector<std::string> texts;
-    static std::vector<TextInfo> textInfo;
     if (changed) {
         texts.clear();
         textSaving.clear();
-        textInfo.clear();
         for (int offset = 0; offset < size; offset += sizeof(void*)) {
             SafePtr ptr = addr + offset;
             RttiInfo info(ptr.read_ptr());
@@ -366,19 +347,9 @@ void DevTools::drawMemory() {
                 if (auto arr = typeinfo_cast<CCArray*>(objectPtr)) {
                     texts.push_back(fmt::format("[{:04x}] cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->data->num, fmt::ptr(arr->data->arr)));
                     textSaving.push_back(fmt::format("{:x}: a cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->data->num, fmt::ptr(arr->data->arr)));
-                    textInfo.push_back({
-                        .type = TextType::Array,
-                        .ptr = *voidPtr,
-                        .arrayPtr = arr->data->arr
-                    });
                 } else if (auto dict = typeinfo_cast<CCDictionary*>(objectPtr)) {
                     texts.push_back(fmt::format("[{:04x}] cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, HASH_COUNT(dict->m_pElements), fmt::ptr(dict->m_pElements)));
                     textSaving.push_back(fmt::format("{:x}: d cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, HASH_COUNT(dict->m_pElements), fmt::ptr(dict->m_pElements)));
-                    textInfo.push_back({
-                        .type = TextType::Dictionary,
-                        .ptr = *voidPtr,
-                        .dictPtr = dict->m_pElements
-                    });
                 } else {
                     auto nodeID = std::string();
                     auto type = "p";
@@ -389,10 +360,6 @@ void DevTools::drawMemory() {
                     }
                     texts.push_back(fmt::format("[{:04x}] {} ({}){}", offset, *name, formattedPtr, nodeID));
                     textSaving.push_back(fmt::format("{:x}: {} {} ({}){}", offset, type, *name, formattedPtr, nodeID));
-                    textInfo.push_back({
-                        .type = TextType::Pointer,
-                        .ptr = *voidPtr
-                    });
                 }
             } else if (auto maybeStr = findStdString(ptr); maybeStr) {
                 auto str = maybeStr->substr(0, 30);
@@ -400,20 +367,11 @@ void DevTools::drawMemory() {
                 auto fmted = matjson::Value(std::string(str)).dump(0);
                 texts.push_back(fmt::format("[{:04x}] maybe std::string {}, {}", offset, maybeStr->size(), fmted));
                 textSaving.push_back(fmt::format("{:x}: s {}", offset, fmted));
-                textInfo.push_back({
-                    .type = TextType::String,
-                    .str = std::string(maybeStr->data())
-                });
             } else if (auto valueOpt = ptr.read_opt<uintptr_t>()) {
                 auto value = *valueOpt;
                 auto data = std::span(reinterpret_cast<uint8_t*>(&value), sizeof(void*));
                 if (showRawBytes) {
                     texts.push_back(fmt::format("[{:04x}] raw {:02x}", offset, fmt::join(data, " ")));
-                    textInfo.push_back({
-                        .type = TextType::Raw,
-                        .data = fmt::format("{:02x}", fmt::join(data, " ")),
-                        .ptr = reinterpret_cast<void*>(value)
-                    });
                 }
                 textSaving.push_back(fmt::format("{:x}: r {:02x}", offset, fmt::join(data, " ")));
             }
@@ -423,43 +381,7 @@ void DevTools::drawMemory() {
     ImGui::PushFont(m_monoFont);
     for (size_t i = 0; i < texts.size(); ++i) {
         const auto& text = texts[i];
-        const auto& info = textInfo[i];
         ImGui::TextUnformatted(text.data(), text.data() + text.size());
-        if (info.type == TextType::Raw) {
-            ImGui::SameLine();
-            if (ImGui::Button(fmt::format("Copy Data##{}", i).c_str())) {
-                clipboard::write(info.data.c_str());
-            }
-            ImGui::SameLine();
-            if (ImGui::Button(fmt::format("Copy As Pointer##{}", i).c_str())) {
-                clipboard::write(fmt::format("{}", fmt::ptr(info.ptr)).c_str());
-            }
-        }
-        else if (info.type != TextType::String) {
-            ImGui::SameLine();
-            if (ImGui::Button(fmt::format("Copy Pointer##{}", i).c_str())) {
-                clipboard::write(fmt::format("{}", fmt::ptr(info.ptr)).c_str());
-            }
-        }
-
-        if (info.type == TextType::String && !info.str.empty()) {
-            ImGui::SameLine();
-            if (ImGui::Button(fmt::format("Copy String##{}", i).c_str())) {
-                clipboard::write(info.str.c_str());
-            }
-        }
-        else if (info.type == TextType::Array) {
-            ImGui::SameLine();
-            if (ImGui::Button(fmt::format("Copy Array Address##{}", i).c_str())) {
-                clipboard::write(fmt::format("{}", fmt::ptr(info.arrayPtr)).c_str());
-            }
-        }
-        else if (info.type == TextType::Dictionary) {
-            ImGui::SameLine();
-            if (ImGui::Button(fmt::format("Copy Dictionary Address##{}", i).c_str())) {
-                clipboard::write(fmt::format("{}", fmt::ptr(info.dictPtr)).c_str());
-            }
-        }
     }
     ImGui::PopFont();
 }
