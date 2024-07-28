@@ -370,17 +370,15 @@ void DevTools::drawMemory() {
             } else if (auto valueOpt = ptr.read_opt<uintptr_t>()) {
                 auto value = *valueOpt;
                 auto data = std::span(reinterpret_cast<uint8_t*>(&value), sizeof(void*));
-                if (showRawBytes) {
+                if (showRawBytes)
                     texts.push_back(fmt::format("[{:04x}] raw {:02x}", offset, fmt::join(data, " ")));
-                }
                 textSaving.push_back(fmt::format("{:x}: r {:02x}", offset, fmt::join(data, " ")));
             }
         }
     }
 
     ImGui::PushFont(m_monoFont);
-    for (size_t i = 0; i < texts.size(); ++i) {
-        const auto& text = texts[i];
+    for (const auto& text : texts) {
         ImGui::TextUnformatted(text.data(), text.data() + text.size());
     }
     ImGui::PopFont();
