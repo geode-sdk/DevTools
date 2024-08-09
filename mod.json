@@ -4,7 +4,8 @@
 	"gd": {
 		"win": "*",
 		"android": "*",
-		"mac": "2.206"
+		"mac": "2.206",
+		"ios": "2.206"
 	},
 	"id": "geode.devtools",
 	"name": "DevTools",
