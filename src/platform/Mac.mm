@@ -1,6 +1,6 @@
 #include <Geode/platform/platform.hpp>
 
-#ifdef GEODE_IS_MACOS
+#ifdef __APPLE__
 
 #include "utils.hpp"
 
