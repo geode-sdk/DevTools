@@ -3,7 +3,14 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #ifdef __APPLE__
+
+#include <TargetConditionals.h>
+#if TARGET_OS_IPHONE
+#include <OpenGLES/ES2/gl.h>
+#else
 #include <OpenGL/gl.h>
+#endif
+
 #endif
 
 ImRect& getGDWindowRect();
