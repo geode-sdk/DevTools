@@ -4,6 +4,9 @@
 #include <Geode/modify/AchievementNotifier.hpp>
 #include <Geode/modify/CCDirector.hpp>
 #include <Geode/modify/CCNode.hpp>
+#ifndef GEODE_IS_IOS
+#include <Geode/modify/CCEGLView.hpp>
+#endif
 #include "DevTools.hpp"
 #include <imgui.h>
 #include "ImGui.hpp"
@@ -112,7 +115,6 @@ class $modify(CCDirector) {
 
 #ifndef GEODE_IS_IOS
 
-#include <Geode/modify/CCEGLView.hpp>
 class $modify(CCEGLView) {
     // this is needed for popout mode because we need to render after gd has rendered,
     // but before the buffers have been swapped, which is not possible with just a
