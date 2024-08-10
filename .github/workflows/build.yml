@@ -39,7 +39,7 @@ jobs:
       - name: Build the mod
         uses: geode-catgirls/build-geode-mod@main
         with:
-          gh-pat: ${{ secrets.GH-PAT }}
+          gh-pat: ${{ secrets.GH_PAT }}
           combine: true
           target: ${{ matrix.config.target }}
       
