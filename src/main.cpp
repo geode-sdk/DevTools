@@ -3,10 +3,10 @@
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>
 #include <Geode/modify/CCDirector.hpp>
-#include <Geode/modify/CCNode.hpp>
 #ifndef GEODE_IS_IOS
 #include <Geode/modify/CCEGLView.hpp>
 #endif
+#include <Geode/modify/CCNode.hpp>
 #include "DevTools.hpp"
 #include <imgui.h>
 #include "ImGui.hpp"
