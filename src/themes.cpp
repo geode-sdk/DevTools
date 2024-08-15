@@ -336,9 +336,9 @@ void applyTheme(std::string const& name) {
     style.Colors[ImGuiCol_NavWindowingHighlight] = theme.navWindowingHighlight;
     style.Colors[ImGuiCol_Tab] = theme.tab;
     style.Colors[ImGuiCol_TabHovered] = theme.tabHovered;
-    style.Colors[ImGuiCol_TabActive] = theme.tabActive;
-    style.Colors[ImGuiCol_TabUnfocused] = theme.tabUnfocused;
-    style.Colors[ImGuiCol_TabUnfocusedActive] = theme.tabUnfocusedActive;
+    style.Colors[ImGuiCol_TabSelected] = theme.tabActive;
+    style.Colors[ImGuiCol_TabDimmed] = theme.tabUnfocused;
+    style.Colors[ImGuiCol_TabDimmedSelected] = theme.tabUnfocusedActive;
     style.Colors[ImGuiCol_TableBorderStrong] = theme.tableBorderStrong;
     style.Colors[ImGuiCol_TableBorderLight] = theme.tableBorderLight;
 }

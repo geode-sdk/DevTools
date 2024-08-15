@@ -41,14 +41,12 @@ class $modify(MenuLayer) {
 
 #endif
 
-class $modify(AppDelegate) {
+class $modify(CCDirector) {
     void willSwitchToScene(CCScene* scene) {
-        AppDelegate::willSwitchToScene(scene);
+        CCDirector::willSwitchToScene(scene);
         DevTools::get()->sceneChanged();
     }
-};
 
-class $modify(CCDirector) {
     void drawScene() {
         if (!DevTools::get()->shouldUseGDWindow()) {
             return CCDirector::drawScene();
