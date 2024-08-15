@@ -200,8 +200,8 @@ void DevTools::drawSettings() {
 
     ImGui::TextWrapped(
         "Running Geode %s, DevTools %s",
-        Loader::get()->getVersion().toString().c_str(),
-        Mod::get()->getVersion().toString().c_str()
+        Loader::get()->getVersion().toVString().c_str(),
+        Mod::get()->getVersion().toVString().c_str()
     );
 
     if (ImGui::Button("Reset Layout")) {
