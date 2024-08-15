@@ -169,7 +169,7 @@ void DevTools::draw(GLRenderCtx* ctx) {
         }
 
         m_dockspaceID = ImGui::DockSpaceOverViewport(
-            nullptr, ImGuiDockNodeFlags_PassthruCentralNode
+            0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode
         );
 
         ImGui::PushFont(m_defaultFont);

@@ -285,11 +285,8 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
 
             auto pad = ImGui::GetStyle().FramePadding.x;
 
-            auto winPos = ImGui::GetWindowPos() +
-                ImGui::GetWindowContentRegionMin();
-            
-            auto winSize = ImGui::GetWindowContentRegionMax() -
-                ImGui::GetWindowContentRegionMin();
+            auto winPos = ImGui::GetCursorScreenPos();
+            auto winSize = ImGui::GetContentRegionAvail();
             
             ImVec2 imgSize = {
                 (winSize.y - pad * 2) * ratio,

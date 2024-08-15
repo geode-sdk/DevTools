@@ -58,7 +58,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
         DevTools::get()->selectNode(node);
         selected = true;
     }
-    if (ImGui::IsItemHovered() && (m_settings.alwaysHighlight || ImGui::IsKeyDown(ImGuiKey_ModShift))) {
+    if (ImGui::IsItemHovered() && (m_settings.alwaysHighlight || ImGui::IsKeyDown(ImGuiMod_Shift))) {
         DevTools::get()->highlightNode(node, HighlightMode::Hovered);
     }
     if (expanded) {
