@@ -209,7 +209,8 @@ void DevTools::drawSettings() {
     }
 }
 
-class $modify(AppDelegate) {
+// TODO: this hook also isnt gd *
+/*class $modify(AppDelegate) {
     void applicationWillEnterForeground() override {
         AppDelegate::applicationWillEnterForeground();
         if (DevTools::get()->pausedGame()) {
@@ -217,4 +218,4 @@ class $modify(AppDelegate) {
             // FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(true);
         }
     }
-};
+};*/
