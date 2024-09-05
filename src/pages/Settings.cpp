@@ -199,9 +199,7 @@ void DevTools::drawSettings() {
     }
 
     ImGui::TextWrapped(
-        "Running Geode %s, DevTools %s",
-        Loader::get()->getVersion().toVString().c_str(),
-        Mod::get()->getVersion().toVString().c_str()
+        "Running Geode %s, DevTools %s"
     );
 
     if (ImGui::Button("Reset Layout")) {
