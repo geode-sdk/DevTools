@@ -3,7 +3,9 @@
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>
 #include <Geode/modify/CCDirector.hpp>
+#ifndef GEODE_IS_IOS
 #include <Geode/modify/CCEGLView.hpp>
+#endif
 #include <Geode/modify/CCNode.hpp>
 #include "DevTools.hpp"
 #include <imgui.h>
@@ -19,6 +21,8 @@ class $modify(CCNode) {
     }
 };
 
+#ifndef GEODE_IS_IOS
+
 // todo: use shortcuts api once Geode has those
 class $modify(CCKeyboardDispatcher) {
     bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool arr) {
@@ -29,6 +33,8 @@ class $modify(CCKeyboardDispatcher) {
         return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr);
     }
 };
+
+#endif
 
 #ifdef GEODE_IS_MOBILE
 // lol
@@ -74,7 +80,12 @@ class $modify(CCDirector) {
             shouldUpdateGDRenderBuffer() = false;
         }
 
+        #ifdef GEODE_IS_IOS
+        auto winSize = this->getOpenGLView()->m_obViewPortRect * geode::utils::getDisplayFactor();
+        #else
         auto winSize = this->getOpenGLView()->getViewPortRect() * geode::utils::getDisplayFactor();
+        #endif
+        
         if (!gdTexture) {
             gdTexture = new GLRenderCtx({ winSize.size.width, winSize.size.height });
         }
@@ -100,6 +111,8 @@ class $modify(CCDirector) {
     }
 };
 
+#ifndef GEODE_IS_IOS
+
 class $modify(CCEGLView) {
     // this is needed for popout mode because we need to render after gd has rendered,
     // but before the buffers have been swapped, which is not possible with just a
@@ -112,3 +125,5 @@ class $modify(CCEGLView) {
         CCEGLView::swapBuffers();
     }
 };
+
+#endif
