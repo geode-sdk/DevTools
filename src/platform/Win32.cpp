@@ -39,12 +39,12 @@ class $modify(CCEGLView) {
         CCEGLView::updateWindow(width, height);
     }
 
-    void toggleFullScreen(bool value, bool borderless) {
+    void toggleFullScreen(bool value, bool borderless, bool fix) {
 		if (!DevTools::get()->isSetup())
-			return CCEGLView::toggleFullScreen(value, borderless);
+			return CCEGLView::toggleFullScreen(value, borderless, fix);
 
 		DevTools::get()->destroy();
-		CCEGLView::toggleFullScreen(value, borderless);
+		CCEGLView::toggleFullScreen(value, borderless, fix);
 		DevTools::get()->setup();
 	}
 
