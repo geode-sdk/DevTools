@@ -22,8 +22,8 @@ void DevTools::setupPlatform() {
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 
     // use static since imgui does not own the pointer!
-    static const auto iniPath = (Mod::get()->getSaveDir() / "imgui.ini").string();
-    io.IniFilename = iniPath.c_str();
+    static const auto iniPath = (Mod::get()->getSaveDir() / "imgui.ini").u8string();
+    io.IniFilename = reinterpret_cast<const char*>(iniPath.c_str());
 
     unsigned char* pixels;
     int width, height;
