@@ -13,36 +13,34 @@
 
 template<>
 struct matjson::Serialize<Settings> {
-    static Settings from_json(const matjson::Value& value) {
-        return Settings {
-            .GDInWindow = value["game_in_window"].as_bool(),
-            .attributesInTree = value["attributes_in_tree"].as_bool(),
-            .alwaysHighlight = value["always_highlight"].as_bool(),
-            .highlightLayouts = value["highlight_layouts"].as_bool(),
-            .arrowExpand = value["arrow_expand"].as_bool(),
-            .orderChildren = value["order_children"].as_bool(),
-            .advancedSettings = value["advanced_settings"].as_bool(),
-            .showMemoryViewer = value["show_memory_viewer"].as_bool(),
-            .theme = value["theme"].as_string(),
-        };
+    static Result<Settings> fromJson(const matjson::Value& value) {
+        Settings defaults;
+
+        return Ok(Settings {
+            .GDInWindow = value["game_in_window"].asBool().unwrapOr(std::move(defaults.GDInWindow)),
+            .attributesInTree = value["attributes_in_tree"].asBool().unwrapOr(std::move(defaults.attributesInTree)),
+            .alwaysHighlight = value["always_highlight"].asBool().unwrapOr(std::move(defaults.alwaysHighlight)),
+            .highlightLayouts = value["highlight_layouts"].asBool().unwrapOr(std::move(defaults.highlightLayouts)),
+            .arrowExpand = value["arrow_expand"].asBool().unwrapOr(std::move(defaults.arrowExpand)),
+            .orderChildren = value["order_children"].asBool().unwrapOr(std::move(defaults.orderChildren)),
+            .advancedSettings = value["advanced_settings"].asBool().unwrapOr(std::move(defaults.advancedSettings)),
+            .showMemoryViewer = value["show_memory_viewer"].asBool().unwrapOr(std::move(defaults.showMemoryViewer)),
+            .theme = value["theme"].asString().unwrapOr(std::move(defaults.theme)),
+        });
     }
 
-    static matjson::Value to_json(const Settings& settings) {
-        auto obj = matjson::Object();
-        obj["game_in_window"] = settings.GDInWindow;
-        obj["attributes_in_tree"] = settings.attributesInTree;
-        obj["always_highlight"] = settings.alwaysHighlight;
-        obj["highlight_layouts"] = settings.highlightLayouts;
-        obj["arrow_expand"] = settings.arrowExpand;
-        obj["order_children"] = settings.orderChildren;
-        obj["advanced_settings"] = settings.advancedSettings;
-        obj["show_memory_viewer"] = settings.showMemoryViewer;
-        obj["theme"] = settings.theme;
-        return obj;
-    }
-
-    static bool is_json(matjson::Value const& val) {
-        return val.is_object();
+    static matjson::Value toJson(const Settings& settings) {
+        return matjson::makeObject({
+            { "game_in_window", settings.GDInWindow },
+            { "attributes_in_tree", settings.attributesInTree },
+            { "always_highlight", settings.alwaysHighlight },
+            { "highlight_layouts", settings.highlightLayouts },
+            { "arrow_expand", settings.arrowExpand },
+            { "order_children", settings.orderChildren },
+            { "advanced_settings", settings.advancedSettings },
+            { "show_memory_viewer", settings.showMemoryViewer },
+            { "theme", settings.theme },
+        });
     }
 };
 

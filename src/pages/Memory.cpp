@@ -333,9 +333,11 @@ void DevTools::drawMemory() {
             } else if (auto maybeStr = findStdString(ptr); maybeStr) {
                 auto str = maybeStr->substr(0, 30);
                 // escapes new lines and stuff for me :3
-                auto fmted = matjson::Value(std::string(str)).dump(0);
-                texts.push_back(fmt::format("[{:04x}] maybe std::string {}, {}", offset, maybeStr->size(), fmted));
-                textSaving.push_back(fmt::format("{:x}: s {}", offset, fmted));
+                if(auto fmted = matjson::Value(std::string(str)).dump(0)) {
+                    auto fmtedStr = fmted.unwrap();
+                    texts.push_back(fmt::format("[{:04x}] maybe std::string {}, {}", offset, maybeStr->size(), fmtedStr));
+                    textSaving.push_back(fmt::format("{:x}: s {}", offset, fmtedStr));
+                }
             } else if (auto valueOpt = ptr.read_opt<uintptr_t>()) {
                 auto value = *valueOpt;
                 auto data = std::span(reinterpret_cast<uint8_t*>(&value), sizeof(void*));

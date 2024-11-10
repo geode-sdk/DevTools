@@ -1,5 +1,5 @@
 {
-	"geode": "3.9.0",
+	"geode": "4.0.0",
 	"version": "v1.7.1",
 	"gd": {
 		"win": "*",
@@ -10,7 +10,9 @@
 	"name": "DevTools",
 	"developer": "Geode Team",
 	"description": "Developer tools for Geode",
-	"repository": "https://github.com/geode-sdk/DevTools",
+	"links": {
+		"source": "https://github.com/geode-sdk/DevTools"
+	},
 	"issues": {
 		"url": "https://github.com/geode-sdk/DevTools/issues",
 		"info": "If you encounter an issue using DevTools, please report it to the GitHub issues page."

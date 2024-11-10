@@ -77,7 +77,9 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
     metadata.setDetails(inputTextMultiline("details", metadata.getDetails()));
     metadata.setChangelog(inputTextMultiline("changelog", metadata.getChangelog()));
     metadata.setSupportInfo(inputTextMultiline("supportInfo", metadata.getSupportInfo()));
-    metadata.setRepository(inputTextMultiline("repository", metadata.getRepository()));
+    metadata.setRepository(inputTextMultiline("community", metadata.getLinks().getCommunityURL()));
+    metadata.setRepository(inputTextMultiline("homepage", metadata.getLinks().getHomepageURL()));
+    metadata.setRepository(inputTextMultiline("source", metadata.getLinks().getSourceURL()));
     metadata.setIssues(inputIssues(metadata.getIssues()));
     metadata.setNeedsEarlyLoad(inputBool("needsEarlyLoad", metadata.needsEarlyLoad()));
     metadata.setIsAPI(inputBool("isAPI", metadata.isAPI()));
@@ -141,7 +143,8 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
         ImGui::TreePop();
     }
 
-    if (ImGui::TreeNode(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(treePtr) + 4), "settings")) {
+    //TODO: fix idc enough
+    /*if (ImGui::TreeNode(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(treePtr) + 4), "settings")) {
         for (auto const& [id, setting] : metadata.getSettings()) {
             if (!ImGui::TreeNode(id.data(), "%s", id.c_str()))
                 continue;
@@ -152,7 +155,7 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
             ImGui::TreePop();
         }
         ImGui::TreePop();
-    }
+    }*/
 
     return metadata;
 }
