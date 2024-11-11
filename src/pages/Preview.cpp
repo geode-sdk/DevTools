@@ -11,10 +11,8 @@ void DevTools::drawNodePreview(CCNode* node) {
     // TODO: this creates a new texture every frame and kills my gpu :sob:
     return;
     auto list = ImGui::GetWindowDrawList();
-    auto winPos = ImGui::GetWindowPos() +
-        ImGui::GetWindowContentRegionMin();
-    auto winSize = ImGui::GetWindowContentRegionMax() -
-        ImGui::GetWindowContentRegionMin();
+    auto winPos = ImGui::GetCursorScreenPos();
+    auto winSize = ImGui::GetContentRegionAvail();
     
     auto pad = ImGui::GetStyle().FramePadding.x;
 

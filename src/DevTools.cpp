@@ -11,13 +11,51 @@
 #include <Geode/loader/Mod.hpp>
 #include "ImGui.hpp"
 
+template<>
+struct matjson::Serialize<Settings> {
+    static Result<Settings> fromJson(const matjson::Value& value) {
+        Settings defaults;
+
+        return Ok(Settings {
+            .GDInWindow = value["game_in_window"].asBool().unwrapOr(std::move(defaults.GDInWindow)),
+            .attributesInTree = value["attributes_in_tree"].asBool().unwrapOr(std::move(defaults.attributesInTree)),
+            .alwaysHighlight = value["always_highlight"].asBool().unwrapOr(std::move(defaults.alwaysHighlight)),
+            .highlightLayouts = value["highlight_layouts"].asBool().unwrapOr(std::move(defaults.highlightLayouts)),
+            .arrowExpand = value["arrow_expand"].asBool().unwrapOr(std::move(defaults.arrowExpand)),
+            .orderChildren = value["order_children"].asBool().unwrapOr(std::move(defaults.orderChildren)),
+            .advancedSettings = value["advanced_settings"].asBool().unwrapOr(std::move(defaults.advancedSettings)),
+            .showMemoryViewer = value["show_memory_viewer"].asBool().unwrapOr(std::move(defaults.showMemoryViewer)),
+            .theme = value["theme"].asString().unwrapOr(std::move(defaults.theme)),
+        });
+    }
+
+    static matjson::Value toJson(const Settings& settings) {
+        return matjson::makeObject({
+            { "game_in_window", settings.GDInWindow },
+            { "attributes_in_tree", settings.attributesInTree },
+            { "always_highlight", settings.alwaysHighlight },
+            { "highlight_layouts", settings.highlightLayouts },
+            { "arrow_expand", settings.arrowExpand },
+            { "order_children", settings.orderChildren },
+            { "advanced_settings", settings.advancedSettings },
+            { "show_memory_viewer", settings.showMemoryViewer },
+            { "theme", settings.theme },
+        });
+    }
+};
+
+$on_mod(DataSaved) { DevTools::get()->saveSettings(); }
+
 DevTools* DevTools::get() {
-    static auto inst = new DevTools;
+    static auto inst = new DevTools();
     return inst;
 }
 
+void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
+void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
+
 bool DevTools::shouldPopGame() const {
-    return m_visible && m_GDInWindow;
+    return m_visible && m_settings.GDInWindow;
 }
 
 bool DevTools::pausedGame() const {
@@ -29,7 +67,7 @@ bool DevTools::isSetup() const {
 }
 
 bool DevTools::shouldOrderChildren() const {
-    return m_orderChildren;
+    return m_settings.orderChildren;
 }
 
 CCNode* DevTools::getSelectedNode() const {
@@ -51,17 +89,9 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
     ImGui::End();
 }
 
-#ifndef GEODE_IS_MACOS
-
-float DevTools::retinaFactor() {
-    return 1.f;
-}
-
-#endif
-
 void DevTools::drawPages() {
     const auto size = CCDirector::sharedDirector()->getOpenGLView()->getFrameSize();
-    
+
     if ((!Mod::get()->setSavedValue("layout-loaded", true) || m_shouldRelayout)) {
         m_shouldRelayout = false;
 
@@ -97,7 +127,7 @@ void DevTools::drawPages() {
         &DevTools::drawSettings
     );
 
-    if (m_advancedSettings) {
+    if (m_settings.advancedSettings) {
         this->drawPage(
                 U8STR(FEATHER_SETTINGS " Advanced Settings###devtools/advanced/settings"),
                 &DevTools::drawAdvancedSettings
@@ -109,10 +139,13 @@ void DevTools::drawPages() {
         &DevTools::drawAttributes
     );
 
+    // TODO: fix preview tab
+#if 0
     this->drawPage(
         U8STR(FEATHER_DATABASE " Preview###devtools/preview"),
         &DevTools::drawPreview
     );
+#endif
 
     if (m_showModGraph) {
         this->drawPage(
@@ -121,23 +154,20 @@ void DevTools::drawPages() {
         );
     }
 
-    if (m_showModIndex) {
-        this->drawPage(
-            U8STR(FEATHER_LIST " Mod Index###devtools/advanced/mod-index"),
-            &DevTools::drawModIndex
-        );
+    if (m_settings.showMemoryViewer) {
+        this->drawPage("Memory viewer", &DevTools::drawMemory);
     }
 }
 
 void DevTools::draw(GLRenderCtx* ctx) {
     if (m_visible) {
         if (m_reloadTheme) {
-            applyTheme(m_theme);
+            applyTheme(m_settings.theme);
             m_reloadTheme = false;
         }
 
         m_dockspaceID = ImGui::DockSpaceOverViewport(
-            nullptr, ImGuiDockNodeFlags_PassthruCentralNode
+            0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode
         );
 
         ImGui::PushFont(m_defaultFont);
@@ -154,7 +184,7 @@ void DevTools::setupFonts() {
     static const ImWchar icon_ranges[] = { FEATHER_MIN_FA, FEATHER_MAX_FA, 0 };
     static const ImWchar box_ranges[]  = { BOX_DRAWING_MIN_FA, BOX_DRAWING_MAX_FA, 0 };
     static const ImWchar* def_ranges   = ImGui::GetIO().Fonts->GetGlyphRangesDefault();
-    
+
     static constexpr auto add_font = [](
         void* font, size_t realSize, float size, const ImWchar* range
     ) {
@@ -182,16 +212,16 @@ void DevTools::setup() {
     m_setup = true;
 
     IMGUI_CHECKVERSION();
-    
+
     auto ctx = ImGui::CreateContext();
-    
+
     auto& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     // if this is true then it just doesnt work :( why
     io.ConfigDockingWithShift = false;
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigWindowsResizeFromEdges = true;
-        
+
     this->setupFonts();
     this->setupPlatform();
 
@@ -200,6 +230,15 @@ void DevTools::setup() {
     ImGui::GetStyle().ScrollbarSize = 60.f;
     // ImGui::GetStyle().TabBarBorderSize = 60.f;
 #endif
+}
+
+void DevTools::destroy() {
+    if (!m_setup) return;
+    m_setup = false;
+    m_visible = false;
+
+    // crashes :(
+    // ImGui::DestroyContext();
 }
 
 void DevTools::show(bool visible) {

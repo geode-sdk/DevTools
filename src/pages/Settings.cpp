@@ -20,36 +20,36 @@ void DevTools::drawSettings() {
 
     // TODO: fix this option as it hasnt worked in a while lol
 #if 0
-    ImGui::Checkbox("GD in Window", &m_GDInWindow);
+    ImGui::Checkbox("GD in Window", &m_settings.GDInWindow);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show GD inside a window when DevTools are open");
     }
-    ImGui::Checkbox("Attributes in Tree", &m_attributesInTree);
+    ImGui::Checkbox("Attributes in Tree", &m_settings.attributesInTree);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show node attributes in the Tree");
     }
 #endif
-    ImGui::Checkbox("Highlight Nodes", &m_alwaysHighlight);
+    ImGui::Checkbox("Highlight Nodes", &m_settings.alwaysHighlight);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
             "Always highlight nodes when hovered in the Tree. "
             "When disabled, you can highlight by pressing Shift."
         );
     }
-    ImGui::Checkbox("Highlight Layouts", &m_highlightLayouts);
+    ImGui::Checkbox("Highlight Layouts", &m_settings.highlightLayouts);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
             "Highlights the borders of all layouts applied to nodes"
         );
     }
-    ImGui::Checkbox("Arrow to Expand", &m_arrowExpand);
+    ImGui::Checkbox("Arrow to Expand", &m_settings.arrowExpand);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
             "If enabled, expanding nodes in the Tree only works with the arrow. "
             "Makes selecting nodes less annoying."
         );
     }
-    ImGui::Checkbox("Order Node Children", &m_orderChildren);
+    ImGui::Checkbox("Order Node Children", &m_settings.orderChildren);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
             "When enabled (default behavior) node children are sorted by Z Order.\n"
@@ -57,10 +57,16 @@ void DevTools::drawSettings() {
             "As a side effect to disabling this, things may render incorrectly."
         );
     }
-    ImGui::Checkbox("Advanced Settings", &m_advancedSettings);
+    ImGui::Checkbox("Advanced Settings", &m_settings.advancedSettings);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
             "Shows advanced settings. Mostly useful only for development of Geode itself."
+        );
+    }
+    ImGui::Checkbox("Show Memory Viewer", &m_settings.showMemoryViewer);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Shows the memory viewer window."
         );
     }
     ImGui::PopStyleVar();
@@ -161,11 +167,11 @@ void DevTools::drawSettings() {
     ImGui::Separator();
 
     ImGui::Text("Theme");
-    static auto SELECTED = static_cast<int>(getThemeIndex(m_theme));
+    static auto SELECTED = static_cast<int>(getThemeIndex(m_settings.theme));
     if (ImGui::Combo("##devtools/theme", &SELECTED,
         (ranges::join(getThemeOptions(), std::string(1, '\0')) + '\0').c_str()
     )) {
-        m_theme = getThemeAtIndex(SELECTED);
+        m_settings.theme = getThemeAtIndex(SELECTED);
         m_reloadTheme = true;
     }
     if (ImGui::IsItemHovered()) {
@@ -194,8 +200,8 @@ void DevTools::drawSettings() {
 
     ImGui::TextWrapped(
         "Running Geode %s, DevTools %s",
-        Loader::get()->getVersion().toString().c_str(),
-        Mod::get()->getVersion().toString().c_str()
+        Loader::get()->getVersion().toVString().c_str(),
+        Mod::get()->getVersion().toVString().c_str()
     );
 
     if (ImGui::Button("Reset Layout")) {
@@ -203,7 +209,8 @@ void DevTools::drawSettings() {
     }
 }
 
-class $modify(AppDelegate) {
+// TODO: this hook also isnt gd *
+/*class $modify(AppDelegate) {
     void applicationWillEnterForeground() override {
         AppDelegate::applicationWillEnterForeground();
         if (DevTools::get()->pausedGame()) {
@@ -211,4 +218,4 @@ class $modify(AppDelegate) {
             // FMODAudioEngine::sharedEngine()->m_globalChannel->setPaused(true);
         }
     }
-};
+};*/

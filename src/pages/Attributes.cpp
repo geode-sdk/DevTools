@@ -63,11 +63,12 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             std::string addr = "N/A";
             ImGui::Text("CCMenuItem selector: %s", addr.c_str());
         } else {
-            const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector));
+            const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector), true);
             ImGui::Text("CCMenuItem selector: %s", addr.c_str());
             ImGui::SameLine();
             if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copymenuitem"))) {
-                clipboard::write(addr);
+                const auto addrNoModule = formatAddressIntoOffset(addresser::getNonVirtual(selector), false);
+                clipboard::write(addrNoModule);
             }
         }
     }
@@ -355,6 +356,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 updateAlign |= ImGui::RadioButton(
                     "Even", &align, static_cast<int>(AxisAlignment::Even)
                 );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Between", &align, static_cast<int>(AxisAlignment::Between)
+                );
                 if (updateAlign) {
                     layout->setAxisAlignment(static_cast<AxisAlignment>(align));
                     updateLayout = true;
@@ -380,6 +385,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 updateAlign |= ImGui::RadioButton(
                     "Even##cross3", &align, static_cast<int>(AxisAlignment::Even)
                 );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Between##cross4", &align, static_cast<int>(AxisAlignment::Between)
+                );
                 if (updateAlign) {
                     layout->setCrossAxisAlignment(static_cast<AxisAlignment>(align));
                     updateLayout = true;
@@ -404,6 +413,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 ImGui::SameLine();
                 updateAlign |= ImGui::RadioButton(
                     "Even##crossline3", &align, static_cast<int>(AxisAlignment::Even)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Between##crossline4", &align, static_cast<int>(AxisAlignment::Between)
                 );
                 if (updateAlign) {
                     layout->setCrossAxisLineAlignment(static_cast<AxisAlignment>(align));

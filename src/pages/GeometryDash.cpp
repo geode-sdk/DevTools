@@ -108,13 +108,15 @@ void drawLayoutArrows(
     float x;
     float y;
     switch (row ? layout->getAxisAlignment() : layout->getCrossAxisAlignment()) {
-        case AxisAlignment::Start: x = tmin.x; break;
+        case AxisAlignment::Start:
+        case AxisAlignment::Between:
         case AxisAlignment::Even: x = tmin.x; break;
         case AxisAlignment::Center: x = tmin.x + (tmax.x - tmin.x) / 2; break;
         case AxisAlignment::End: x = tmax.x; break;
     }
     switch (row ? layout->getCrossAxisAlignment() : layout->getAxisAlignment()) {
-        case AxisAlignment::Start: y = tmin.y; break;
+        case AxisAlignment::Start:
+        case AxisAlignment::Between:
         case AxisAlignment::Even: y = tmin.y; break;
         case AxisAlignment::Center: y = tmin.y + (tmax.y - tmin.y) / 2; break;
         case AxisAlignment::End: y = tmax.y; break;
@@ -283,11 +285,8 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
 
             auto pad = ImGui::GetStyle().FramePadding.x;
 
-            auto winPos = ImGui::GetWindowPos() +
-                ImGui::GetWindowContentRegionMin();
-            
-            auto winSize = ImGui::GetWindowContentRegionMax() -
-                ImGui::GetWindowContentRegionMin();
+            auto winPos = ImGui::GetCursorScreenPos();
+            auto winSize = ImGui::GetContentRegionAvail();
             
             ImVec2 imgSize = {
                 (winSize.y - pad * 2) * ratio,
@@ -315,7 +314,7 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
                 ImGui::IsWindowHovered() &&
                 getGDWindowRect().Contains(ImGui::GetMousePos());
             
-            if (m_highlightLayouts) {
+            if (m_settings.highlightLayouts) {
                 this->drawLayoutHighlights(CCDirector::get()->getRunningScene());
             }
 

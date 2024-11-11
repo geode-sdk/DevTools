@@ -5,8 +5,10 @@
 #include "themes.hpp"
 #include <cocos2d.h>
 #include <Geode/utils/cocos.hpp>
+#include <Geode/utils/addresser.hpp>
+#include <Geode/loader/Loader.hpp>
+#include <Geode/loader/ModMetadata.hpp>
 #include <unordered_map>
-#include <Geode/loader/Index.hpp>
 
 using namespace geode::prelude;
 
@@ -16,23 +18,27 @@ enum class HighlightMode {
     Layout,
 };
 
+struct Settings {
+    bool GDInWindow = true;
+    bool attributesInTree = false;
+    bool alwaysHighlight = true;
+    bool highlightLayouts = false;
+    bool arrowExpand = false;
+    bool orderChildren = true;
+    bool advancedSettings = false;
+    bool showMemoryViewer = false;
+    std::string theme = DARK_THEME;
+};
+
 class DevTools {
 protected:
     bool m_visible = false;
     bool m_setup = false;
     bool m_reloadTheme = true;
-    bool m_GDInWindow = true;
-    bool m_attributesInTree = false;
-    bool m_alwaysHighlight = true;
     bool m_shouldRelayout = false;
-    bool m_highlightLayouts = false;
-    bool m_arrowExpand = false;
-    bool m_advancedSettings = false;
     bool m_showModGraph = false;
-    bool m_showModIndex = false;
     bool m_pauseGame = false;
-    bool m_orderChildren = true;
-    std::string m_theme = DARK_THEME;
+    Settings m_settings;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
     ImFont* m_smallFont    = nullptr;
@@ -58,10 +64,9 @@ protected:
     void drawModGraph();
     void drawModGraphNode(Mod* node);
     ModMetadata inputMetadata(void* treePtr, ModMetadata metadata);
-    void drawModIndex();
-    void drawIndexItem(IndexItemHandle const& node);
     void drawPage(const char* name, void(DevTools::* fun)());
     void drawPages();
+    void drawMemory();
     void draw(GLRenderCtx* ctx);
 
     void newFrame();
@@ -70,8 +75,12 @@ protected:
 
     bool hasExtension(const std::string& ext) const;
 
+    DevTools() { loadSettings(); }
+
 public:
     static DevTools* get();
+    void loadSettings();
+    void saveSettings();
 
     bool shouldUseGDWindow() const;
 
@@ -85,12 +94,12 @@ public:
     void highlightNode(CCNode* node, HighlightMode mode);
 
     void sceneChanged();
-    static float retinaFactor();
 
     void render(GLRenderCtx* ctx);
 
     // setup ImGui & DevTools
     void setup();
+    void destroy();
 
     void show(bool visible);
     void toggle();

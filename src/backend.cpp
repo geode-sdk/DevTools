@@ -21,6 +21,10 @@ void DevTools::setupPlatform() {
     // this is a lie hehe
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 
+    // use static since imgui does not own the pointer!
+    static const auto iniPath = (Mod::get()->getSaveDir() / "imgui.ini").u8string();
+    io.IniFilename = reinterpret_cast<const char*>(iniPath.c_str());
+
     unsigned char* pixels;
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
@@ -39,7 +43,7 @@ void DevTools::newFrame() {
 
     auto* director = CCDirector::sharedDirector();
     const auto winSize = director->getWinSize();
-    const auto frameSize = director->getOpenGLView()->getFrameSize() * DevTools::retinaFactor();
+    const auto frameSize = director->getOpenGLView()->getFrameSize() * geode::utils::getDisplayFactor();
 
     // glfw new frame
     io.DisplaySize = ImVec2(frameSize.width, frameSize.height);
@@ -83,7 +87,6 @@ bool DevTools::hasExtension(const std::string& ext) const {
     }
 
     std::string extsStr(exts);
-    log::debug("{}", extsStr);
     return extsStr.find(ext) != std::string::npos;
 }
 
