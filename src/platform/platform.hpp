@@ -2,6 +2,7 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <cocos2d.h>
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
 #endif

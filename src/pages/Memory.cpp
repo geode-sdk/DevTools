@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <span>
 #include <fmt/chrono.h>
+#include <Geode/utils/string.hpp>
+#include <Geode/utils/ranges.hpp>
 
 using namespace geode::prelude;
 
