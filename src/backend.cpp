@@ -21,6 +21,10 @@ void DevTools::setupPlatform() {
     // this is a lie hehe
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 
+    // use static since imgui does not own the pointer!
+    static const auto iniPath = (Mod::get()->getSaveDir() / "imgui.ini").u8string();
+    io.IniFilename = reinterpret_cast<const char*>(iniPath.c_str());
+
     unsigned char* pixels;
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
@@ -192,7 +196,7 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
         auto* list = draw_data->CmdLists[i];
 
         // convert vertex coords to cocos space
-        for(size_t j = 0; j < list->VtxBuffer.size(); j++) {
+        for(int j = 0; j < list->VtxBuffer.size(); j++) {
             auto point = toCocos(list->VtxBuffer[j].pos);
             list->VtxBuffer[j].pos = ImVec2(point.x, point.y);
         }

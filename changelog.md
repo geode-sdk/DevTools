@@ -1,3 +1,7 @@
+## v1.7.1
+* Added support for Intel Mac
+* Disabled GD hooks that were still enabled on Windows
+
 ## v1.7.0
 
 * Support for 2.206
