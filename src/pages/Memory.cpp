@@ -285,6 +285,22 @@ void DevTools::drawMemory() {
 
     static char buffer[256] = {'0', '\0'};
     bool changed = ImGui::InputText("Addr", buffer, sizeof(buffer));
+    ImGui::SameLine();
+    if (ImGui::Button("Paste")) {
+        auto str = string::trim(clipboard::read());
+        auto stripped = false;
+        if (string::startsWith(str, "0x")) {
+            str = str.substr(2);
+            stripped = true;
+        }
+        if (std::all_of(str.begin(), str.end(), [](char c) {
+            return std::isxdigit(c);
+        })) {
+            if (stripped) str = "0x" + str;
+            std::memcpy(buffer, str.c_str(), str.size() + 1);
+            changed = true;
+        }
+    }
     static int size = 0x100;
     changed |= ImGui::DragInt("Size", &size, 16.f, 0, 0, "%x");
     if (size < 4) {
@@ -327,11 +343,26 @@ void DevTools::drawMemory() {
             RttiInfo info(ptr.read_ptr());
             auto name = info.class_name();
             if (name) {
-                texts.push_back(fmt::format("[{:04x}] {}", offset, *name));
-                textSaving.push_back(fmt::format("{:x}: p {}", offset, *name));
-                // if (typeinfo_cast<CCArray*>(ptr.as_ptr())) {
-                //     // look at types..
-                // }
+                auto voidPtr = reinterpret_cast<void**>(ptr.as_ptr());
+                auto objectPtr = reinterpret_cast<CCObject*>(*voidPtr);
+                auto formattedPtr = fmt::ptr(*voidPtr);
+                if (auto arr = typeinfo_cast<CCArray*>(objectPtr)) {
+                    texts.push_back(fmt::format("[{:04x}] cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->count(), fmt::ptr(arr->data->arr)));
+                    textSaving.push_back(fmt::format("{:x}: a cocos2d::CCArray ({}, size {}, data {})", offset, formattedPtr, arr->count(), fmt::ptr(arr->data->arr)));
+                } else if (auto dict = typeinfo_cast<CCDictionary*>(objectPtr)) {
+                    texts.push_back(fmt::format("[{:04x}] cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, dict->count(), fmt::ptr(dict->m_pElements)));
+                    textSaving.push_back(fmt::format("{:x}: d cocos2d::CCDictionary ({}, size {}, data {})", offset, formattedPtr, dict->count(), fmt::ptr(dict->m_pElements)));
+                } else {
+                    std::string nodeID;
+                    auto type = "p";
+                    if (auto node = typeinfo_cast<CCNode*>(objectPtr)) {
+                        auto foundID = node->getID();
+                        if (!foundID.empty()) nodeID = fmt::format(" \"{}\"", foundID);
+                        type = "n";
+                    }
+                    texts.push_back(fmt::format("[{:04x}] {} ({}){}", offset, *name, formattedPtr, nodeID));
+                    textSaving.push_back(fmt::format("{:x}: {} {} ({}){}", offset, type, *name, formattedPtr, nodeID));
+                }
             } else if (auto maybeStr = findStdString(ptr); maybeStr) {
                 auto str = maybeStr->substr(0, 30);
                 // escapes new lines and stuff for me :3
