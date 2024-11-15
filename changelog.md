@@ -1,7 +1,8 @@
 ## v1.8.0
 * Support for 2.206
 * Bump to Geode `v4.0.0-beta.1`
-* Overhaul the memory viewer
+* Memory viewer overhaul (#46) - thanks @hiimjustin000
+* Fix a crash related to UTF-8 directory names (3edd503)
 
 ## v1.7.1
 * Added support for Intel Mac
