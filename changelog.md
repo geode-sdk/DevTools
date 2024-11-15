@@ -1,3 +1,8 @@
+## v1.8.0
+* Support for 2.206
+* Bump to Geode `v4.0.0-beta.1`
+* Overhaul the memory viewer
+
 ## v1.7.1
 * Added support for Intel Mac
 * Disabled GD hooks that were still enabled on Windows
