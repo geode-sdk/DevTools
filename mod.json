@@ -1,5 +1,5 @@
 {
-	"geode": "4.0.0-beta.1",
+	"geode": "4.1.2",
 	"version": "v1.8.0",
 	"gd": {
 		"win": "*",
@@ -16,6 +16,11 @@
 	"issues": {
 		"url": "https://github.com/geode-sdk/DevTools/issues",
 		"info": "If you encounter an issue using DevTools, please report it to the GitHub issues page."
+	},
+	"resources": {
+		"sprites": [
+			"resources/*.png"
+		]
 	},
 	"settings": {
 		"should-use-gd-window": {
