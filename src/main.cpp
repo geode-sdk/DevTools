@@ -1,4 +1,3 @@
-
 #include "platform/platform.hpp"
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>
@@ -33,9 +32,25 @@ class $modify(CCKeyboardDispatcher) {
 #ifdef GEODE_IS_MOBILE
 // lol
 #include <Geode/modify/MenuLayer.hpp>
-class $modify(MenuLayer) {
-    void onMoreGames(CCObject*) {
+class $modify(DTMenuLayer, MenuLayer) {
+    void onDevTools(CCObject*) {
         DevTools::get()->toggle();
+    }
+    bool init() {
+        if (!MenuLayer::init()) {
+            return false;
+        }
+
+        auto btn = CCMenuItemSpriteExtra::create(
+            CircleButtonSprite::createWithSprite(
+                "devtools.png"_spr, 1, CircleBaseColor::Green,
+                CircleBaseSize::MediumAlt),
+            this, menu_selector(DTMenuLayer::onDevTools));
+        btn->setID("devtools"_spr);
+        auto menu = this->getChildByID("bottom-menu");
+        menu->addChild(btn);
+        menu->updateLayout();
+        return true;
     }
 };
 
