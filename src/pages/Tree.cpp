@@ -9,20 +9,22 @@ using namespace geode::prelude;
 
 std::string getNodeName(CCObject* node) {
 #ifdef GEODE_IS_WINDOWS
-    return typeid(*node).name() + 6;
-#else 
-    {
-        std::string ret;
+    std::string_view sv = typeid(*node).name();
+    if (sv.starts_with("class ")) sv.remove_prefix(6);
+    if (sv.starts_with("struct ")) sv.remove_prefix(7);
 
-        int status = 0;
-        auto demangle = abi::__cxa_demangle(typeid(*node).name(), 0, 0, &status);
-        if (status == 0) {
-            ret = demangle;
-        }
-        free(demangle);
+    return std::string(sv);
+#else
+    std::string ret;
 
-        return ret;
+    int status = 0;
+    auto demangle = abi::__cxa_demangle(typeid(*node).name(), 0, 0, &status);
+    if (status == 0) {
+        ret = demangle;
     }
+    free(demangle);
+
+    return ret;
 #endif
 }
 
@@ -54,7 +56,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     }
     // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
     bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.str().c_str());
-    if (ImGui::IsItemClicked()) { 
+    if (ImGui::IsItemClicked()) {
         DevTools::get()->selectNode(node);
         selected = true;
     }
