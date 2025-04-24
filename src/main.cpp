@@ -22,10 +22,16 @@ class $modify(CCNode) {
 // todo: use shortcuts api once Geode has those
 class $modify(CCKeyboardDispatcher) {
     bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool arr) {
+        auto dt = DevTools::get();
+
         if (down && (key == KEY_F11 GEODE_MACOS(|| key == KEY_F10))) {
-            DevTools::get()->toggle();
+            dt->toggle();
+            return true;
+        } else if (down && key == KEY_Escape && dt->isHoverSelectEnabled()) {
+            dt->cancelHoverSelect();
             return true;
         }
+
         return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr);
     }
 };
@@ -51,7 +57,7 @@ class $modify(CCDirector) {
         if (!DevTools::get()->shouldUseGDWindow()) {
             return CCDirector::drawScene();
         }
-        
+
         DevTools::get()->setup();
 
         static GLRenderCtx* gdTexture = nullptr;

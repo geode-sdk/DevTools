@@ -268,3 +268,7 @@ bool DevTools::isHoverSelectEnabled() const {
 void DevTools::consumeNodeHoverTouch() {
     m_nodeHoverSelectConsumeTouch = true;
 }
+
+void DevTools::cancelHoverSelect() {
+    m_nodeHoverSelectEnabled = false;
+}

@@ -94,6 +94,7 @@ public:
     bool shouldOrderChildren() const;
     bool isHoverSelectEnabled() const;
     void consumeNodeHoverTouch();
+    void cancelHoverSelect();
 
     CCNode* getSelectedNode() const;
     void selectNode(CCNode* node);
