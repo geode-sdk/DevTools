@@ -99,7 +99,7 @@ namespace {
         ccGLEnableVertexAttribs(kCCVertexAttribFlag_PosColorTex);
 
         static_assert(sizeof(CCPoint) == sizeof(ccVertex2F), "so the cocos devs were right then");
-        
+
         glVertexAttribPointer(kCCVertexAttrib_Position, 2, GL_FLOAT, GL_FALSE, 0, poli.data());
         glVertexAttribPointer(kCCVertexAttrib_Color, 4, GL_FLOAT, GL_FALSE, 0, colors.data());
         glVertexAttribPointer(kCCVertexAttrib_TexCoords, 2, GL_FLOAT, GL_FALSE, 0, uvs.data());
@@ -262,24 +262,29 @@ class $modify(CCTouchDispatcher) {
         if (io.WantCaptureMouse) {
             bool didGDSwallow = false;
 
-            if (DevTools::get()->shouldUseGDWindow() && shouldPassEventsToGDButTransformed()) {
-                auto win = ImGui::GetMainViewport()->Size;
-                const auto gdRect = getGDWindowRect();
-                if (gdRect.Contains(pos) && !DevTools::get()->pausedGame()) {
-                    auto relativePos = ImVec2(
-                        pos.x - gdRect.Min.x,
-                        pos.y - gdRect.Min.y
-                    );
-                    auto x = (relativePos.x / gdRect.GetWidth()) * win.x;
-                    auto y = (1.f - relativePos.y / gdRect.GetHeight()) * win.y;
+            auto dt = DevTools::get();
+            if (dt->shouldUseGDWindow() && shouldPassEventsToGDButTransformed()) {
+                if (dt->isHoverSelectEnabled()) {
+                    dt->consumeNodeHoverTouch();
+                } else {
+                    auto win = ImGui::GetMainViewport()->Size;
+                    const auto gdRect = getGDWindowRect();
+                    if (gdRect.Contains(pos) && !dt->pausedGame()) {
+                        auto relativePos = ImVec2(
+                            pos.x - gdRect.Min.x,
+                            pos.y - gdRect.Min.y
+                        );
+                        auto x = (relativePos.x / gdRect.GetWidth()) * win.x;
+                        auto y = (1.f - relativePos.y / gdRect.GetHeight()) * win.y;
 
-                    auto pos = toCocos(ImVec2(x, y));
-                    touch->setTouchInfo(touch->getID(), pos.x, pos.y);
-                    CCTouchDispatcher::touches(touches, event, type);
+                        auto pos = toCocos(ImVec2(x, y));
+                        touch->setTouchInfo(touch->getID(), pos.x, pos.y);
+                        CCTouchDispatcher::touches(touches, event, type);
 
-                    ImGui::SetWindowFocus("Geometry Dash");
-                    didGDSwallow = true;
-                    io.AddMouseButtonEvent(0, false);
+                        ImGui::SetWindowFocus("Geometry Dash");
+                        didGDSwallow = true;
+                        io.AddMouseButtonEvent(0, false);
+                    }
                 }
             }
 

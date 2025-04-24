@@ -38,6 +38,8 @@ protected:
     bool m_shouldRelayout = false;
     bool m_showModGraph = false;
     bool m_pauseGame = false;
+    bool m_nodeHoverSelectEnabled = false;
+    bool m_nodeHoverSelectConsumeTouch = false;
     Settings m_settings;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
@@ -51,7 +53,9 @@ protected:
     void setupPlatform();
 
     void drawTree();
-    void drawTreeBranch(CCNode* node, size_t index);
+    void drawTreeBranch(CCNode* node, size_t index, const std::vector<CCNode*>& selectedAncestors);
+    void drawTreeHoverSelectButton();
+    void drawHoveredNodeHighlight();
     void drawSettings();
     void drawAdvancedSettings();
     void drawNodeAttributes(CCNode* node);
@@ -88,6 +92,8 @@ public:
     bool pausedGame() const;
     bool isSetup() const;
     bool shouldOrderChildren() const;
+    bool isHoverSelectEnabled() const;
+    void consumeNodeHoverTouch();
 
     CCNode* getSelectedNode() const;
     void selectNode(CCNode* node);

@@ -260,3 +260,11 @@ void DevTools::sceneChanged() {
 bool DevTools::shouldUseGDWindow() const {
     return Mod::get()->getSettingValue<bool>("should-use-gd-window");
 }
+
+bool DevTools::isHoverSelectEnabled() const {
+    return m_nodeHoverSelectEnabled;
+}
+
+void DevTools::consumeNodeHoverTouch() {
+    m_nodeHoverSelectConsumeTouch = true;
+}

@@ -119,7 +119,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     if (node->getZOrder() != zOrder) {
         node->setZOrder(zOrder);
     }
-    
+
     checkbox("Visible", node, &CCNode::isVisible, &CCNode::setVisible);
     checkbox(
         "Ignore Anchor Point for Position",
@@ -127,21 +127,20 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         &CCNode::isIgnoreAnchorPointForPosition,
         &CCNode::ignoreAnchorPointForPosition
     );
-    
+
     if (auto rgbaNode = typeinfo_cast<CCRGBAProtocol*>(node)) {
         auto color = rgbaNode->getColor();
         float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
         if (ImGui::ColorEdit4("Color", _color)) {
-            rgbaNode->setColor({
+            rgbaNode->setColor(ccColor4B{
                 static_cast<GLubyte>(_color[0] * 255),
                 static_cast<GLubyte>(_color[1] * 255),
-                static_cast<GLubyte>(_color[2] * 255)
+                static_cast<GLubyte>(_color[2] * 255),
+                static_cast<GLubyte>(_color[3] * 255)
             });
-
-            rgbaNode->setOpacity(static_cast<GLubyte>(_color[3] * 255));
         }
     }
-    
+
     if (auto labelNode = typeinfo_cast<CCLabelProtocol*>(node)) {
         std::string str = labelNode->getString();
         if (ImGui::InputText("Text", &str, 256)) {
@@ -180,7 +179,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     ImGui::NewLine();
     ImGui::Separator();
     ImGui::NewLine();
-    
+
     if (auto rawOpts = node->getLayoutOptions()) {
         ImGui::Text("Layout options: %s", typeid(*rawOpts).name());
 
@@ -287,7 +286,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             }
         }
     }
-    
+
 
     ImGui::NewLine();
     ImGui::Separator();
@@ -295,7 +294,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
 
     if (auto rawLayout = node->getLayout()) {
         ImGui::Text("Layout: %s", typeid(*rawLayout).name());
-        
+
         if (ImGui::Button(U8STR(FEATHER_REFRESH_CW " Update Layout"))) {
             node->updateLayout();
         }
