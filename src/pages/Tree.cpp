@@ -121,7 +121,16 @@ static CCRect getActualMenuRect(CCNode* menu) {
     CCPoint topRight{};
 
     for (auto node : CCArrayExt<CCNode>(menu->getChildren())) {
-        auto bbox = node->boundingBox();
+        CCRect bbox;
+
+        if (typeinfo_cast<CCMenu*>(node)) {
+            auto basepos = node->getPosition() - (node->getAnchorPoint() * node->getScaledContentSize() * !node->isIgnoreAnchorPointForPosition());
+
+            bbox = getActualMenuRect(node);
+            bbox.origin += basepos;
+        } else {
+            bbox = node->boundingBox();
+        }
 
         if (bbox.origin.x < bottomLeft.x) {
             bottomLeft.x = bbox.origin.x;
