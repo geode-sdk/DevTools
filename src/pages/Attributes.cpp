@@ -132,7 +132,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         auto color = rgbaNode->getColor();
         float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
         if (ImGui::ColorEdit4("Color", _color)) {
-            rgbaNode->setColor({
+            rgbaNode->setColor(ccColor3B{
                 static_cast<GLubyte>(_color[0] * 255),
                 static_cast<GLubyte>(_color[1] * 255),
                 static_cast<GLubyte>(_color[2] * 255)

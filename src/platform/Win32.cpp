@@ -24,10 +24,13 @@ ImGuiKey keyFromGLFW(int key) {
         case GLFW_KEY_UP: return ImGuiKey_UpArrow;
         case GLFW_KEY_DOWN: return ImGuiKey_DownArrow;
         case GLFW_KEY_ESCAPE: return ImGuiKey_Escape;
-        case GLFW_KEY_LEFT_SHIFT: return ImGuiKey_LeftShift;
-        case GLFW_KEY_RIGHT_SHIFT: return ImGuiKey_RightShift;
-        case GLFW_KEY_LEFT_CONTROL: return ImGuiKey_LeftCtrl;
-        case GLFW_KEY_LEFT_ALT: return ImGuiKey_LeftAlt;
+        case GLFW_KEY_LEFT_SHIFT: case GLFW_KEY_RIGHT_SHIFT: return ImGuiKey_ModShift;
+        case GLFW_KEY_LEFT_CONTROL: case GLFW_KEY_RIGHT_CONTROL: return ImGuiKey_ModCtrl;
+        case GLFW_KEY_LEFT_ALT: case GLFW_KEY_RIGHT_ALT: return ImGuiKey_ModAlt;
+        case GLFW_KEY_HOME: return ImGuiKey_Home;
+        case GLFW_KEY_END: return ImGuiKey_End;
+        case GLFW_KEY_DELETE: return ImGuiKey_Delete;
+        case GLFW_KEY_ENTER: return ImGuiKey_Enter;
         // TODO: rest :-)
     }
     return ImGuiKey_None;
@@ -49,12 +52,14 @@ class $modify(CCEGLView) {
 	}
 
     //todo: i dont care someone else can figure it out, it completely breaks keyboard support
-    /*void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        //auto& io = ImGui::GetIO();
-        CCEGLView::onGLFWKeyCallback(window, key, scancode, action, mods);
+    void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        auto& io = ImGui::GetIO();
+        if (!io.WantCaptureKeyboard) {
+            CCEGLView::onGLFWKeyCallback(window, key, scancode, action, mods);
+        }
         // in practice this is only used for arrow keys
-        //io.AddKeyEvent(keyFromGLFW(key), action != GLFW_RELEASE);
-    }*/
+        io.AddKeyEvent(keyFromGLFW(key), action != GLFW_RELEASE);
+    }
 };
 
 #include "utils.hpp"
