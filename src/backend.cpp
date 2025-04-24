@@ -1,6 +1,7 @@
 #include <cocos2d.h>
 #include <Geode/modify/CCTouchDispatcher.hpp>
 #include <Geode/modify/CCMouseDispatcher.hpp>
+#include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/CCIMEDispatcher.hpp>
 #include "platform/platform.hpp"
 #include "DevTools.hpp"
@@ -322,5 +323,46 @@ class $modify(CCIMEDispatcher) {
         // is this really how youre supposed to do this
         io.AddKeyEvent(ImGuiKey_Backspace, true);
         io.AddKeyEvent(ImGuiKey_Backspace, false);
+    }
+};
+
+ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
+	if (key >= KEY_A && key <= KEY_Z) {
+		return static_cast<ImGuiKey>(ImGuiKey_A + (key - KEY_A));
+	}
+	if (key >= KEY_Zero && key <= KEY_Nine) {
+		return static_cast<ImGuiKey>(ImGuiKey_0 + (key - KEY_Zero));
+	}
+	switch (key) {
+		case KEY_Up: return ImGuiKey_UpArrow;
+		case KEY_Down: return ImGuiKey_DownArrow;
+		case KEY_Left: return ImGuiKey_LeftArrow;
+		case KEY_Right: return ImGuiKey_RightArrow;
+
+		case KEY_Control: return ImGuiKey_ModCtrl;
+		case KEY_Shift: return ImGuiKey_ModShift;
+		case KEY_Alt: return ImGuiKey_ModAlt;
+		case KEY_Enter: return ImGuiKey_Enter;
+
+		case KEY_Home: return ImGuiKey_Home;
+		case KEY_End: return ImGuiKey_End;
+		case KEY_Delete: return ImGuiKey_Delete;
+
+		default: return ImGuiKey_None;
+	}
+}
+
+class $modify(CCKeyboardDispatcher) {
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) {
+		auto& io = ImGui::GetIO();
+		const auto imKey = cocosToImGuiKey(key);
+		if (imKey != ImGuiKey_None) {
+			io.AddKeyEvent(imKey, down);
+		}
+		if (ImGui::GetIO().WantCaptureKeyboard) {
+			return false;
+		} else {
+			return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat);
+		}
     }
 };
