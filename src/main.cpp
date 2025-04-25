@@ -29,33 +29,6 @@ class $modify(CCKeyboardDispatcher) {
     }
 };
 
-#ifdef GEODE_IS_MOBILE
-// lol
-#include <Geode/modify/MenuLayer.hpp>
-class $modify(DTMenuLayer, MenuLayer) {
-    void onDevTools(CCObject*) {
-        DevTools::get()->toggle();
-    }
-    bool init() {
-        if (!MenuLayer::init()) {
-            return false;
-        }
-
-        auto btn = CCMenuItemSpriteExtra::create(
-            CircleButtonSprite::createWithSprite(
-                "devtools.png"_spr, 1, CircleBaseColor::Green,
-                CircleBaseSize::MediumAlt),
-            this, menu_selector(DTMenuLayer::onDevTools));
-        btn->setID("devtools"_spr);
-        auto menu = this->getChildByID("bottom-menu");
-        menu->addChild(btn);
-        menu->updateLayout();
-        return true;
-    }
-};
-
-#endif
-
 class $modify(CCDirector) {
     void willSwitchToScene(CCScene* scene) {
         CCDirector::willSwitchToScene(scene);
@@ -127,3 +100,16 @@ class $modify(CCEGLView) {
         CCEGLView::swapBuffers();
     }
 };
+
+
+// For the one eclipse shortcut
+struct ToggleDevToolsEvent : geode::Event {
+    ToggleDevToolsEvent() {}
+};
+
+$on_mod(Loaded) {
+    new EventListener<EventFilter<ToggleDevToolsEvent>>(+[](ToggleDevToolsEvent* e) {
+        DevTools::get()->toggle();
+        return ListenerResult::Stop;
+    });
+}
