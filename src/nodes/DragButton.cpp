@@ -18,7 +18,7 @@ bool DragButton::init() {
     SceneManager::get()->keepAcrossScenes(this);
     scheduleUpdate();
 
-    setZOrder(300);
+    setZOrder(70000);
 
     auto x = Mod::get()->getSavedValue<float>("button-x", 50.f);
     auto y = Mod::get()->getSavedValue<float>("button-y", 50.f);
