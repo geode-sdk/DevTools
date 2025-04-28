@@ -132,7 +132,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         auto color = rgbaNode->getColor();
         float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
         if (ImGui::ColorEdit4("Color", _color)) {
-            rgbaNode->setColor({
+            rgbaNode->setColor(ccColor3B{
                 static_cast<GLubyte>(_color[0] * 255),
                 static_cast<GLubyte>(_color[1] * 255),
                 static_cast<GLubyte>(_color[2] * 255)
@@ -306,6 +306,224 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             node->addChild(btn);
             node->updateLayout();
         }
+        if (auto layout = typeinfo_cast<SimpleAxisLayout*>(rawLayout)) {
+            bool updateLayout = false;
+            auto axis = static_cast<int>(layout->getAxis());
+            ImGui::Text("Axis");
+            auto updateAxis = false;
+            updateAxis |= ImGui::RadioButton("Row",    &axis, static_cast<int>(Axis::Row));
+            ImGui::SameLine();
+            updateAxis |= ImGui::RadioButton("Column", &axis, static_cast<int>(Axis::Column));
+            if (updateAxis) {
+                if (layout->getAxis() != static_cast<Axis>(axis)) {
+                    node->setContentSize({
+                        node->getContentSize().height,
+                        node->getContentSize().width
+                    });
+                }
+                layout->setAxis(static_cast<Axis>(axis));
+                updateLayout = true;
+            }
+            {
+                auto axisScaling = static_cast<int>(layout->getMainAxisScaling());
+                ImGui::Text("Main Axis Scaling");
+                bool updateScaling = false;
+                updateScaling |= ImGui::RadioButton(
+                    "None", &axisScaling, static_cast<int>(AxisScaling::None)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Scale Down", &axisScaling, static_cast<int>(AxisScaling::ScaleDown)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Scale", &axisScaling, static_cast<int>(AxisScaling::Scale)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Grow", &axisScaling, static_cast<int>(AxisScaling::Grow)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Fit", &axisScaling, static_cast<int>(AxisScaling::Fit)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Scale Down Gaps", &axisScaling, static_cast<int>(AxisScaling::ScaleDownGaps)
+                );
+                if (updateScaling) {
+                    layout->setMainAxisScaling(static_cast<AxisScaling>(axisScaling));
+                    updateLayout = true;
+                }
+            }
+            {
+                auto axisScaling = static_cast<int>(layout->getCrossAxisScaling());
+                ImGui::Text("Cross Axis Scaling");
+                bool updateScaling = false;
+                updateScaling |= ImGui::RadioButton(
+                    "None", &axisScaling, static_cast<int>(AxisScaling::None)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Scale Down", &axisScaling, static_cast<int>(AxisScaling::ScaleDown)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Scale", &axisScaling, static_cast<int>(AxisScaling::Scale)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Grow", &axisScaling, static_cast<int>(AxisScaling::Grow)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Fit", &axisScaling, static_cast<int>(AxisScaling::Fit)
+                );
+                ImGui::SameLine();
+                updateScaling |= ImGui::RadioButton(
+                    "Scale Down Gaps", &axisScaling, static_cast<int>(AxisScaling::ScaleDownGaps)
+                );
+                if (updateScaling) {
+                    layout->setCrossAxisScaling(static_cast<AxisScaling>(axisScaling));
+                    updateLayout = true;
+                }
+            }
+            {
+                auto align = static_cast<int>(layout->getMainAxisAlignment());
+                ImGui::Text("Main Axis Alignment");
+                bool updateAlign = false;
+                updateAlign |= ImGui::RadioButton(
+                    "Start", &align, static_cast<int>(MainAxisAlignment::Start)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Center", &align, static_cast<int>(MainAxisAlignment::Center)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "End", &align, static_cast<int>(MainAxisAlignment::End)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Even", &align, static_cast<int>(MainAxisAlignment::Even)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Between", &align, static_cast<int>(MainAxisAlignment::Between)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Around", &align, static_cast<int>(MainAxisAlignment::Around)
+                );
+                if (updateAlign) {
+                    layout->setMainAxisAlignment(static_cast<MainAxisAlignment>(align));
+                    updateLayout = true;
+                }
+            }
+            {
+                auto align = static_cast<int>(layout->getCrossAxisAlignment());
+                ImGui::Text("Cross Axis Alignment");
+                bool updateAlign = false;
+                updateAlign |= ImGui::RadioButton(
+                    "Start", &align, static_cast<int>(CrossAxisAlignment::Start)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "Center", &align, static_cast<int>(CrossAxisAlignment::Center)
+                );
+                ImGui::SameLine();
+                updateAlign |= ImGui::RadioButton(
+                    "End", &align, static_cast<int>(CrossAxisAlignment::End)
+                );
+                if (updateAlign) {
+                    layout->setCrossAxisAlignment(static_cast<CrossAxisAlignment>(align));
+                    updateLayout = true;
+                }
+            }
+            {
+                auto direction = static_cast<int>(layout->getMainAxisDirection());
+                ImGui::Text("Main Axis Direction");
+                bool updateDirection = false;
+                updateDirection |= ImGui::RadioButton(
+                    "Front to Back", &direction, static_cast<int>(AxisDirection::FrontToBack)
+                );
+                ImGui::SameLine();
+                updateDirection |= ImGui::RadioButton(
+                    "Back to front", &direction, static_cast<int>(AxisDirection::BackToFront)
+                );
+                if (updateDirection) {
+                    layout->setMainAxisDirection(static_cast<AxisDirection>(direction));
+                    updateLayout = true;
+                }
+            }
+            {
+                auto direction = static_cast<int>(layout->getCrossAxisDirection());
+                ImGui::Text("Cross Axis Direction");
+                bool updateDirection = false;
+                updateDirection |= ImGui::RadioButton(
+                    "Front to Back", &direction, static_cast<int>(AxisDirection::FrontToBack)
+                );
+                ImGui::SameLine();
+                updateDirection |= ImGui::RadioButton(
+                    "Back to front", &direction, static_cast<int>(AxisDirection::BackToFront)
+                );
+                if (updateDirection) {
+                    layout->setCrossAxisDirection(static_cast<AxisDirection>(direction));
+                    updateLayout = true;
+                }
+            }
+
+            auto gap = layout->getGap();
+            if (ImGui::DragFloat("Gap", &gap)) {
+                layout->setGap(gap);
+                updateLayout = true;
+            }
+
+            auto minRelativeScaleOpt = layout->getMinRelativeScale();
+            float minRelativeScale = minRelativeScaleOpt.value_or(0);
+            bool hasMinRelativeScale = minRelativeScaleOpt.has_value();
+
+            if (ImGui::Checkbox("Has Min Relative Scale", &hasMinRelativeScale)) {
+                if (hasMinRelativeScale) {
+                    layout->setMinRelativeScale(0);
+                }
+                else {
+                    layout->setMinRelativeScale(std::nullopt);
+                }
+                updateLayout = true;
+            }
+
+            if (ImGui::DragFloat("Min Relative Scale", &minRelativeScale)) {
+                if (hasMinRelativeScale) {
+                    layout->setMinRelativeScale(minRelativeScale);
+                    updateLayout = true;
+                }
+            }
+
+            auto maxRelativeScaleOpt = layout->getMaxRelativeScale();
+            float maxRelativeScale = maxRelativeScaleOpt.value_or(0);
+            bool hasMaxRelativeScale = maxRelativeScaleOpt.has_value();
+            if (ImGui::Checkbox("Has Max Relative Scale", &hasMaxRelativeScale)) {
+                if (hasMaxRelativeScale) {
+                    layout->setMaxRelativeScale(0);
+                }
+                else {
+                    layout->setMaxRelativeScale(std::nullopt);
+                }
+                updateLayout = true;
+            }
+
+            if (ImGui::DragFloat("Max Relative Scale", &maxRelativeScale)) {
+                if (hasMaxRelativeScale) {
+                    layout->setMaxRelativeScale(maxRelativeScale);
+                    updateLayout = true;
+                }
+            }
+
+            if (updateLayout) {
+                node->updateLayout();
+            }
+        }
         if (auto layout = typeinfo_cast<AxisLayout*>(rawLayout)) {
             bool updateLayout = false;
 
@@ -454,6 +672,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
     else {
+        if (ImGui::Button(U8STR(FEATHER_PLUS " Add SimpleAxisLayout"))) {
+            node->setLayout(SimpleAxisLayout::create(Axis::Row));
+        }
         if (ImGui::Button(U8STR(FEATHER_PLUS " Add AxisLayout"))) {
             node->setLayout(AxisLayout::create());
         }
