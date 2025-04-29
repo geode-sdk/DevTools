@@ -300,6 +300,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             node->updateLayout();
         }
         ImGui::SameLine();
+        if (ImGui::Button(U8STR(FEATHER_TRASH_2 " Remove Layout"))) {
+            node->setLayout(nullptr);
+        }
+        ImGui::SameLine();
         if (ImGui::Button(U8STR(FEATHER_PLUS " Add Test Child"))) {
             auto spr = CCSprite::create("GJ_button_01.png");
             auto btn = CCMenuItemSpriteExtra::create(spr, node, nullptr);
