@@ -440,16 +440,20 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                     updateLayout = true;
                 }
             }
+
+            std::string axisDirection = axis ? "Left to Right" : "Bottom to Top";
+            std::string secondAxisDirection = axis ? "Right to Left" : "Top to Bottom";
             {
                 auto direction = static_cast<int>(layout->getMainAxisDirection());
                 ImGui::Text("Main Axis Direction");
                 bool updateDirection = false;
+                
                 updateDirection |= ImGui::RadioButton(
-                    "Front to Back", &direction, static_cast<int>(AxisDirection::FrontToBack)
+                    axisDirection.c_str(), &direction, static_cast<int>(AxisDirection::FrontToBack)
                 );
                 ImGui::SameLine();
                 updateDirection |= ImGui::RadioButton(
-                    "Back to front", &direction, static_cast<int>(AxisDirection::BackToFront)
+                    secondAxisDirection.c_str(), &direction, static_cast<int>(AxisDirection::BackToFront)
                 );
                 if (updateDirection) {
                     layout->setMainAxisDirection(static_cast<AxisDirection>(direction));
@@ -461,11 +465,11 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 ImGui::Text("Cross Axis Direction");
                 bool updateDirection = false;
                 updateDirection |= ImGui::RadioButton(
-                    "Front to Back##crossdirection0", &direction, static_cast<int>(AxisDirection::FrontToBack)
+                    fmt::format("{}##crossdirection0", axisDirection).c_str(), &direction, static_cast<int>(AxisDirection::FrontToBack)
                 );
                 ImGui::SameLine();
                 updateDirection |= ImGui::RadioButton(
-                    "Back to front##crossdirection1", &direction, static_cast<int>(AxisDirection::BackToFront)
+                    fmt::format("{}##crossdirection0", secondAxisDirection).c_str(), &direction, static_cast<int>(AxisDirection::BackToFront)
                 );
                 if (updateDirection) {
                     layout->setCrossAxisDirection(static_cast<AxisDirection>(direction));
