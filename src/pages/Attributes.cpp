@@ -361,27 +361,27 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 ImGui::Text("Cross Axis Scaling");
                 bool updateScaling = false;
                 updateScaling |= ImGui::RadioButton(
-                    "None", &axisScaling, static_cast<int>(AxisScaling::None)
+                    "None##crossscale0", &axisScaling, static_cast<int>(AxisScaling::None)
                 );
                 ImGui::SameLine();
                 updateScaling |= ImGui::RadioButton(
-                    "Scale Down", &axisScaling, static_cast<int>(AxisScaling::ScaleDown)
+                    "Scale Down##crossscale1", &axisScaling, static_cast<int>(AxisScaling::ScaleDown)
                 );
                 ImGui::SameLine();
                 updateScaling |= ImGui::RadioButton(
-                    "Scale", &axisScaling, static_cast<int>(AxisScaling::Scale)
+                    "Scale##crossscale2", &axisScaling, static_cast<int>(AxisScaling::Scale)
                 );
                 ImGui::SameLine();
                 updateScaling |= ImGui::RadioButton(
-                    "Grow", &axisScaling, static_cast<int>(AxisScaling::Grow)
+                    "Grow##crossscale3", &axisScaling, static_cast<int>(AxisScaling::Grow)
                 );
                 ImGui::SameLine();
                 updateScaling |= ImGui::RadioButton(
-                    "Fit", &axisScaling, static_cast<int>(AxisScaling::Fit)
+                    "Fit##crossscale4", &axisScaling, static_cast<int>(AxisScaling::Fit)
                 );
                 ImGui::SameLine();
                 updateScaling |= ImGui::RadioButton(
-                    "Scale Down Gaps", &axisScaling, static_cast<int>(AxisScaling::ScaleDownGaps)
+                    "Scale Down Gaps##crossscale5", &axisScaling, static_cast<int>(AxisScaling::ScaleDownGaps)
                 );
                 if (updateScaling) {
                     layout->setCrossAxisScaling(static_cast<AxisScaling>(axisScaling));
@@ -425,15 +425,15 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 ImGui::Text("Cross Axis Alignment");
                 bool updateAlign = false;
                 updateAlign |= ImGui::RadioButton(
-                    "Start", &align, static_cast<int>(CrossAxisAlignment::Start)
+                    "Start##crossalign0", &align, static_cast<int>(CrossAxisAlignment::Start)
                 );
                 ImGui::SameLine();
                 updateAlign |= ImGui::RadioButton(
-                    "Center", &align, static_cast<int>(CrossAxisAlignment::Center)
+                    "Center##crossalign1", &align, static_cast<int>(CrossAxisAlignment::Center)
                 );
                 ImGui::SameLine();
                 updateAlign |= ImGui::RadioButton(
-                    "End", &align, static_cast<int>(CrossAxisAlignment::End)
+                    "End##crossalign2", &align, static_cast<int>(CrossAxisAlignment::End)
                 );
                 if (updateAlign) {
                     layout->setCrossAxisAlignment(static_cast<CrossAxisAlignment>(align));
@@ -461,11 +461,11 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 ImGui::Text("Cross Axis Direction");
                 bool updateDirection = false;
                 updateDirection |= ImGui::RadioButton(
-                    "Front to Back", &direction, static_cast<int>(AxisDirection::FrontToBack)
+                    "Front to Back##crossdirection0", &direction, static_cast<int>(AxisDirection::FrontToBack)
                 );
                 ImGui::SameLine();
                 updateDirection |= ImGui::RadioButton(
-                    "Back to front", &direction, static_cast<int>(AxisDirection::BackToFront)
+                    "Back to front##crossdirection1", &direction, static_cast<int>(AxisDirection::BackToFront)
                 );
                 if (updateDirection) {
                     layout->setCrossAxisDirection(static_cast<AxisDirection>(direction));
