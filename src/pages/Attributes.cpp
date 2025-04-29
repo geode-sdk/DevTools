@@ -503,11 +503,12 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 }
                 updateLayout = true;
             }
-
-            if (ImGui::DragFloat("Min Relative Scale", &minRelativeScale)) {
-                if (hasMinRelativeScale) {
+            if (hasMinRelativeScale) {
+                if (ImGui::DragFloat("Min Relative Scale", &minRelativeScale)) {
+                    
                     layout->setMinRelativeScale(minRelativeScale);
                     updateLayout = true;
+                    
                 }
             }
 
@@ -524,8 +525,8 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 updateLayout = true;
             }
 
-            if (ImGui::DragFloat("Max Relative Scale", &maxRelativeScale)) {
-                if (hasMaxRelativeScale) {
+            if (hasMaxRelativeScale) {
+                if (ImGui::DragFloat("Max Relative Scale", &maxRelativeScale)) {
                     layout->setMaxRelativeScale(maxRelativeScale);
                     updateLayout = true;
                 }
