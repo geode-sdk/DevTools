@@ -441,8 +441,8 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 }
             }
 
-            std::string axisDirection = axis ? "Left to Right" : "Bottom to Top";
-            std::string secondAxisDirection = axis ? "Right to Left" : "Top to Bottom";
+            std::string axisDirection = axis ? "Bottom to Top" : "Left to Right";
+            std::string secondAxisDirection = axis ? "Top to Bottom" : "Right to Left";
             {
                 auto direction = static_cast<int>(layout->getMainAxisDirection());
                 ImGui::Text("Main Axis Direction");
@@ -469,7 +469,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 );
                 ImGui::SameLine();
                 updateDirection |= ImGui::RadioButton(
-                    fmt::format("{}##crossdirection0", secondAxisDirection).c_str(), &direction, static_cast<int>(AxisDirection::BackToFront)
+                    fmt::format("{}##crossdirection1", secondAxisDirection).c_str(), &direction, static_cast<int>(AxisDirection::BackToFront)
                 );
                 if (updateDirection) {
                     layout->setCrossAxisDirection(static_cast<AxisDirection>(direction));
