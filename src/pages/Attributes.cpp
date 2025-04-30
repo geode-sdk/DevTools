@@ -177,6 +177,16 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
 
+    if (AxisGap* gap = typeinfo_cast<AxisGap*>(node)){
+        float axisGap = gap->getGap();
+        if (ImGui::DragFloat("Axis Gap", &axisGap)) {
+            gap->setGap(axisGap);
+            if (CCNode* parent = node->getParent()) {
+                parent->updateLayout();
+            }
+        }
+    }
+
     if (auto delegate = typeinfo_cast<CCTouchDelegate*>(node)) {
         if (auto handler = CCTouchDispatcher::get()->findHandler(delegate)) {
             auto priority = handler->getPriority();
@@ -538,6 +548,11 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             node->updateLayout();
         }
         if (auto layout = typeinfo_cast<SimpleAxisLayout*>(rawLayout)) {
+            ImGui::SameLine();
+            if (ImGui::Button(U8STR(FEATHER_PLUS " Add AxisGap"))) {
+                node->addChild(AxisGap::create(5));
+                node->updateLayout();
+            }
             bool updateLayout = false;
             auto axis = static_cast<int>(layout->getAxis());
             ImGui::Text("Axis");
