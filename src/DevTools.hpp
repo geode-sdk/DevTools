@@ -28,6 +28,7 @@ struct Settings {
     bool advancedSettings = false;
     bool showMemoryViewer = false;
     std::string theme = DARK_THEME;
+    ccColor4B themeColor = {2, 119, 189, 255};
 };
 
 class DevTools {
@@ -81,7 +82,7 @@ public:
     static DevTools* get();
     void loadSettings();
     void saveSettings();
-
+    Settings getSettings();
     bool shouldUseGDWindow() const;
 
     bool shouldPopGame() const;

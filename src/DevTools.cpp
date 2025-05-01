@@ -16,6 +16,11 @@ struct matjson::Serialize<Settings> {
     static Result<Settings> fromJson(const matjson::Value& value) {
         Settings defaults;
 
+        ccColor4B themeColor = {2, 119, 189, 255};
+        if (value["theme_color"].as<ccColor4B>().isOk()) {
+            themeColor = value["theme_color"].as<ccColor4B>().unwrap();
+        }
+
         return Ok(Settings {
             .GDInWindow = value["game_in_window"].asBool().unwrapOr(std::move(defaults.GDInWindow)),
             .attributesInTree = value["attributes_in_tree"].asBool().unwrapOr(std::move(defaults.attributesInTree)),
@@ -26,6 +31,7 @@ struct matjson::Serialize<Settings> {
             .advancedSettings = value["advanced_settings"].asBool().unwrapOr(std::move(defaults.advancedSettings)),
             .showMemoryViewer = value["show_memory_viewer"].asBool().unwrapOr(std::move(defaults.showMemoryViewer)),
             .theme = value["theme"].asString().unwrapOr(std::move(defaults.theme)),
+            .themeColor = themeColor
         });
     }
 
@@ -40,6 +46,7 @@ struct matjson::Serialize<Settings> {
             { "advanced_settings", settings.advancedSettings },
             { "show_memory_viewer", settings.showMemoryViewer },
             { "theme", settings.theme },
+            { "theme_color", settings.themeColor },
         });
     }
 };
@@ -53,6 +60,7 @@ DevTools* DevTools::get() {
 
 void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
 void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
+Settings DevTools::getSettings() { return m_settings; }
 
 bool DevTools::shouldPopGame() const {
     return m_visible && m_settings.GDInWindow;

@@ -178,6 +178,19 @@ void DevTools::drawSettings() {
         ImGui::SetTooltip("Select Theme");
     }
 
+    if (m_settings.theme == "Dark") {
+        auto color = m_settings.themeColor;
+        float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, color.a / 255.f };
+        if (ImGui::ColorEdit4("Primary Color", _color)) {
+            color.r = _color[0] * 255;
+            color.g = _color[1] * 255;
+            color.b = _color[2] * 255;
+            color.a = _color[3] * 255;
+            m_settings.themeColor = color;
+            m_reloadTheme = true;
+        }
+    }
+
     ImGui::Separator();
 
     ImGui::TextWrapped("Developed by ");
