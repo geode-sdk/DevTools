@@ -165,6 +165,14 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                     gradient->setEndOpacity(static_cast<GLubyte>(_color[3] * 255));
                 }
             }
+            CCPoint gradientVector = gradient->getVector();
+            float vector[2] = {
+                gradientVector.x,
+                gradientVector.y
+            };
+            if (ImGui::DragFloat2("Vector", vector, 0.05f)) {
+                gradient->setVector({vector[0], vector[1]});
+            }
         }
         else {
             auto color = rgbaNode->getColor();
