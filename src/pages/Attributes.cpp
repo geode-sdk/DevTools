@@ -36,7 +36,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         return this->selectNode(nullptr);
     }
     ImGui::SameLine();
-    if (ImGui::Button(U8STR(FEATHER_COPY "Copy Class Name"))) {
+    if (ImGui::Button(U8STR(FEATHER_COPY " Copy Class Name"))) {
         clipboard::write(getNodeName(node));
     }
     ImGui::Text("Address: %s", fmt::to_string(fmt::ptr(node)).c_str());
@@ -106,6 +106,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     ImGui::InputInt("Z Order", &zOrder);
     if (node->getZOrder() != zOrder) {
         node->setZOrder(zOrder);
+    }
+    int tag = node->getTag();
+    if (ImGui::InputInt("Tag", &tag)) {
+        node->setTag(tag);
     }
 
     if (auto delegate = typeinfo_cast<CCTouchDelegate*>(node)) {
