@@ -200,7 +200,9 @@ void DevTools::drawSettings() {
 
     ImGui::TextWrapped("Developed by ");
 
-    RAINBOW_HUE += 0.01f;
+    float dt = CCDirector::get()->getDeltaTime();
+
+    RAINBOW_HUE += 0.25f * dt;
     if (RAINBOW_HUE >= 1.f) {
         RAINBOW_HUE = 0.f;
     }
