@@ -57,22 +57,6 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::Text("Node ID: N/A");
     }
 
-    if (auto menuItemNode = typeinfo_cast<CCMenuItem*>(node)) {
-        const auto selector = menuItemNode->m_pfnSelector;
-        if (!selector) {
-            std::string addr = "N/A";
-            ImGui::Text("CCMenuItem selector: %s", addr.c_str());
-        } else {
-            const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector), true);
-            ImGui::Text("CCMenuItem selector: %s", addr.c_str());
-            ImGui::SameLine();
-            if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copymenuitem"))) {
-                const auto addrNoModule = formatAddressIntoOffset(addresser::getNonVirtual(selector), false);
-                clipboard::write(addrNoModule);
-            }
-        }
-    }
-
     float pos[2] = {
         node->getPositionX(),
         node->getPositionY()
@@ -118,6 +102,16 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     ImGui::InputInt("Z Order", &zOrder);
     if (node->getZOrder() != zOrder) {
         node->setZOrder(zOrder);
+    }
+
+    if (auto delegate = typeinfo_cast<CCTouchDelegate*>(node)) {
+        if (auto handler = CCTouchDispatcher::get()->findHandler(delegate)) {
+            auto priority = handler->getPriority();
+
+            if (ImGui::InputInt("Touch Priority", &priority)) {
+                CCTouchDispatcher::get()->setPriority(priority, handler->getDelegate());
+            }
+        }
     }
 
     if (auto sprite = typeinfo_cast<CCSprite*>(node)) {
@@ -178,9 +172,10 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             }
         }
         checkbox("Cascade Color", rgbaNode, &CCRGBAProtocol::isCascadeColorEnabled, &CCRGBAProtocol::setCascadeColorEnabled);
+        ImGui::SameLine();
         checkbox("Cascade Opacity", rgbaNode, &CCRGBAProtocol::isCascadeOpacityEnabled, &CCRGBAProtocol::setCascadeOpacityEnabled);
     }
-    
+
     if (auto labelNode = typeinfo_cast<CCLabelProtocol*>(node)) {
         std::string str = labelNode->getString();
         if (ImGui::InputText("Text", &str, 256)) {
@@ -194,16 +189,6 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             gap->setGap(axisGap);
             if (CCNode* parent = node->getParent()) {
                 parent->updateLayout();
-            }
-        }
-    }
-
-    if (auto delegate = typeinfo_cast<CCTouchDelegate*>(node)) {
-        if (auto handler = CCTouchDispatcher::get()->findHandler(delegate)) {
-            auto priority = handler->getPriority();
-
-            if (ImGui::DragInt("Touch Priority", &priority, .03f)) {
-                CCTouchDispatcher::get()->setPriority(priority, handler->getDelegate());
             }
         }
     }
@@ -245,12 +230,54 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 }
             }
         }
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+    }
+    
+    if (auto menuItemNode = typeinfo_cast<CCMenuItem*>(node)) {
+        const auto selector = menuItemNode->m_pfnSelector;
+        if (!selector) {
+            std::string addr = "N/A";
+            ImGui::Text("CCMenuItem selector: %s", addr.c_str());
+        } else {
+            const auto addr = formatAddressIntoOffset(addresser::getNonVirtual(selector), true);
+            ImGui::Text("CCMenuItem selector: %s", addr.c_str());
+            ImGui::SameLine();
+            if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copymenuitem"))) {
+                const auto addrNoModule = formatAddressIntoOffset(addresser::getNonVirtual(selector), false);
+                clipboard::write(addrNoModule);
+            }
+        }
+        if (ImGui::Button(U8STR(FEATHER_LINK " Activate##activatemenuitem"))) {
+            menuItemNode->activate();
+        }
+        checkbox("Enabled##enabledmenuitem", menuItemNode, &CCMenuItem::isEnabled, &CCMenuItem::setEnabled);
+
+        if (auto menuItemSpriteExtra = typeinfo_cast<CCMenuItemSpriteExtra*>(menuItemNode)) {
+            bool animationEnabled = menuItemSpriteExtra->m_animationEnabled;
+            if (ImGui::Checkbox("Animation Enabled##menuitemanimationenabled", &animationEnabled)) {
+                menuItemSpriteExtra->m_animationEnabled = animationEnabled;
+            }
+            float sizeMult = menuItemSpriteExtra->m_fSizeMult;
+            if (ImGui::DragFloat("Size Multiplier##menuitemsizemult", &sizeMult, .1f)) {
+                menuItemSpriteExtra->setSizeMult(sizeMult);
+            }
+            float scaleMultiplier = menuItemSpriteExtra->m_scaleMultiplier;
+            if (ImGui::DragFloat("Scale Multipler##menuitemscalemultiplier", &scaleMultiplier, .03f)) {
+                menuItemSpriteExtra->m_scaleMultiplier = scaleMultiplier;
+            }
+            float baseScale = menuItemSpriteExtra->m_baseScale;
+            if (ImGui::DragFloat("Base Scale##menuitembasescale", &baseScale, .03f)) {
+                menuItemSpriteExtra->m_baseScale = baseScale;
+            }
+        }
+
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
     }
 
-    ImGui::NewLine();
-    ImGui::Separator();
-    ImGui::NewLine();
-    
     if (auto rawOpts = node->getLayoutOptions()) {
         ImGui::Text("Layout options: %s", typeid(*rawOpts).name());
 
