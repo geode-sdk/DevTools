@@ -119,6 +119,12 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     if (node->getZOrder() != zOrder) {
         node->setZOrder(zOrder);
     }
+
+    if (auto sprite = typeinfo_cast<CCSprite*>(node)) {
+        checkbox("Flip X", sprite, &CCSprite::isFlipX, &CCSprite::setFlipX);
+        ImGui::SameLine();
+        checkbox("Flip Y", sprite, &CCSprite::isFlipY, &CCSprite::setFlipY);
+    }
     
     checkbox("Visible", node, &CCNode::isVisible, &CCNode::setVisible);
     checkbox(
@@ -129,7 +135,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     );
     
     if (auto rgbaNode = typeinfo_cast<CCRGBAProtocol*>(node)) {
-        if (CCLayerGradient* gradient = typeinfo_cast<CCLayerGradient*>(node)) {
+        if (auto gradient = typeinfo_cast<CCLayerGradient*>(node)) {
             {
                 auto color = gradient->getStartColor();
                 float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, gradient->getStartOpacity() / 255.f };
@@ -179,7 +185,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         }
     }
     
-    if (AxisGap* gap = typeinfo_cast<AxisGap*>(node)){
+    if (auto gap = typeinfo_cast<AxisGap*>(node)){
         float axisGap = gap->getGap();
         if (ImGui::DragFloat("Axis Gap", &axisGap)) {
             gap->setGap(axisGap);
