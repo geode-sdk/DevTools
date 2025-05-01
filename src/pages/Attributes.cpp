@@ -839,6 +839,12 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 layout->setGap(gap);
                 updateLayout = true;
             }
+            
+            auto ignoreInvisibleChildren = layout->isIgnoreInvisibleChildren();
+            if (ImGui::Checkbox("Ignore Invisible Children", &ignoreInvisibleChildren)) {
+                layout->ignoreInvisibleChildren(ignoreInvisibleChildren);
+                updateLayout = true;
+            }
 
             auto minRelativeScaleOpt = layout->getMinRelativeScale();
             float minRelativeScale = minRelativeScaleOpt.value_or(0);
@@ -1007,6 +1013,12 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             auto gap = layout->getGap();
             if (ImGui::DragFloat("Gap", &gap)) {
                 layout->setGap(gap);
+                updateLayout = true;
+            }
+
+            auto ignoreInvisibleChildren = layout->isIgnoreInvisibleChildren();
+            if (ImGui::Checkbox("Ignore Invisible Children", &ignoreInvisibleChildren)) {
+                layout->ignoreInvisibleChildren(ignoreInvisibleChildren);
                 updateLayout = true;
             }
 
