@@ -220,7 +220,17 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                         break;
                     }
                 }
+                float textureRect[4] = {
+                    spriteNode->getTextureRect().getMinX(),
+                    spriteNode->getTextureRect().getMinY(),
+                    spriteNode->getTextureRect().size.width,
+                    spriteNode->getTextureRect().size.height,
+                };
+                if (ImGui::DragFloat4("Rect", textureRect), 0.03f) {
+                    spriteNode->setTextureRect({textureRect[0], textureRect[1], textureRect[2], textureRect[3]});
+                }
             }
+            ImGui::NewLine();
             auto* cachedTextures = CCTextureCache::sharedTextureCache()->m_pTextures;
             for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D*>(cachedTextures)) {
                 if (obj == texture) {
