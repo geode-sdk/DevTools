@@ -80,7 +80,6 @@ void DevTools::drawSettings() {
     ImGui::Text("GD Window");
 
     // TODO: undo later
-#if 0
     auto winSize = CCDirector::get()->getWinSize();
     auto frameSize = GameManager::get()->resolutionForKey(GameManager::get()->m_resolution);
     auto fps = roundf(1 / CCDirector::get()->getAnimationInterval());
@@ -149,7 +148,7 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.width / ratio),
         static_cast<int>(frameSize.height / ratio)
     );
-
+#if 0
     static Ref<CCSet> PAUSED_TARGETS = nullptr;
     if (ImGui::Button(m_pauseGame ? "Resume Game" : "Pause Game")) {
         m_pauseGame ^= 1;

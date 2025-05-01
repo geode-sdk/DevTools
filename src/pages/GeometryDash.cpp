@@ -429,3 +429,46 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
         ImGui::End();
     }
 }
+
+// cheaty way to detect resize and update the render
+class ResizeWatcher : public CCObject {
+private:
+    int m_lastWidth;
+    int m_lastHeight;
+    float m_resizeTimer;
+    bool m_hasPendingResize;
+public:
+    static ResizeWatcher* create() {
+        auto ret = new ResizeWatcher();
+        ret->autorelease();
+        return ret;
+    }
+
+    void update(float dt) {
+        auto view = CCDirector::sharedDirector()->getOpenGLView();
+        int w = view->getFrameSize().width;
+        int h = view->getFrameSize().height;
+
+        if (w != m_lastWidth || h != m_lastHeight) {
+            m_lastWidth = w;
+            m_lastHeight = h;
+            m_resizeTimer = 0.0f;
+            m_hasPendingResize = true;
+            return;
+        }
+
+        if (m_hasPendingResize) {
+            m_resizeTimer += dt;
+            if (m_resizeTimer > 0.2f) {
+                m_hasPendingResize = false;
+                shouldUpdateGDRenderBuffer() = true;
+            }
+        }
+    }
+};
+
+$execute {
+    Loader::get()->queueInMainThread([]{
+        CCScheduler::get()->scheduleUpdateForTarget(ResizeWatcher::create(), INT_MAX, false);
+    });
+}
