@@ -1028,6 +1028,26 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 updateLayout = true;
             }
 
+            auto maxAutoGrowAxisOpt = layout->getAutoGrowAxis();
+            float autoGrowAxis = maxAutoGrowAxisOpt.value_or(0);
+            bool hasAutoGrowAxis = maxAutoGrowAxisOpt.has_value();
+            if (ImGui::Checkbox("Has Auto Grow Axis", &hasAutoGrowAxis)) {
+                if (hasAutoGrowAxis) {
+                    layout->setAutoGrowAxis(0);
+                }
+                else {
+                    layout->setAutoGrowAxis(std::nullopt);
+                }
+                updateLayout = true;
+            }
+
+            if (hasAutoGrowAxis) {
+                if (ImGui::DragFloat("Auto Grow Axis", &autoGrowAxis)) {
+                    layout->setAutoGrowAxis(autoGrowAxis);
+                    updateLayout = true;
+                }
+            }
+
             if (updateLayout) {
                 node->updateLayout();
             }
