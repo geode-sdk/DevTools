@@ -227,7 +227,12 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                     spriteNode->getTextureRect().size.height,
                 };
                 if (ImGui::DragFloat4("Rect", textureRect), 0.03f) {
-                    spriteNode->setTextureRect({textureRect[0], textureRect[1], textureRect[2], textureRect[3]});
+                    spriteNode->setTextureRect({textureRect[0], textureRect[1], textureRect[2], textureRect[3]}, spriteNode->isTextureRectRotated(), spriteNode->getContentSize());
+                }
+
+                bool isRectRotated = spriteNode->isTextureRectRotated();;
+                if (ImGui::Checkbox("Rotate Rect", &isRectRotated)) {
+                    spriteNode->setTextureRect(spriteNode->getTextureRect(), isRectRotated, spriteNode->getContentSize());
                 }
             }
             ImGui::NewLine();
