@@ -69,6 +69,12 @@ void DevTools::drawSettings() {
             "Shows the memory viewer window."
         );
     }
+    ImGui::Checkbox("Show Mod Graph", &m_settings.showModGraph);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Shows the mod graph window."
+        );
+    }
     ImGui::PopStyleVar();
 
     ImGui::Separator();

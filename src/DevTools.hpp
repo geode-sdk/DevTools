@@ -27,6 +27,7 @@ struct Settings {
     bool orderChildren = true;
     bool advancedSettings = false;
     bool showMemoryViewer = false;
+    bool showModGraph = false;
     std::string theme = DARK_THEME;
     ccColor4B themeColor = {2, 119, 189, 255};
 };

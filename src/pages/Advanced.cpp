@@ -7,7 +7,6 @@ using namespace geode::prelude;
 
 void DevTools::drawAdvancedSettings() {
     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 1.f, 1.f });
-    ImGui::Checkbox("Show Mod Graph", &m_showModGraph);
     ImGui::PopStyleVar();
 }
 
