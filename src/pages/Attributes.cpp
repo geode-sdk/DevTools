@@ -151,14 +151,6 @@ void DevTools::drawNodeAttributes(CCNode* node) {
 
     if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
         if (auto texture = textureProtocol->getTexture()) {
-            auto* cachedTextures = CCTextureCache::sharedTextureCache()->m_pTextures;
-            for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D*>(cachedTextures)) {
-                if (obj == texture) {
-                    ImGui::TextWrapped("Texture name: %s", key.c_str());
-                    break;
-                }
-            }
-
             if (auto spriteNode = typeinfo_cast<CCSprite*>(node)) {
                 auto* cachedFrames = CCSpriteFrameCache::sharedSpriteFrameCache()->m_pSpriteFrames;
                 const auto rect = spriteNode->getTextureRect();
@@ -173,7 +165,24 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                     }
                 }
             }
+            auto* cachedTextures = CCTextureCache::sharedTextureCache()->m_pTextures;
+            for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D*>(cachedTextures)) {
+                if (obj == texture) {
+                    std::string fileName = std::filesystem::path(key).filename().string();
+                    ImGui::TextWrapped("Texture name: %s", fileName.c_str());
+                    ImGui::SameLine();
+                    if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copytexturename"))) {
+                        clipboard::write(fileName);
+                    }
 
+                    ImGui::TextWrapped("Texture path: %s", key.c_str());
+                    ImGui::SameLine();
+                    if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copytexturepath"))) {
+                        clipboard::write(key);
+                    }
+                    break;
+                }
+            }
         }
     }
 
