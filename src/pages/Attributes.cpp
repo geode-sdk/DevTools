@@ -36,7 +36,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         return this->selectNode(nullptr);
     }
     ImGui::SameLine();
-    if (ImGui::Button("Copy Class Name")) {
+    if (ImGui::Button(U8STR(FEATHER_COPY "Copy Class Name"))) {
         clipboard::write(getNodeName(node));
     }
     ImGui::Text("Address: %s", fmt::to_string(fmt::ptr(node)).c_str());
