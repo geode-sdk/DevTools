@@ -135,6 +135,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     );
     
     if (auto rgbaNode = typeinfo_cast<CCRGBAProtocol*>(node)) {
+
         if (auto gradient = typeinfo_cast<CCLayerGradient*>(node)) {
             {
                 auto color = gradient->getStartColor();
@@ -176,6 +177,8 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 rgbaNode->setOpacity(static_cast<GLubyte>(_color[3] * 255));
             }
         }
+        checkbox("Cascade Color", rgbaNode, &CCRGBAProtocol::isCascadeColorEnabled, &CCRGBAProtocol::setCascadeColorEnabled);
+        checkbox("Cascade Opacity", rgbaNode, &CCRGBAProtocol::isCascadeOpacityEnabled, &CCRGBAProtocol::setCascadeOpacityEnabled);
     }
     
     if (auto labelNode = typeinfo_cast<CCLabelProtocol*>(node)) {
