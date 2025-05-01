@@ -129,16 +129,46 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     );
     
     if (auto rgbaNode = typeinfo_cast<CCRGBAProtocol*>(node)) {
-        auto color = rgbaNode->getColor();
-        float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
-        if (ImGui::ColorEdit4("Color", _color)) {
-            rgbaNode->setColor(ccColor3B{
-                static_cast<GLubyte>(_color[0] * 255),
-                static_cast<GLubyte>(_color[1] * 255),
-                static_cast<GLubyte>(_color[2] * 255)
-            });
-
-            rgbaNode->setOpacity(static_cast<GLubyte>(_color[3] * 255));
+        if (CCLayerGradient* gradient = typeinfo_cast<CCLayerGradient*>(node)) {
+            {
+                auto color = gradient->getStartColor();
+                float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, gradient->getStartOpacity() / 255.f };
+                if (ImGui::ColorEdit4("Color 1", _color)) {
+                    gradient->setStartColor(ccColor3B{
+                        static_cast<GLubyte>(_color[0] * 255),
+                        static_cast<GLubyte>(_color[1] * 255),
+                        static_cast<GLubyte>(_color[2] * 255)
+                    });
+    
+                    gradient->setStartOpacity(static_cast<GLubyte>(_color[3] * 255));
+                }
+            }
+            {
+                auto color = gradient->getEndColor();
+                float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, gradient->getEndOpacity() / 255.f };
+                if (ImGui::ColorEdit4("Color 2", _color)) {
+                    gradient->setEndColor(ccColor3B{
+                        static_cast<GLubyte>(_color[0] * 255),
+                        static_cast<GLubyte>(_color[1] * 255),
+                        static_cast<GLubyte>(_color[2] * 255)
+                    });
+    
+                    gradient->setEndOpacity(static_cast<GLubyte>(_color[3] * 255));
+                }
+            }
+        }
+        else {
+            auto color = rgbaNode->getColor();
+            float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, rgbaNode->getOpacity() / 255.f };
+            if (ImGui::ColorEdit4("Color", _color)) {
+                rgbaNode->setColor(ccColor3B{
+                    static_cast<GLubyte>(_color[0] * 255),
+                    static_cast<GLubyte>(_color[1] * 255),
+                    static_cast<GLubyte>(_color[2] * 255)
+                });
+    
+                rgbaNode->setOpacity(static_cast<GLubyte>(_color[3] * 255));
+            }
         }
     }
     
@@ -148,6 +178,30 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             labelNode->setString(str.c_str());
         }
     }
+    
+    if (AxisGap* gap = typeinfo_cast<AxisGap*>(node)){
+        float axisGap = gap->getGap();
+        if (ImGui::DragFloat("Axis Gap", &axisGap)) {
+            gap->setGap(axisGap);
+            if (CCNode* parent = node->getParent()) {
+                parent->updateLayout();
+            }
+        }
+    }
+
+    if (auto delegate = typeinfo_cast<CCTouchDelegate*>(node)) {
+        if (auto handler = CCTouchDispatcher::get()->findHandler(delegate)) {
+            auto priority = handler->getPriority();
+
+            if (ImGui::DragInt("Touch Priority", &priority, .03f)) {
+                CCTouchDispatcher::get()->setPriority(priority, handler->getDelegate());
+            }
+        }
+    }
+
+    ImGui::NewLine();
+    ImGui::Separator();
+    ImGui::NewLine();
 
     if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
         if (auto texture = textureProtocol->getTexture()) {
@@ -170,38 +224,16 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 if (obj == texture) {
                     std::string fileName = std::filesystem::path(key).filename().string();
                     ImGui::TextWrapped("Texture name: %s", fileName.c_str());
-                    ImGui::SameLine();
-                    if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copytexturename"))) {
+                    ImGui::TextWrapped("Texture path: %s", key.c_str());
+                    if (ImGui::Button(U8STR(FEATHER_COPY " Copy Texture Name##copytexturename"))) {
                         clipboard::write(fileName);
                     }
-
-                    ImGui::TextWrapped("Texture path: %s", key.c_str());
                     ImGui::SameLine();
-                    if (ImGui::Button(U8STR(FEATHER_COPY " Copy##copytexturepath"))) {
+                    if (ImGui::Button(U8STR(FEATHER_COPY " Copy Texture Path##copytexturepath"))) {
                         clipboard::write(key);
                     }
                     break;
                 }
-            }
-        }
-    }
-
-    if (AxisGap* gap = typeinfo_cast<AxisGap*>(node)){
-        float axisGap = gap->getGap();
-        if (ImGui::DragFloat("Axis Gap", &axisGap)) {
-            gap->setGap(axisGap);
-            if (CCNode* parent = node->getParent()) {
-                parent->updateLayout();
-            }
-        }
-    }
-
-    if (auto delegate = typeinfo_cast<CCTouchDelegate*>(node)) {
-        if (auto handler = CCTouchDispatcher::get()->findHandler(delegate)) {
-            auto priority = handler->getPriority();
-
-            if (ImGui::DragInt("Touch Priority", &priority, .03f)) {
-                CCTouchDispatcher::get()->setPriority(priority, handler->getDelegate());
             }
         }
     }
