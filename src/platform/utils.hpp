@@ -2,6 +2,9 @@
 
 #include <string>
 #include <stdint.h>
+#ifndef GEODE_IS_WINDOWS
+#include <cxxabi.h>
+#endif
 #include <Geode/cocos/cocoa/CCObject.h>
 
 static inline std::string getNodeName(cocos2d::CCObject* node) {
