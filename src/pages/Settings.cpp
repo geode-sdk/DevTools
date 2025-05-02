@@ -134,7 +134,6 @@ void DevTools::drawSettings() {
             CCEGLView::get()->centerWindow();
         }
     }
-    #endif
 
 
     ImGui::TextWrapped(
@@ -153,6 +152,8 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.width / ratio),
         static_cast<int>(frameSize.height / ratio)
     );
+    #endif
+
 #if 0
     static Ref<CCSet> PAUSED_TARGETS = nullptr;
     if (ImGui::Button(m_pauseGame ? "Resume Game" : "Pause Game")) {
