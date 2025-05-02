@@ -4,6 +4,8 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include "../platform/utils.hpp"
+#include <ccTypes.h>
+#include <Geode/ui/Layout.hpp>
 
 using namespace geode::prelude;
 
