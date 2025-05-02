@@ -34,6 +34,13 @@ target_sources(${PROJECT_NAME} PRIVATE
     ${imgui_SOURCE_DIR}/misc/cpp/imgui_stdlib.cpp
 )
 
+# Love you imgui
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag(-Wnontrivial-memcall HAVE_NONTRIVIAL_MEMCALL)
+if (HAVE_NONTRIVIAL_MEMCALL)
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wno-nontrivial-memcall)
+endif()
+
 # i still dont like this (alk)
 target_compile_definitions(geode-sdk INTERFACE GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
 

@@ -35,8 +35,6 @@ CCPoint getMousePos_H() {
 }
 
 void DevTools::setupPlatform() {
-    ImGui::CreateContext();
-
     auto& io = ImGui::GetIO();
 
     io.BackendPlatformUserData = this;
@@ -52,13 +50,11 @@ void DevTools::setupPlatform() {
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
-    auto* tex2d = new CCTexture2D;
-    tex2d->initWithData(pixels, kCCTexture2DPixelFormat_RGBA8888, width, height, CCSize(width, height));
+    m_fontTexture = new CCTexture2D;
+    m_fontTexture->initWithData(pixels, kCCTexture2DPixelFormat_RGBA8888, width, height, CCSize(width, height));
+    m_fontTexture->retain();
 
-    // TODO: not leak this :-)
-    tex2d->retain();
-
-    io.Fonts->SetTexID(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(tex2d->getName())));
+    io.Fonts->SetTexID(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(m_fontTexture->getName())));
 
     // fixes getMousePos to be relative to the GD view
     #ifndef GEODE_IS_MOBILE
@@ -68,7 +64,6 @@ void DevTools::setupPlatform() {
         "geode::cocos::getMousePos"
     );
     #endif
-}
 
 void DevTools::newFrame() {
     auto& io = ImGui::GetIO();
