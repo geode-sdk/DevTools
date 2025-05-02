@@ -81,12 +81,13 @@ void DevTools::drawSettings() {
     ImGui::Separator();
 
     ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 0.01f, 1.0f, 3.0f);
+    
+    #ifdef GEODE_IS_WINDOWS
 
     ImGui::Separator();
 
     ImGui::Text("GD Window");
 
-    #ifdef GEODE_IS_WINDOWS
     auto winSize = CCDirector::get()->getWinSize();
     auto frameSize = GameManager::get()->resolutionForKey(GameManager::get()->m_resolution);
     auto fps = roundf(1 / CCDirector::get()->getAnimationInterval());
