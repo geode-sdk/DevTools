@@ -82,7 +82,7 @@ void DevTools::drawSettings() {
 
     ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 0.01f, 1.0f, 3.0f);
     
-    #ifdef GEODE_IS_DESKTOP
+#ifdef GEODE_IS_DESKTOP
 
     ImGui::Separator();
 
@@ -92,6 +92,7 @@ void DevTools::drawSettings() {
     auto frameSize = GameManager::get()->resolutionForKey(GameManager::get()->m_resolution);
     auto fps = roundf(1 / CCDirector::get()->getAnimationInterval());
     auto ratio = std::gcd(static_cast<int>(frameSize.width), static_cast<int>(frameSize.height));
+#ifdef GEODE_IS_WINDOWS
 
     std::string text = "";
     text += "Custom";
@@ -135,6 +136,7 @@ void DevTools::drawSettings() {
             CCEGLView::get()->centerWindow();
         }
     }
+#endif
 
 
     ImGui::TextWrapped(
@@ -153,7 +155,7 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.width / ratio),
         static_cast<int>(frameSize.height / ratio)
     );
-    #endif
+#endif
 
 #if 0
     static Ref<CCSet> PAUSED_TARGETS = nullptr;
