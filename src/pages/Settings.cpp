@@ -86,7 +86,7 @@ void DevTools::drawSettings() {
 
     ImGui::Text("GD Window");
 
-    // TODO: undo later
+    #ifdef GEODE_IS_WINDOWS
     auto winSize = CCDirector::get()->getWinSize();
     auto frameSize = GameManager::get()->resolutionForKey(GameManager::get()->m_resolution);
     auto fps = roundf(1 / CCDirector::get()->getAnimationInterval());
@@ -108,7 +108,6 @@ void DevTools::drawSettings() {
         GameManager::get()->m_resolution = selectedResolution;
 
         // TODO: idk how to do this on macos
-    #ifdef GEODE_IS_WINDOWS
         if (selectedResolution != 0) {
             auto size = GameManager::get()->resolutionForKey(selectedResolution);
             CCEGLView::get()->resizeWindow(size.width, size.height);
