@@ -8,7 +8,6 @@
 #include <Geode/utils/addresser.hpp>
 #include <Geode/loader/Loader.hpp>
 #include <Geode/loader/ModMetadata.hpp>
-#include <unordered_map>
 
 using namespace geode::prelude;
 
@@ -44,6 +43,7 @@ protected:
     ImFont* m_smallFont    = nullptr;
     ImFont* m_monoFont     = nullptr;
     ImFont* m_boxFont      = nullptr;
+    CCTexture2D* m_fontTexture = nullptr;
     Ref<CCNode> m_selectedNode;
     std::vector<std::pair<CCNode*, HighlightMode>> m_toHighlight;
 
