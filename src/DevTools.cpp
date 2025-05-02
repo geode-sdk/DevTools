@@ -1,4 +1,3 @@
-
 #include <imgui_internal.h>
 #include "DevTools.hpp"
 #include "fonts/FeatherIcons.hpp"
@@ -189,11 +188,15 @@ void DevTools::setupFonts() {
         void* font, size_t realSize, float size, const ImWchar* range
     ) {
         auto& io = ImGui::GetIO();
+        // AddFontFromMemoryTTF assumes ownership of the passed data unless you configure it not to.
+        // Our font data has static lifetime, so we're handling the ownership.
+
         ImFontConfig config;
-        config.MergeMode = true;
+        config.FontDataOwnedByAtlas = false;
         auto* result = io.Fonts->AddFontFromMemoryTTF(
-            font, realSize, size, nullptr, range
+            font, realSize, size, &config, range
         );
+        config.MergeMode = true;
         io.Fonts->AddFontFromMemoryTTF(
             Font_FeatherIcons, sizeof(Font_FeatherIcons), size - 4.f, &config, icon_ranges
         );
@@ -213,7 +216,7 @@ void DevTools::setup() {
 
     IMGUI_CHECKVERSION();
 
-    auto ctx = ImGui::CreateContext();
+    ImGui::CreateContext();
 
     auto& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -234,23 +237,27 @@ void DevTools::setup() {
 
 void DevTools::destroy() {
     if (!m_setup) return;
-    m_setup = false;
-    m_visible = false;
+    this->show(false);
+    auto& io = ImGui::GetIO();
+    io.BackendPlatformUserData = nullptr;
+    m_fontTexture->release();
+    m_fontTexture = nullptr;
 
-    // crashes :(
-    // ImGui::DestroyContext();
+    ImGui::DestroyContext();
+    m_setup = false;
+    m_reloadTheme = true;
 }
 
 void DevTools::show(bool visible) {
     m_visible = visible;
+
+    auto& io = ImGui::GetIO();
+    io.WantCaptureMouse = visible;
+    io.WantCaptureKeyboard = visible;
 }
 
 void DevTools::toggle() {
     this->show(!m_visible);
-    if (!m_visible) {
-        ImGui::GetIO().WantCaptureMouse = false;
-        ImGui::GetIO().WantCaptureKeyboard = false;
-    }
 }
 
 void DevTools::sceneChanged() {
