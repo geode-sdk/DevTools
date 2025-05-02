@@ -116,7 +116,6 @@ void DevTools::drawSettings() {
             CCEGLView::get()->resizeWindow(customResolution.width, customResolution.height);
         }
         CCEGLView::get()->centerWindow();
-    #endif
     }
 
     if (selectedResolution == 0) {
@@ -129,14 +128,14 @@ void DevTools::drawSettings() {
             size[1] = std::fabs(size[1]);
             customResolution = CCSizeMake(size[0], size[1]);
         }
-    #ifdef GEODE_IS_WINDOWS
         if (ImGui::Button("Apply##size-apply")) {
             GameManager::get()->m_resolution = 0;
             CCEGLView::get()->resizeWindow(customResolution.width, customResolution.height);
             CCEGLView::get()->centerWindow();
         }
-    #endif
     }
+    #endif
+
 
     ImGui::TextWrapped(
         "GL Size: %dx%d",
