@@ -64,6 +64,7 @@ void DevTools::setupPlatform() {
         "geode::cocos::getMousePos"
     );
     #endif
+}
 
 void DevTools::newFrame() {
     auto& io = ImGui::GetIO();
