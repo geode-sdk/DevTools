@@ -82,7 +82,7 @@ void DevTools::drawSettings() {
 
     ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 0.01f, 1.0f, 3.0f);
     
-    #ifdef GEODE_IS_WINDOWS
+    #ifdef GEODE_IS_DESKTOP
 
     ImGui::Separator();
 
