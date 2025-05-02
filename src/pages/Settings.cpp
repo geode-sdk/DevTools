@@ -6,6 +6,7 @@
 #include <Geode/modify/AppDelegate.hpp>
 #include <fmod.hpp>
 #include <numeric>
+#include <Geode/binding/GameManager.hpp>
 
 using namespace geode::prelude;
 

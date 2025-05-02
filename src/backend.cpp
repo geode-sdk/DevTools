@@ -12,9 +12,30 @@ using namespace cocos2d;
 
 // based off https://github.com/matcool/gd-imgui-cocos
 
-void DevTools::setupPlatform() {
-    ImGui::CreateContext();
+static bool g_useNormalPos = false;
 
+CCPoint getMousePos_H() {
+    CCPoint mouse = cocos::getMousePos();
+    const auto pos = toVec2(mouse);
+
+    if (DevTools::get()->shouldUseGDWindow() && shouldPassEventsToGDButTransformed() && !g_useNormalPos) {
+        auto win = ImGui::GetMainViewport()->Size;
+        const auto gdRect = getGDWindowRect();
+
+        auto relativePos = ImVec2(
+            pos.x - gdRect.Min.x,
+            pos.y - gdRect.Min.y
+        );
+        auto x = (relativePos.x / gdRect.GetWidth()) * win.x;
+        auto y = (relativePos.y / gdRect.GetHeight()) * win.y;
+
+        mouse = toCocos(ImVec2(x, y));
+    }
+    
+    return mouse;
+}
+
+void DevTools::setupPlatform() {
     auto& io = ImGui::GetIO();
 
     io.BackendPlatformUserData = this;
@@ -30,13 +51,20 @@ void DevTools::setupPlatform() {
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
-    auto* tex2d = new CCTexture2D;
-    tex2d->initWithData(pixels, kCCTexture2DPixelFormat_RGBA8888, width, height, CCSize(width, height));
+    m_fontTexture = new CCTexture2D;
+    m_fontTexture->initWithData(pixels, kCCTexture2DPixelFormat_RGBA8888, width, height, CCSize(width, height));
+    m_fontTexture->retain();
 
-    // TODO: not leak this :-)
-    tex2d->retain();
+    io.Fonts->SetTexID(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(m_fontTexture->getName())));
 
-    io.Fonts->SetTexID(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(tex2d->getName())));
+    // fixes getMousePos to be relative to the GD view
+    #ifndef GEODE_IS_MOBILE
+    (void) Mod::get()->hook(
+        reinterpret_cast<void*>(addresser::getNonVirtual(&geode::cocos::getMousePos)),
+        &getMousePos_H,
+        "geode::cocos::getMousePos"
+    );
+    #endif
 }
 
 void DevTools::newFrame() {
@@ -55,7 +83,9 @@ void DevTools::newFrame() {
     io.DeltaTime = director->getDeltaTime();
 
 #ifdef GEODE_IS_DESKTOP
+    g_useNormalPos = true;
     const auto mousePos = toVec2(geode::cocos::getMousePos());
+    g_useNormalPos = false;
     io.AddMousePosEvent(mousePos.x, mousePos.y);
 #endif
 

@@ -4,6 +4,7 @@
 #include <Geode/utils/ranges.hpp>
 #include <Geode/binding/FLAlertLayer.hpp>
 #include <Geode/binding/GJDropDownLayer.hpp>
+#include <Geode/ui/Layout.hpp>
 
 void drawRowAxisArrow(
     ImDrawList& foreground,
