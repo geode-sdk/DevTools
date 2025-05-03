@@ -22,7 +22,7 @@
 * Add back custom resolutions and window information
 * Hook Geode's `getMousePos` to be relative to the GD view while DevTools is open
 
-Thanks to <cj>Alphalanous</c> for doing <co>most of the changes in this update!</c>
+Thanks to <cj>Alphalaneous</c> for doing <co>most of the changes in this update!</c>
 
 ## v1.8.0
 * Support for 2.206
