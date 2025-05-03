@@ -59,7 +59,7 @@ constexpr const char* DARK_THEME = "Dark";
 constexpr const char* MATERIAL_DARK_THEME = "Material Dark";
 constexpr const char* LIGHT_THEME = "Light";
 
-ThemeDef& getThemeDef(std::string const& theme);
+ThemeDef getThemeDef(std::string const& theme);
 void applyTheme(std::string const& theme);
 
 std::vector<std::string> getThemeOptions();

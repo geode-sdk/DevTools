@@ -70,22 +70,29 @@ void DevTools::drawSettings() {
             "Shows the memory viewer window."
         );
     }
+    ImGui::Checkbox("Show Mod Graph", &m_settings.showModGraph);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Shows the mod graph window."
+        );
+    }
     ImGui::PopStyleVar();
 
     ImGui::Separator();
 
     ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 0.01f, 1.0f, 3.0f);
+    
+#ifdef GEODE_IS_DESKTOP
 
     ImGui::Separator();
 
     ImGui::Text("GD Window");
 
-    // TODO: undo later
-#if 0
     auto winSize = CCDirector::get()->getWinSize();
     auto frameSize = GameManager::get()->resolutionForKey(GameManager::get()->m_resolution);
     auto fps = roundf(1 / CCDirector::get()->getAnimationInterval());
     auto ratio = std::gcd(static_cast<int>(frameSize.width), static_cast<int>(frameSize.height));
+#ifdef GEODE_IS_WINDOWS
 
     std::string text = "";
     text += "Custom";
@@ -103,7 +110,6 @@ void DevTools::drawSettings() {
         GameManager::get()->m_resolution = selectedResolution;
 
         // TODO: idk how to do this on macos
-    #ifdef GEODE_IS_WINDOWS
         if (selectedResolution != 0) {
             auto size = GameManager::get()->resolutionForKey(selectedResolution);
             CCEGLView::get()->resizeWindow(size.width, size.height);
@@ -112,7 +118,6 @@ void DevTools::drawSettings() {
             CCEGLView::get()->resizeWindow(customResolution.width, customResolution.height);
         }
         CCEGLView::get()->centerWindow();
-    #endif
     }
 
     if (selectedResolution == 0) {
@@ -125,14 +130,14 @@ void DevTools::drawSettings() {
             size[1] = std::fabs(size[1]);
             customResolution = CCSizeMake(size[0], size[1]);
         }
-    #ifdef GEODE_IS_WINDOWS
         if (ImGui::Button("Apply##size-apply")) {
             GameManager::get()->m_resolution = 0;
             CCEGLView::get()->resizeWindow(customResolution.width, customResolution.height);
             CCEGLView::get()->centerWindow();
         }
-    #endif
     }
+#endif
+
 
     ImGui::TextWrapped(
         "GL Size: %dx%d",
@@ -150,7 +155,9 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.width / ratio),
         static_cast<int>(frameSize.height / ratio)
     );
+#endif
 
+#if 0
     static Ref<CCSet> PAUSED_TARGETS = nullptr;
     if (ImGui::Button(m_pauseGame ? "Resume Game" : "Pause Game")) {
         m_pauseGame ^= 1;
@@ -179,11 +186,26 @@ void DevTools::drawSettings() {
         ImGui::SetTooltip("Select Theme");
     }
 
+    if (m_settings.theme == "Dark") {
+        auto color = m_settings.themeColor;
+        float _color[4] = { color.r / 255.f, color.g / 255.f, color.b / 255.f, color.a / 255.f };
+        if (ImGui::ColorEdit4("Primary Color", _color)) {
+            color.r = _color[0] * 255;
+            color.g = _color[1] * 255;
+            color.b = _color[2] * 255;
+            color.a = _color[3] * 255;
+            m_settings.themeColor = color;
+            m_reloadTheme = true;
+        }
+    }
+
     ImGui::Separator();
 
     ImGui::TextWrapped("Developed by ");
 
-    RAINBOW_HUE += 0.01f;
+    float dt = CCDirector::get()->getDeltaTime();
+
+    RAINBOW_HUE += 0.25f * dt;
     if (RAINBOW_HUE >= 1.f) {
         RAINBOW_HUE = 0.f;
     }
