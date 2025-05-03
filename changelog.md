@@ -1,4 +1,4 @@
-## v1.9.0
+## v1.9.0 && v1.9.1
 * Bump to Geode `v4.4.0`
 * Add support for `SimpleAxisLayout`
 * Add missing `AxisLayoutOptions` attributes
