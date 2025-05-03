@@ -2,6 +2,7 @@
 #include <Geode/utils/ranges.hpp>
 #include <Geode/utils/general.hpp>
 #include <cocos2d.h>
+#include "DevTools.hpp"
 
 using namespace geode::prelude;
 
@@ -25,6 +26,33 @@ namespace {
             v / 255.f,
             v / 255.f,
             v / 255.f,
+        };
+    }
+
+    constexpr ImVec4 colorFromCocos(const ccColor4B& color) {
+        return {
+            color.r / 255.f, 
+            color.g / 255.f, 
+            color.b / 255.f, 
+            color.a / 255.f
+        };
+    }
+
+    constexpr ImVec4 lighterColor(ImVec4 color, float factor = 1.2f) {
+        return ImVec4{
+            (color.x * factor > 1.0f ? 1.0f : color.x * factor),
+            (color.y * factor > 1.0f ? 1.0f : color.y * factor),
+            (color.z * factor > 1.0f ? 1.0f : color.z * factor),
+            color.w
+        };
+    }
+    
+    constexpr ImVec4 darkerColor(ImVec4 color, float factor = 0.6f) {
+        return ImVec4{
+            color.x * factor,
+            color.y * factor,
+            color.z * factor,
+            color.w
         };
     }
 
@@ -73,64 +101,70 @@ namespace {
     }
 }
 
-constexpr ImVec4 DARK_THEME_BG            = color(33, 33, 33, 255);
-constexpr ImVec4 DARK_THEME_BG_DARK       = color(22, 22, 22, 255);
-constexpr ImVec4 DARK_THEME_TEXT          = color(255, 255, 255, 255);
-constexpr ImVec4 DARK_THEME_LIGHT         = color(255, 255, 255, 255);
-constexpr ImVec4 DARK_THEME_PRIMARY       = color(2, 119, 189, 255);
-constexpr ImVec4 DARK_THEME_PRIMARY_DARK  = color(2, 66, 104, 255);
-constexpr ImVec4 DARK_THEME_PRIMARY_LIGHT = color(73, 164, 216, 255);
 
-ThemeDef DARK_THEME_DEF {
-    .text                   = DARK_THEME_TEXT,
-    .textDisabled           = DARK_THEME_TEXT - 102,
-    .textSelectedBG         = DARK_THEME_PRIMARY - 60 - alpha(180),
-    .windowBG               = DARK_THEME_BG,
-    .childBG                = DARK_THEME_BG,
-    .popupBG                = DARK_THEME_BG,
-    .border                 = DARK_THEME_BG + 23,
-    .borderShadow           = DARK_THEME_BG + 50,
-    .frameBG                = DARK_THEME_BG_DARK,
-    .frameBGHovered         = DARK_THEME_BG_DARK + 20,
-    .frameBGActive          = DARK_THEME_BG_DARK,
-    .titleBarBG             = DARK_THEME_PRIMARY_DARK,
-    .titleBarBGCollapsed    = DARK_THEME_PRIMARY_DARK - alpha(150),
-    .titleBarBGActive       = DARK_THEME_PRIMARY,
-    .menuBarBG              = DARK_THEME_BG_DARK,
-    .scrollbarBG            = DARK_THEME_BG_DARK,
-    .scrollbarGrab          = DARK_THEME_PRIMARY,
-    .scrollbarGrabHovered   = DARK_THEME_PRIMARY_LIGHT,
-    .scrollbarGrabActive    = DARK_THEME_PRIMARY_DARK,
-    .checkMark              = DARK_THEME_PRIMARY,
-    .sliderGrab             = DARK_THEME_PRIMARY,
-    .sliderGrabActive       = DARK_THEME_PRIMARY_DARK,
-    .button                 = DARK_THEME_PRIMARY,
-    .buttonHovered          = DARK_THEME_PRIMARY_LIGHT,
-    .buttonActive           = DARK_THEME_PRIMARY_DARK,
-    .header                 = DARK_THEME_PRIMARY - alpha(140),
-    .headerHovered          = DARK_THEME_PRIMARY_LIGHT - alpha(40),
-    .headerActive           = DARK_THEME_PRIMARY_DARK,
-    .separator              = DARK_THEME_LIGHT - alpha(140),
-    .separatorHovered       = DARK_THEME_LIGHT - alpha(40),
-    .separatorActive        = DARK_THEME_PRIMARY_DARK,
-    .resizeGrip             = DARK_THEME_LIGHT - alpha(200),
-    .resizeGripHovered      = DARK_THEME_LIGHT - alpha(100),
-    .resizeGripActive       = DARK_THEME_PRIMARY_DARK,
-    .plotLines              = DARK_THEME_PRIMARY - alpha(140),
-    .plotLinesHovered       = DARK_THEME_PRIMARY - alpha(40),
-    .plotHistogram          = DARK_THEME_PRIMARY - alpha(140),
-    .plotHistogramHovered   = DARK_THEME_PRIMARY - alpha(40),
-    .dragDropTarget         = DARK_THEME_PRIMARY - 60 - alpha(20),
-    .navHighlight           = DARK_THEME_PRIMARY - 30 - alpha(40),
-    .navWindowingHighlight  = DARK_THEME_PRIMARY - 40 - alpha(40),
-    .tab                    = DARK_THEME_PRIMARY - alpha(200),
-    .tabHovered             = DARK_THEME_PRIMARY,
-    .tabActive              = DARK_THEME_PRIMARY_LIGHT,
-    .tabUnfocused           = DARK_THEME_PRIMARY_DARK - alpha(140),
-    .tabUnfocusedActive     = DARK_THEME_PRIMARY - alpha(140),
-    .tableBorderStrong      = DARK_THEME_LIGHT - alpha(50),
-    .tableBorderLight       = DARK_THEME_LIGHT - alpha(100),
-};
+
+ThemeDef createDarkTheme() {
+
+    constexpr ImVec4 DARK_THEME_BG            = color(33, 33, 33, 255);
+    constexpr ImVec4 DARK_THEME_BG_DARK       = color(22, 22, 22, 255);
+    constexpr ImVec4 DARK_THEME_TEXT          = color(255, 255, 255, 255);
+    constexpr ImVec4 DARK_THEME_LIGHT         = color(255, 255, 255, 255);
+    ImVec4 DARK_THEME_PRIMARY       = colorFromCocos(DevTools::get()->getSettings().themeColor);
+    ImVec4 DARK_THEME_PRIMARY_DARK  = darkerColor(DARK_THEME_PRIMARY);
+    ImVec4 DARK_THEME_PRIMARY_LIGHT = lighterColor(DARK_THEME_PRIMARY);
+
+    ThemeDef DARK_THEME_DEF {
+        .text                   = DARK_THEME_TEXT,
+        .textDisabled           = DARK_THEME_TEXT - 102,
+        .textSelectedBG         = DARK_THEME_PRIMARY - 60 - alpha(180),
+        .windowBG               = DARK_THEME_BG,
+        .childBG                = DARK_THEME_BG,
+        .popupBG                = DARK_THEME_BG,
+        .border                 = DARK_THEME_BG + 23,
+        .borderShadow           = DARK_THEME_BG + 50,
+        .frameBG                = DARK_THEME_BG_DARK,
+        .frameBGHovered         = DARK_THEME_BG_DARK + 20,
+        .frameBGActive          = DARK_THEME_BG_DARK,
+        .titleBarBG             = DARK_THEME_PRIMARY_DARK,
+        .titleBarBGCollapsed    = DARK_THEME_PRIMARY_DARK - alpha(150),
+        .titleBarBGActive       = DARK_THEME_PRIMARY,
+        .menuBarBG              = DARK_THEME_BG_DARK,
+        .scrollbarBG            = DARK_THEME_BG_DARK,
+        .scrollbarGrab          = DARK_THEME_PRIMARY,
+        .scrollbarGrabHovered   = DARK_THEME_PRIMARY_LIGHT,
+        .scrollbarGrabActive    = DARK_THEME_PRIMARY_DARK,
+        .checkMark              = DARK_THEME_PRIMARY,
+        .sliderGrab             = DARK_THEME_PRIMARY,
+        .sliderGrabActive       = DARK_THEME_PRIMARY_DARK,
+        .button                 = DARK_THEME_PRIMARY,
+        .buttonHovered          = DARK_THEME_PRIMARY_LIGHT,
+        .buttonActive           = DARK_THEME_PRIMARY_DARK,
+        .header                 = DARK_THEME_PRIMARY - alpha(140),
+        .headerHovered          = DARK_THEME_PRIMARY_LIGHT - alpha(40),
+        .headerActive           = DARK_THEME_PRIMARY_DARK,
+        .separator              = DARK_THEME_LIGHT - alpha(140),
+        .separatorHovered       = DARK_THEME_LIGHT - alpha(40),
+        .separatorActive        = DARK_THEME_PRIMARY_DARK,
+        .resizeGrip             = DARK_THEME_LIGHT - alpha(200),
+        .resizeGripHovered      = DARK_THEME_LIGHT - alpha(100),
+        .resizeGripActive       = DARK_THEME_PRIMARY_DARK,
+        .plotLines              = DARK_THEME_PRIMARY - alpha(140),
+        .plotLinesHovered       = DARK_THEME_PRIMARY - alpha(40),
+        .plotHistogram          = DARK_THEME_PRIMARY - alpha(140),
+        .plotHistogramHovered   = DARK_THEME_PRIMARY - alpha(40),
+        .dragDropTarget         = DARK_THEME_PRIMARY - 60 - alpha(20),
+        .navHighlight           = DARK_THEME_PRIMARY - 30 - alpha(40),
+        .navWindowingHighlight  = DARK_THEME_PRIMARY - 40 - alpha(40),
+        .tab                    = DARK_THEME_PRIMARY - alpha(200),
+        .tabHovered             = DARK_THEME_PRIMARY,
+        .tabActive              = DARK_THEME_PRIMARY_LIGHT,
+        .tabUnfocused           = DARK_THEME_PRIMARY_DARK - alpha(140),
+        .tabUnfocusedActive     = DARK_THEME_PRIMARY - alpha(140),
+        .tableBorderStrong      = DARK_THEME_LIGHT - alpha(50),
+        .tableBorderLight       = DARK_THEME_LIGHT - alpha(100),
+    };
+    return DARK_THEME_DEF;
+}
 
 constexpr ImVec4 MATERIAL_DARK_THEME_BG            = color(33,  33,  33, 255);
 constexpr ImVec4 MATERIAL_DARK_THEME_BG_DARK       = color(22,  22,  22, 255);
@@ -279,20 +313,20 @@ void applyCommon(ImGuiStyle& style) {
     // style.ColorButtonPosition = ImGuiDir_Left;
 }
 
-ThemeDef& getThemeDef(std::string const& name) {
+ThemeDef getThemeDef(std::string const& name) {
     switch (hash(name.c_str())) {
-        case hash(DARK_THEME): return DARK_THEME_DEF;
+        case hash(DARK_THEME): return createDarkTheme();
         case hash(MATERIAL_DARK_THEME): return MATERIAL_DARK_THEME_DEF;
         case hash(LIGHT_THEME): return LIGHT_THEME_DEF;
     }
-    return DARK_THEME_DEF;
+    return createDarkTheme();
 }
 
 void applyTheme(std::string const& name) {
     auto& style = ImGui::GetStyle();
     applyCommon(style);
 
-    auto& theme = getThemeDef(name);
+    auto theme = getThemeDef(name);
     style.Colors[ImGuiCol_Text] = theme.text;
     style.Colors[ImGuiCol_TextDisabled] = theme.textDisabled;
     style.Colors[ImGuiCol_TextSelectedBg] = theme.textSelectedBG;

@@ -24,7 +24,9 @@ struct matjson::Serialize<Settings> {
             .orderChildren = value["order_children"].asBool().unwrapOr(std::move(defaults.orderChildren)),
             .advancedSettings = value["advanced_settings"].asBool().unwrapOr(std::move(defaults.advancedSettings)),
             .showMemoryViewer = value["show_memory_viewer"].asBool().unwrapOr(std::move(defaults.showMemoryViewer)),
+            .showModGraph = value["show_mod_graph"].asBool().unwrapOr(std::move(defaults.showModGraph)),
             .theme = value["theme"].asString().unwrapOr(std::move(defaults.theme)),
+            .themeColor = value["theme_color"].as<ccColor4B>().isOk() ? value["theme_color"].as<ccColor4B>().unwrap() : std::move(defaults.themeColor)
         });
     }
 
@@ -38,7 +40,9 @@ struct matjson::Serialize<Settings> {
             { "order_children", settings.orderChildren },
             { "advanced_settings", settings.advancedSettings },
             { "show_memory_viewer", settings.showMemoryViewer },
+            { "show_mod_graph", settings.showModGraph },
             { "theme", settings.theme },
+            { "theme_color", settings.themeColor },
         });
     }
 };
@@ -52,6 +56,7 @@ DevTools* DevTools::get() {
 
 void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
 void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
+Settings DevTools::getSettings() { return m_settings; }
 
 bool DevTools::shouldPopGame() const {
     return m_visible && m_settings.GDInWindow;
@@ -126,12 +131,15 @@ void DevTools::drawPages() {
         &DevTools::drawSettings
     );
 
+    // if advanced ever has more than one option, add it back
+#if 0
     if (m_settings.advancedSettings) {
         this->drawPage(
                 U8STR(FEATHER_SETTINGS " Advanced Settings###devtools/advanced/settings"),
                 &DevTools::drawAdvancedSettings
         );
     }
+#endif
 
     this->drawPage(
         U8STR(FEATHER_TOOL " Attributes###devtools/attributes"),
@@ -146,7 +154,7 @@ void DevTools::drawPages() {
     );
 #endif
 
-    if (m_showModGraph) {
+    if (m_settings.showModGraph) {
         this->drawPage(
             U8STR(FEATHER_SHARE_2 " Mod Graph###devtools/advanced/mod-graph"),
             &DevTools::drawModGraph
@@ -154,7 +162,10 @@ void DevTools::drawPages() {
     }
 
     if (m_settings.showMemoryViewer) {
-        this->drawPage("Memory viewer", &DevTools::drawMemory);
+        this->drawPage(
+            U8STR(FEATHER_TERMINAL " Memory viewer"), 
+            &DevTools::drawMemory
+        );
     }
 }
 

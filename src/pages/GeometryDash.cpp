@@ -165,6 +165,103 @@ void drawLayoutArrows(
     );
 }
 
+AxisAlignment translateToAxisAlignment(const MainAxisAlignment& alignment) {
+    switch (alignment) {
+        case MainAxisAlignment::Start: return AxisAlignment::Start;
+        case MainAxisAlignment::Between: return AxisAlignment::Between;
+        case MainAxisAlignment::Even: return AxisAlignment::Even;
+        case MainAxisAlignment::Center: return AxisAlignment::Center;
+        case MainAxisAlignment::Around:
+        case MainAxisAlignment::End: return AxisAlignment::End;
+    }
+    return AxisAlignment::Start;
+}
+
+AxisAlignment translateToAxisAlignment(const CrossAxisAlignment& alignment) {
+    switch (alignment) {
+        case CrossAxisAlignment::Start: return AxisAlignment::Start;
+        case CrossAxisAlignment::Center: return AxisAlignment::Center;
+        case CrossAxisAlignment::End: return AxisAlignment::End;
+    }
+    return AxisAlignment::Start;
+}
+
+void drawLayoutArrows(
+    ImDrawList& foreground,
+    SimpleAxisLayout* layout,
+    ImVec2 const& tmax, ImVec2 const& tmin
+) {
+    auto row = layout->getAxis() == Axis::Row;
+
+    float x;
+    float y;
+
+    // cheating
+    AxisAlignment mainAxisAlignment = translateToAxisAlignment(layout->getMainAxisAlignment());
+    AxisAlignment crossAxisAlignment = translateToAxisAlignment(layout->getCrossAxisAlignment());
+
+    switch (row ? mainAxisAlignment : crossAxisAlignment) {
+        case AxisAlignment::Start:
+        case AxisAlignment::Between:
+        case AxisAlignment::Even: x = tmin.x; break;
+        case AxisAlignment::Center: x = tmin.x + (tmax.x - tmin.x) / 2; break;
+        case AxisAlignment::End: x = tmax.x; break;
+    }
+    switch (row ? crossAxisAlignment : mainAxisAlignment) {
+        case AxisAlignment::Start:
+        case AxisAlignment::Between:
+        case AxisAlignment::Even: y = tmin.y; break;
+        case AxisAlignment::Center: y = tmin.y + (tmax.y - tmin.y) / 2; break;
+        case AxisAlignment::End: y = tmax.y; break;
+    }
+
+    bool mainReverse = layout->getMainAxisDirection() == static_cast<AxisDirection>(1);
+    bool crossReverse = layout->getCrossAxisDirection() == static_cast<AxisDirection>(1);
+
+    bool growCrossAxis = layout->getCrossAxisScaling() == AxisScaling::Grow;
+
+    if (row) {
+        drawRowAxisArrow(
+            foreground,
+            x, y, tmax, tmin,
+            mainAxisAlignment,
+            mainReverse,
+            IM_COL32(255, 55, 55, 255)
+        );
+        if (growCrossAxis) {
+            drawColAxisArrow(
+                foreground,
+                x, y, tmax, tmin,
+                crossAxisAlignment,
+                crossReverse,
+                IM_COL32(55, 55, 255, 255)
+            );
+        }
+    }
+    else {
+        drawColAxisArrow(
+            foreground,
+            x, y, tmax, tmin,
+            mainAxisAlignment,
+            !mainReverse,
+            IM_COL32(255, 55, 55, 255)
+        );
+        if (growCrossAxis) {
+            drawRowAxisArrow(
+                foreground,
+                x, y, tmax, tmin,
+                crossAxisAlignment,
+                !crossReverse,
+                IM_COL32(55, 55, 255, 255)
+            );
+        }
+    }
+    
+    foreground.AddCircleFilled(
+        ImVec2(x, y), 6.f, IM_COL32(255, 55, 55, 255)
+    );
+}
+
 void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
 	auto& foreground = *ImGui::GetWindowDrawList();
 	auto parent = node->getParent();
@@ -231,6 +328,9 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
             if (auto layout = typeinfo_cast<AxisLayout*>(node->getLayout())) {
                 drawLayoutArrows(foreground, layout, tmax, tmin);
             }
+            if (auto layout = typeinfo_cast<SimpleAxisLayout*>(node->getLayout())) {
+                drawLayoutArrows(foreground, layout, tmax, tmin);
+            }
         } break;
 
         case HighlightMode::Layout: {
@@ -240,6 +340,9 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
             );
             // built-in Geode layouts get special extra markings
             if (auto layout = typeinfo_cast<AxisLayout*>(node->getLayout())) {
+                drawLayoutArrows(foreground, layout, tmax, tmin);
+            }
+            if (auto layout = typeinfo_cast<SimpleAxisLayout*>(node->getLayout())) {
                 drawLayoutArrows(foreground, layout, tmax, tmin);
             }
         } break;
@@ -326,4 +429,47 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
         }
         ImGui::End();
     }
+}
+
+// cheaty way to detect resize and update the render
+class ResizeWatcher : public CCObject {
+private:
+    int m_lastWidth;
+    int m_lastHeight;
+    float m_resizeTimer;
+    bool m_hasPendingResize;
+public:
+    static ResizeWatcher* create() {
+        auto ret = new ResizeWatcher();
+        ret->autorelease();
+        return ret;
+    }
+
+    void update(float dt) {
+        auto view = CCDirector::sharedDirector()->getOpenGLView();
+        int w = view->getFrameSize().width;
+        int h = view->getFrameSize().height;
+
+        if (w != m_lastWidth || h != m_lastHeight) {
+            m_lastWidth = w;
+            m_lastHeight = h;
+            m_resizeTimer = 0.0f;
+            m_hasPendingResize = true;
+            return;
+        }
+
+        if (m_hasPendingResize) {
+            m_resizeTimer += dt;
+            if (m_resizeTimer > 0.2f) {
+                m_hasPendingResize = false;
+                shouldUpdateGDRenderBuffer() = true;
+            }
+        }
+    }
+};
+
+$execute {
+    Loader::get()->queueInMainThread([]{
+        CCScheduler::get()->scheduleUpdateForTarget(ResizeWatcher::create(), INT_MAX, false);
+    });
 }
