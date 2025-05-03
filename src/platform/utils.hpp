@@ -3,6 +3,9 @@
 #include <string>
 #include <stdint.h>
 #include <Geode/cocos/cocoa/CCObject.h>
+#ifndef GEODE_IS_WINDOWS
+#include <cxxabi.h>
+#endif
 
 static inline std::string getNodeName(cocos2d::CCObject* node) {
 #ifdef GEODE_IS_WINDOWS
