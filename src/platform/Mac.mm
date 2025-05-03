@@ -18,6 +18,16 @@
 #include <mach-o/dyld.h>
 #import <Foundation/Foundation.h>
 
+#include <Carbon/Carbon.h>
+#import <objc/runtime.h>
+
+#include <Geode/cocos/platform/mac/CCEventDispatcher.h>
+#import <Geode/cocos/platform/mac/EAGLView.h>
+#include <Geode/loader/ModEvent.hpp>
+#include <Geode/loader/Log.hpp>
+
+#include <imgui.h>
+
 static std::vector<struct dyld_image_info const*> getAllImages() {
     std::vector<struct dyld_image_info const*> images;
     struct task_dyld_info dyldInfo;
@@ -84,6 +94,54 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
 
     if(module) return fmt::format("{} + {:#x}", imageName, addr - base);
     else return fmt::format("{:#x}", addr - base);
+}
+
+#define OBJC_SWIZZLE(klass, type, cleanFuncName, funcName) \
+	do { \
+		auto cleanFuncName ## Method = class_getInstanceMethod(objc_getClass(#klass), @selector(funcName)); \
+		cleanFuncName ## OIMP = reinterpret_cast<type>(method_getImplementation(cleanFuncName ## Method)); \
+		method_setImplementation(cleanFuncName ## Method, reinterpret_cast<IMP>(&cleanFuncName)); \
+		geode::log::debug("Swizzled Objective C Method '" #klass " " #funcName "'"); \
+	} while(0)
+
+using key_event_t = void(*)(EAGLView*, SEL, NSEvent*);
+
+static key_event_t flagsChangedExecOIMP;
+void flagsChangedExec(EAGLView* self, SEL sel, NSEvent* event)
+{
+
+    flagsChangedExecOIMP(self, sel, event);
+
+    auto& io = ImGui::GetIO();
+    const NSEventModifierFlags flags = [event modifierFlags];
+
+    static NSEventModifierFlags previousFlags = 0;
+    NSEventModifierFlags changedFlags = flags ^ previousFlags;
+
+    if (changedFlags & NSEventModifierFlagControl) {
+        bool isPressed = flags & NSEventModifierFlagControl;
+        io.AddKeyEvent(ImGuiKey_ModCtrl, isPressed);
+    }
+    if (changedFlags & NSEventModifierFlagOption) {
+        bool isPressed = flags & NSEventModifierFlagOption;
+        io.AddKeyEvent(ImGuiKey_ModAlt, isPressed);
+    }
+    if (changedFlags & NSEventModifierFlagCommand) {
+        bool isPressed = flags & NSEventModifierFlagCommand;
+        io.AddKeyEvent(ImGuiKey_ModSuper, isPressed);
+    }
+    if (changedFlags & NSEventModifierFlagShift) {
+        bool isPressed = flags & NSEventModifierFlagShift;
+        io.AddKeyEvent(ImGuiKey_ModShift, isPressed);
+    }
+
+    previousFlags = flags;
+}
+
+// https://github.com/qimiko/click-on-steps/blob/d8a87e93b5407e5f2113a9715363a5255724c901/src/macos.mm#L101
+$on_mod(Loaded)
+{
+	OBJC_SWIZZLE(EAGLView, key_event_t, flagsChangedExec, flagsChanged:);
 }
 
 #endif

@@ -370,6 +370,7 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 		case KEY_Right: return ImGuiKey_RightArrow;
 
 		case KEY_Control: return ImGuiKey_ModCtrl;
+        case KEY_LeftWindowsKey: return ImGuiKey_ModSuper;
 		case KEY_Shift: return ImGuiKey_ModShift;
 		case KEY_Alt: return ImGuiKey_ModAlt;
 		case KEY_Enter: return ImGuiKey_Enter;
@@ -390,7 +391,7 @@ class $modify(CCKeyboardDispatcher) {
 		if (imKey != ImGuiKey_None) {
 			io.AddKeyEvent(imKey, down);
 		}
-		if (ImGui::GetIO().WantCaptureKeyboard) {
+		if (io.WantCaptureKeyboard) {
 			return false;
 		} else {
 			return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat);
