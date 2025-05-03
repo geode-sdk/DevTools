@@ -1,3 +1,18 @@
+## v1.9.0
+* Bump to Geode `v4.4.0`
+* Add support for `SimpleAxisLayout`
+* Fix some bugs with `AxisLayout` options
+* Hook Geode's `getMousePos` to be relative to the GD view while DevTools is open
+* Add display for texture name / paths
+* Fix fullscreen toggling sometimes breaking the UI
+* Add `Auto Grow Axis` to `AxisLayout` attributes
+* Add `Ignore Invisible Children` checkbox for layouts
+* Add `CCMenuItemSpriteExtra` attributes
+* Add toggleable cascade color and opacity
+* Add `Flip X` and `Flip Y` for `CCSprite`
+
+Thanks to <cj>Alphalanous</c> for doing <co>most of the changes in this update!</c>
+
 ## v1.8.0
 * Support for 2.206
 * Bump to Geode `v4.0.0-beta.1`
