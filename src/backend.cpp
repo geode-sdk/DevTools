@@ -380,17 +380,54 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 		case KEY_Delete: return ImGuiKey_Delete;
 		case KEY_Escape: return ImGuiKey_Escape;
 
+        // KEY_Control and KEY_Shift aren't called on android like windows or mac
+        #ifdef GEODE_IS_ANDROID
+        case KEY_LeftControl: return ImGuiKey_ModCtrl;
+        case KEY_RightContol: return ImGuiKey_ModCtrl;
+        case KEY_LeftShift: return ImGuiKey_ModShift;
+        case KEY_RightShift: return ImGuiKey_ModShift;
+        #endif
+
 		default: return ImGuiKey_None;
 	}
 }
 
 class $modify(CCKeyboardDispatcher) {
     bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) {
+        log::info("{}", keyToString(key));
 		auto& io = ImGui::GetIO();
 		const auto imKey = cocosToImGuiKey(key);
 		if (imKey != ImGuiKey_None) {
 			io.AddKeyEvent(imKey, down);
 		}
+
+        // CCIMEDispatcher stuff doesn't get called on android unless the virtual keyboard would be up.
+        // Similarly, CCKeyboardDispatcher doesn't get called if the virtual keyboard would be up.
+        #ifdef GEODE_IS_ANDROID
+        if (down) {
+            char c = 0;
+            if (key >= KEY_A && key <= KEY_Z) {
+                c = static_cast<char>(key);
+                if (!io.KeyShift) {
+                    c = static_cast<char>(tolower(c));
+                }
+            } else if (key >= KEY_Zero && key <= KEY_Nine) {
+                c = static_cast<char>('0' + (key - KEY_Zero));
+            } else if (key == KEY_Space) {
+                c = ' ';
+            }
+
+            if (c != 0) {
+                std::string str(1, c);
+                io.AddInputCharactersUTF8(str.c_str());
+            }
+        }
+        if (key == KEY_Backspace) {
+            io.AddKeyEvent(ImGuiKey_Backspace, true);
+            io.AddKeyEvent(ImGuiKey_Backspace, false);
+        }
+        #endif
+
 		if (io.WantCaptureKeyboard) {
 			return false;
 		} else {
