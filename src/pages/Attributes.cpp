@@ -5,6 +5,7 @@
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include "../platform/utils.hpp"
 #include <ccTypes.h>
+#include <Geode/ui/SimpleAxisLayout.hpp>
 #include <Geode/ui/Layout.hpp>
 
 using namespace geode::prelude;
