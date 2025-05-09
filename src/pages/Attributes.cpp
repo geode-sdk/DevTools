@@ -311,7 +311,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::Separator();
         ImGui::NewLine();
     }
-    auto layoutOptsFn = [node] {
+    [&] {
         if (auto rawOpts = node->getLayoutOptions()) {
             ImGui::Text("Layout options: %s", typeid(*rawOpts).name());
 
@@ -637,14 +637,13 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 node->setLayoutOptions(AnchorLayoutOptions::create());
             }
         }
-    };
-    layoutOptsFn();
+    }();
 
     ImGui::NewLine();
     ImGui::Separator();
     ImGui::NewLine();
 
-    auto layoutFn = [node] {
+    [&] {
         if (auto rawLayout = node->getLayout()) {
             ImGui::Text("Layout: %s", typeid(*rawLayout).name());
             
@@ -1084,8 +1083,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
                 node->setLayout(AnchorLayout::create());
             }
         }
-    };
-    layoutFn();
+    }();
 }
 
 void DevTools::drawAttributes() {
