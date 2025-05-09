@@ -118,7 +118,7 @@ void DragButton::update(float delta) {
         shouldRender = devtools->getSettings().buttonInGameplay;
     } else if(auto el = LevelEditorLayer::get() && CCScene::get()->getChildByType<EditorPauseLayer *>(0) == nullptr) {
         if (devtools->getSettings().buttonInEditor) {
-            shouldRender = el->m_playbackMode != PlaybackMode::Playing || devtools->getSettings().buttonInGameplay;
+            shouldRender = (el->m_playbackMode != PlaybackMode::Playing) || devtools->getSettings().buttonInGameplay;
         } else {
             shouldRender = false;
         }
