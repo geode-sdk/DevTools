@@ -33,6 +33,7 @@ struct Settings {
     int buttonOpacity = 255;
     bool buttonInGameplay = false;
     bool buttonInEditor = false;
+    CCPoint buttonPos = {0, 0};
 };
 
 class DevTools {

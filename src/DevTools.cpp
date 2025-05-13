@@ -31,6 +31,10 @@ struct matjson::Serialize<Settings> {
             .buttonOpacity = value["button_opacity"].as<int>().unwrapOr(std::move(defaults.buttonOpacity)),
             .buttonInGameplay = value["button_gameplay"].asBool().unwrapOr(std::move(defaults.buttonInGameplay)),
             .buttonInEditor = value["button_editor"].asBool().unwrapOr(std::move(defaults.buttonInEditor)),
+            .buttonPos = CCPoint{
+                value["button_x"].as<float>().unwrapOr(std::move(defaults.buttonPos.x)),
+                value["button_y"].as<float>().unwrapOr(std::move(defaults.buttonPos.y))
+            },
         });
     }
 
@@ -51,6 +55,8 @@ struct matjson::Serialize<Settings> {
             { "button_opacity", settings.buttonOpacity },
             { "button_gameplay", settings.buttonInGameplay },
             { "button_editor", settings.buttonInEditor },
+            { "button_x", settings.buttonPos.x },
+            { "button_y", settings.buttonPos.y },
         });
     }
 };

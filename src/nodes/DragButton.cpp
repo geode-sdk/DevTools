@@ -6,6 +6,9 @@ DragButton *DragButton::m_instance = nullptr;
 bool DragButton::init() {
     if (!CCMenu::init())
         return false;
+
+    auto winSize = CCDirector::get()->getWinSize();
+    
     m_sprite = CircleButtonSprite::createWithSprite("devtools.png"_spr, 1, 
         CircleBaseColor::Green, CircleBaseSize::MediumAlt);
     m_sprite->setScale(.8f);
@@ -19,18 +22,13 @@ bool DragButton::init() {
     scheduleUpdate();
 
     setZOrder(70000);
-
-    auto x = Mod::get()->getSavedValue<float>("button-x", 50.f);
-    auto y = Mod::get()->getSavedValue<float>("button-y", 50.f);
-    x = std::clamp(x, -getContentWidth() / 2, CCDirector::get()->getWinSize().width - getContentWidth() / 2);
-    y = std::clamp(y, -getContentHeight() / 2, CCDirector::get()->getWinSize().height - getContentHeight() / 2);
-    setPosition({x, y});
-
-    Mod::get()->setSavedValue<float>("button-x", x);
-    Mod::get()->setSavedValue<float>("button-y", y);
+    
     auto settings = DevTools::get()->getSettings();
     setOpacity(settings.buttonOpacity);
     setScale(settings.buttonScale);
+    settings.buttonPos.x = std::clamp(settings.buttonPos.x, -getContentWidth() / 2, winSize.width - getContentWidth() / 2);
+    settings.buttonPos.y = std::clamp(settings.buttonPos.y, -getContentHeight() / 2, winSize.height - getContentHeight() / 2);
+    setPosition(settings.buttonPos);
 
     setID("drag-button"_spr);
 
@@ -63,7 +61,7 @@ bool DragButton::ccTouchBegan(CCTouch *touch, CCEvent *evt) {
     }
 
     m_diff = getPosition() - touch->getLocation();
-    m_startPos = new CCPoint(touch->getLocation());
+    m_startPos = touch->getLocation();
 
     m_moving = false;
 
@@ -92,8 +90,7 @@ void DragButton::ccTouchEnded(CCTouch *touch, CCEvent *evt) {
     m_sprite->runAction(CCEaseSineOut::create(CCScaleTo::create(0.3f, .8 * m_scale)));
     #endif
     if (m_moving) {
-      Mod::get()->setSavedValue<float>("button-x", getPositionX());
-      Mod::get()->setSavedValue<float>("button-y", getPositionY());
+      DevTools::get()->getSettings().buttonPos = getPosition();
       return;
     }
     activate();
@@ -101,7 +98,7 @@ void DragButton::ccTouchEnded(CCTouch *touch, CCEvent *evt) {
 
 void DragButton::ccTouchMoved(CCTouch *touch, CCEvent *evt) {
     if (!m_moving)
-        if (ccpDistance(*m_startPos, touch->getLocation()) > 3)
+        if (ccpDistance(m_startPos, touch->getLocation()) > 3)
         m_moving = true;
     if (m_moving) {
         auto pos = touch->getLocation() + m_diff;

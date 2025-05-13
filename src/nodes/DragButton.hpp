@@ -12,7 +12,7 @@ protected:
     bool m_render = true;
     bool m_moving = false;
 
-    cocos2d::CCPoint *m_startPos;
+    cocos2d::CCPoint m_startPos;
     cocos2d::CCPoint m_diff;
     cocos2d::CCSprite *m_sprite;
     
