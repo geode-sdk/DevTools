@@ -96,6 +96,8 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
     else return fmt::format("{:#x}", addr - base);
 }
 
+// Below is adapted from BetterInputs - thanks Spaghett
+
 #define OBJC_SWIZZLE(klass, type, cleanFuncName, funcName) \
 	do { \
 		auto cleanFuncName ## Method = class_getInstanceMethod(objc_getClass(#klass), @selector(funcName)); \
@@ -138,7 +140,6 @@ void flagsChangedExec(EAGLView* self, SEL sel, NSEvent* event)
     previousFlags = flags;
 }
 
-// https://github.com/qimiko/click-on-steps/blob/d8a87e93b5407e5f2113a9715363a5255724c901/src/macos.mm#L101
 $on_mod(Loaded)
 {
 	OBJC_SWIZZLE(EAGLView, key_event_t, flagsChangedExec, flagsChanged:);
