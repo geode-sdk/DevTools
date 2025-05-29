@@ -12,7 +12,7 @@ void DevTools::drawAdvancedSettings() {
 
 void DevTools::drawModGraph() {
     // TODO: function to get loader mod
-    this->drawModGraphNode(Mod::get()->getMetadata().getDependencies()[0].mod);
+    this->drawModGraphNode(Mod::get()->getMetadataRef().getDependencies()[0].mod);
 }
 
 namespace {
@@ -175,7 +175,7 @@ void DevTools::drawModGraphNode(Mod* node) {
     if (!treeNode)
         return;
 
-    node->setMetadata(this->inputMetadata(node, node->getMetadata()));
+    node->setMetadata(this->inputMetadata(node, node->getMetadataRef()));
 
     ImGui::Text("isInternal: %s", node->isInternal() ? "true" : "false");
     ImGui::Text("early: %s", node->needsEarlyLoad() ? "true" : "false");
