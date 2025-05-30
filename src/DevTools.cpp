@@ -26,7 +26,15 @@ struct matjson::Serialize<Settings> {
             .showMemoryViewer = value["show_memory_viewer"].asBool().unwrapOr(std::move(defaults.showMemoryViewer)),
             .showModGraph = value["show_mod_graph"].asBool().unwrapOr(std::move(defaults.showModGraph)),
             .theme = value["theme"].asString().unwrapOr(std::move(defaults.theme)),
-            .themeColor = value["theme_color"].as<ccColor4B>().isOk() ? value["theme_color"].as<ccColor4B>().unwrap() : std::move(defaults.themeColor)
+            .themeColor = value["theme_color"].as<ccColor4B>().isOk() ? value["theme_color"].as<ccColor4B>().unwrap() : std::move(defaults.themeColor),
+            .buttonScale = value["button_scale"].as<float>().unwrapOr(std::move(defaults.buttonScale)),
+            .buttonOpacity = value["button_opacity"].as<int>().unwrapOr(std::move(defaults.buttonOpacity)),
+            .buttonInGameplay = value["button_gameplay"].asBool().unwrapOr(std::move(defaults.buttonInGameplay)),
+            .buttonInEditor = value["button_editor"].asBool().unwrapOr(std::move(defaults.buttonInEditor)),
+            .buttonPos = CCPoint{
+                value["button_x"].as<float>().unwrapOr(std::move(defaults.buttonPos.x)),
+                value["button_y"].as<float>().unwrapOr(std::move(defaults.buttonPos.y))
+            },
         });
     }
 
@@ -43,6 +51,12 @@ struct matjson::Serialize<Settings> {
             { "show_mod_graph", settings.showModGraph },
             { "theme", settings.theme },
             { "theme_color", settings.themeColor },
+            { "button_scale", settings.buttonScale },
+            { "button_opacity", settings.buttonOpacity },
+            { "button_gameplay", settings.buttonInGameplay },
+            { "button_editor", settings.buttonInEditor },
+            { "button_x", settings.buttonPos.x },
+            { "button_y", settings.buttonPos.y },
         });
     }
 };
@@ -54,7 +68,9 @@ DevTools* DevTools::get() {
     return inst;
 }
 
-void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
+void DevTools::loadSettings() { 
+    m_settings = Mod::get()->getSavedValue<Settings>("settings");
+}
 void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
 Settings DevTools::getSettings() { return m_settings; }
 

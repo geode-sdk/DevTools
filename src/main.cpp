@@ -1,4 +1,3 @@
-
 #include "platform/platform.hpp"
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>
@@ -29,17 +28,6 @@ class $modify(CCKeyboardDispatcher) {
         return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr);
     }
 };
-
-#ifdef GEODE_IS_MOBILE
-// lol
-#include <Geode/modify/MenuLayer.hpp>
-class $modify(MenuLayer) {
-    void onMoreGames(CCObject*) {
-        DevTools::get()->toggle();
-    }
-};
-
-#endif
 
 class $modify(CCDirector) {
     void willSwitchToScene(CCScene* scene) {
@@ -112,3 +100,16 @@ class $modify(CCEGLView) {
         CCEGLView::swapBuffers();
     }
 };
+
+
+// For the one eclipse shortcut
+struct ToggleDevToolsEvent : geode::Event {
+    ToggleDevToolsEvent() {}
+};
+
+$on_mod(Loaded) {
+    new EventListener<EventFilter<ToggleDevToolsEvent>>(+[](ToggleDevToolsEvent* e) {
+        DevTools::get()->toggle();
+        return ListenerResult::Stop;
+    });
+}

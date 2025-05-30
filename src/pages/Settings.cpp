@@ -7,6 +7,7 @@
 #include <fmod.hpp>
 #include <numeric>
 #include <Geode/binding/GameManager.hpp>
+#include "../nodes/DragButton.hpp"
 
 using namespace geode::prelude;
 
@@ -230,6 +231,26 @@ void DevTools::drawSettings() {
     if (ImGui::Button("Reset Layout")) {
         m_shouldRelayout = true;
     }
+
+    #ifdef GEODE_IS_MOBILE
+    auto button = DragButton::get();
+
+    ImGui::Separator();
+    
+    ImGui::Text("Draggable Button");
+
+    if (ImGui::DragFloat("Scale", &m_settings.buttonScale, 0.05f, 0.5f, 1.f)) {
+        button->setScale(m_settings.buttonScale);
+    }
+
+    if (ImGui::DragInt("Opacity", &m_settings.buttonOpacity, 1, 0, 255)) {
+        button->setOpacity(m_settings.buttonOpacity);
+    }
+
+    ImGui::Checkbox("Visible in Game", &m_settings.buttonInGameplay);
+    ImGui::Checkbox("Visible in Editor", &m_settings.buttonInEditor);
+
+    #endif
 }
 
 // TODO: this hook also isnt gd *
