@@ -3,8 +3,10 @@
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <cocos2d.h>
-#ifdef __APPLE__
+#if defined(GEODE_IS_MACOS)
 #include <OpenGL/gl.h>
+#elif defined(GEODE_IS_IOS)
+#include <OpenGLES/ES2/gl.h>
 #endif
 
 ImRect& getGDWindowRect();

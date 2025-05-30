@@ -1,6 +1,6 @@
 #include <Geode/platform/platform.hpp>
 
-#ifdef GEODE_IS_MACOS
+#if defined(GEODE_IS_MACOS) || defined(GEODE_IS_IOS)
 
 #include "utils.hpp"
 

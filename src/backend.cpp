@@ -261,6 +261,7 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
 
 static float SCROLL_SENSITIVITY = 10;
 
+#ifndef GEODE_IS_IOS
 class $modify(CCMouseDispatcher) {
     bool dispatchScrollMSG(float y, float x) {
         if(!DevTools::get()->isSetup()) return true;
@@ -275,6 +276,7 @@ class $modify(CCMouseDispatcher) {
         return true;
     }
 };
+#endif
 
 class $modify(CCTouchDispatcher) {
     void touches(CCSet* touches, CCEvent* event, unsigned int type) {
