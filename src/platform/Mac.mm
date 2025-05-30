@@ -86,4 +86,65 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
     else return fmt::format("{:#x}", addr - base);
 }
 
+// Below is adapted from BetterInputs - thanks Spaghett
+#ifdef GEODE_IS_MACOS
+
+#include <Carbon/Carbon.h>
+#import <objc/runtime.h>
+
+#include <Geode/cocos/platform/mac/CCEventDispatcher.h>
+#import <Geode/cocos/platform/mac/EAGLView.h>
+#include <Geode/loader/ModEvent.hpp>
+#include <Geode/loader/Log.hpp>
+
+#include <imgui.h>
+
+#define OBJC_SWIZZLE(klass, type, cleanFuncName, funcName) \
+	do { \
+		auto cleanFuncName ## Method = class_getInstanceMethod(objc_getClass(#klass), @selector(funcName)); \
+		cleanFuncName ## OIMP = reinterpret_cast<type>(method_getImplementation(cleanFuncName ## Method)); \
+		method_setImplementation(cleanFuncName ## Method, reinterpret_cast<IMP>(&cleanFuncName)); \
+		geode::log::debug("Swizzled Objective C Method '" #klass " " #funcName "'"); \
+	} while(0)
+
+using key_event_t = void(*)(EAGLView*, SEL, NSEvent*);
+
+static key_event_t flagsChangedExecOIMP;
+void flagsChangedExec(EAGLView* self, SEL sel, NSEvent* event)
+{
+
+    flagsChangedExecOIMP(self, sel, event);
+
+    auto& io = ImGui::GetIO();
+    const NSEventModifierFlags flags = [event modifierFlags];
+
+    static NSEventModifierFlags previousFlags = 0;
+    NSEventModifierFlags changedFlags = flags ^ previousFlags;
+
+    if (changedFlags & NSEventModifierFlagControl) {
+        bool isPressed = flags & NSEventModifierFlagControl;
+        io.AddKeyEvent(ImGuiKey_ModCtrl, isPressed);
+    }
+    if (changedFlags & NSEventModifierFlagOption) {
+        bool isPressed = flags & NSEventModifierFlagOption;
+        io.AddKeyEvent(ImGuiKey_ModAlt, isPressed);
+    }
+    if (changedFlags & NSEventModifierFlagCommand) {
+        bool isPressed = flags & NSEventModifierFlagCommand;
+        io.AddKeyEvent(ImGuiKey_ModSuper, isPressed);
+    }
+    if (changedFlags & NSEventModifierFlagShift) {
+        bool isPressed = flags & NSEventModifierFlagShift;
+        io.AddKeyEvent(ImGuiKey_ModShift, isPressed);
+    }
+
+    previousFlags = flags;
+}
+
+$on_mod(Loaded)
+{
+	OBJC_SWIZZLE(EAGLView, key_event_t, flagsChangedExec, flagsChanged:);
+}
+
+#endif
 #endif

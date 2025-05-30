@@ -1,6 +1,7 @@
 #include <cocos2d.h>
 #include <Geode/modify/CCTouchDispatcher.hpp>
 #include <Geode/modify/CCMouseDispatcher.hpp>
+#include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/CCIMEDispatcher.hpp>
 #include "platform/platform.hpp"
 #include "DevTools.hpp"
@@ -356,3 +357,87 @@ class $modify(CCIMEDispatcher) {
         io.AddKeyEvent(ImGuiKey_Backspace, false);
     }
 };
+
+ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
+	if (key >= KEY_A && key <= KEY_Z) {
+		return static_cast<ImGuiKey>(ImGuiKey_A + (key - KEY_A));
+	}
+	if (key >= KEY_Zero && key <= KEY_Nine) {
+		return static_cast<ImGuiKey>(ImGuiKey_0 + (key - KEY_Zero));
+	}
+	switch (key) {
+		case KEY_Up: return ImGuiKey_UpArrow;
+		case KEY_Down: return ImGuiKey_DownArrow;
+		case KEY_Left: return ImGuiKey_LeftArrow;
+		case KEY_Right: return ImGuiKey_RightArrow;
+
+		case KEY_Control: return ImGuiKey_ModCtrl;
+        case KEY_LeftWindowsKey: return ImGuiKey_ModSuper;
+		case KEY_Shift: return ImGuiKey_ModShift;
+		case KEY_Alt: return ImGuiKey_ModAlt;
+		case KEY_Enter: return ImGuiKey_Enter;
+
+		case KEY_Home: return ImGuiKey_Home;
+		case KEY_End: return ImGuiKey_End;
+        // macos uses delete instead of backspace for some reason
+        #ifndef GEODE_IS_MACOS
+		case KEY_Delete: return ImGuiKey_Delete;
+        #endif
+		case KEY_Escape: return ImGuiKey_Escape;
+
+        // KEY_Control and KEY_Shift aren't called on android like windows or mac
+        #ifdef GEODE_IS_ANDROID
+        case KEY_LeftControl: return ImGuiKey_ModCtrl;
+        case KEY_RightContol: return ImGuiKey_ModCtrl;
+        case KEY_LeftShift: return ImGuiKey_ModShift;
+        case KEY_RightShift: return ImGuiKey_ModShift;
+        #endif
+
+		default: return ImGuiKey_None;
+	}
+}
+
+#ifndef GEODE_IS_IOS
+class $modify(CCKeyboardDispatcher) {
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) {
+		auto& io = ImGui::GetIO();
+		const auto imKey = cocosToImGuiKey(key);
+		if (imKey != ImGuiKey_None) {
+			io.AddKeyEvent(imKey, down);
+		}
+
+        // CCIMEDispatcher stuff doesn't get called on android unless the virtual keyboard would be up.
+        // Similarly, CCKeyboardDispatcher doesn't get called if the virtual keyboard would be up.
+        #ifdef GEODE_IS_ANDROID
+        if (down) {
+            char c = 0;
+            if (key >= KEY_A && key <= KEY_Z) {
+                c = static_cast<char>(key);
+                if (!io.KeyShift) {
+                    c = static_cast<char>(tolower(c));
+                }
+            } else if (key >= KEY_Zero && key <= KEY_Nine) {
+                c = static_cast<char>('0' + (key - KEY_Zero));
+            } else if (key == KEY_Space) {
+                c = ' ';
+            }
+
+            if (c != 0) {
+                std::string str(1, c);
+                io.AddInputCharactersUTF8(str.c_str());
+            }
+        }
+        if (key == KEY_Backspace) {
+            io.AddKeyEvent(ImGuiKey_Backspace, true);
+            io.AddKeyEvent(ImGuiKey_Backspace, false);
+        }
+        #endif
+
+		if (io.WantCaptureKeyboard) {
+			return false;
+		} else {
+			return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat);
+		}
+    }
+};
+#endif
