@@ -1,10 +1,11 @@
 {
-	"geode": "4.4.0",
+	"geode": "4.5.0",
 	"version": "v1.9.1",
 	"gd": {
 		"win": "*",
 		"android": "*",
-		"mac": "2.2074"
+		"mac": "2.2074",
+		"ios": "2.2074"
 	},
 	"id": "geode.devtools",
 	"name": "DevTools",

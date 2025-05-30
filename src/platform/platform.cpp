@@ -51,8 +51,9 @@ ImVec2 GLRenderCtx::size() const {
 }
 
 bool GLRenderCtx::begin() {
-    // save currently bound fbo
+    // save currently bound fbo and rbo
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &m_prevDrawBuffer);
+    glGetIntegerv(GL_RENDERBUFFER_BINDING, &m_prevReadBuffer);
 
     if (!m_buffer) {
         glGenFramebuffers(1, &m_buffer);
@@ -76,6 +77,8 @@ bool GLRenderCtx::begin() {
             0,GL_RGB, GL_UNSIGNED_BYTE, 0
         );
 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     }
@@ -106,7 +109,8 @@ bool GLRenderCtx::begin() {
 
 void GLRenderCtx::end() {
 
-    // bind the framebuffer that was bound before us
+    // bind the renderbuffer and framebuffer that was bound before us
+    glBindRenderbuffer(GL_RENDERBUFFER, m_prevReadBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, m_prevDrawBuffer);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     //glFlush();

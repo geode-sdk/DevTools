@@ -63,6 +63,14 @@ protected:
     void drawAdvancedSettings();
     void drawNodeAttributes(CCNode* node);
     void drawAttributes();
+    void drawBasicAttributes(CCNode* node);
+    void drawColorAttributes(CCNode* node);
+    void drawLabelAttributes(CCNode* node);
+    void drawAxisGapAttribute(CCNode* node);
+    void drawTextureAttributes(CCNode* node);
+    void drawMenuItemAttributes(CCNode* node);
+    void drawLayoutOptionsAttributes(CCNode* node);
+    void drawLayoutAttributes(CCNode* node);
     void drawPreview();
     void drawNodePreview(CCNode* node);
     void drawHighlight(CCNode* node, HighlightMode mode);
