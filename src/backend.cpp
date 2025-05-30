@@ -379,7 +379,10 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 
 		case KEY_Home: return ImGuiKey_Home;
 		case KEY_End: return ImGuiKey_End;
+        // macos uses delete instead of backspace for some reason
+        #ifndef GEODE_IS_MACOS
 		case KEY_Delete: return ImGuiKey_Delete;
+        #endif
 		case KEY_Escape: return ImGuiKey_Escape;
 
         // KEY_Control and KEY_Shift aren't called on android like windows or mac
@@ -394,9 +397,9 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 	}
 }
 
+#ifndef GEODE_IS_IOS
 class $modify(CCKeyboardDispatcher) {
     bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) {
-        log::info("{}", keyToString(key));
 		auto& io = ImGui::GetIO();
 		const auto imKey = cocosToImGuiKey(key);
 		if (imKey != ImGuiKey_None) {
@@ -437,3 +440,4 @@ class $modify(CCKeyboardDispatcher) {
 		}
     }
 };
+#endif
