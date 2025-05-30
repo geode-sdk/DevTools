@@ -35,6 +35,28 @@ bool checkbox(const char* text, T* ptr, bool(T::* get)() const, R(T::* set)(bool
 }
 
 void DevTools::drawNodeAttributes(CCNode* node) {
+    drawBasicAttributes(node);
+    drawColorAttributes(node);
+    drawLabelAttributes(node);
+    drawAxisGapAttribute(node);
+    
+    ImGui::NewLine();
+    ImGui::Separator();
+    ImGui::NewLine();
+
+    drawTextureAttributes(node);
+    drawMenuItemAttributes(node);
+
+    drawLayoutOptionsAttributes(node);
+        
+    ImGui::NewLine();
+    ImGui::Separator();
+    ImGui::NewLine();
+
+    drawLayoutAttributes(node);
+}
+
+void DevTools::drawBasicAttributes(CCNode* node) {
     if (ImGui::Button("Deselect")) {
         return this->selectNode(nullptr);
     }
@@ -138,7 +160,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         &CCNode::isIgnoreAnchorPointForPosition,
         &CCNode::ignoreAnchorPointForPosition
     );
-    
+}
+
+void DevTools::drawColorAttributes(CCNode* node) {
     if (auto rgbaNode = typeinfo_cast<CCRGBAProtocol*>(node)) {
 
         if (auto gradient = typeinfo_cast<CCLayerGradient*>(node)) {
@@ -194,14 +218,18 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::SameLine();
         checkbox("Cascade Opacity", rgbaNode, &CCRGBAProtocol::isCascadeOpacityEnabled, &CCRGBAProtocol::setCascadeOpacityEnabled);
     }
+}
 
+void DevTools::drawLabelAttributes(CCNode* node) {
     if (auto labelNode = typeinfo_cast<CCLabelProtocol*>(node)) {
         std::string str = labelNode->getString();
         if (ImGui::InputText("Text", &str, 256)) {
             labelNode->setString(str.c_str());
         }
     }
-    
+}
+
+void DevTools::drawAxisGapAttribute(CCNode* node) {
     if (auto gap = typeinfo_cast<AxisGap*>(node)){
         float axisGap = gap->getGap();
         if (ImGui::DragFloat("Axis Gap", &axisGap)) {
@@ -211,11 +239,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             }
         }
     }
+}
 
-    ImGui::NewLine();
-    ImGui::Separator();
-    ImGui::NewLine();
-
+void DevTools::drawTextureAttributes(CCNode* node) {
     if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
         if (auto texture = textureProtocol->getTexture()) {
             if (auto spriteNode = typeinfo_cast<CCSprite*>(node)) {
@@ -268,7 +294,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::Separator();
         ImGui::NewLine();
     }
-    
+}
+
+void DevTools::drawMenuItemAttributes(CCNode* node) {
     if (auto menuItemNode = typeinfo_cast<CCMenuItem*>(node)) {
         const auto selector = menuItemNode->m_pfnSelector;
         if (!selector) {
@@ -311,7 +339,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::Separator();
         ImGui::NewLine();
     }
+}
 
+void DevTools::drawLayoutOptionsAttributes(CCNode* node) {
     if (auto rawOpts = node->getLayoutOptions()) {
         ImGui::Text("Layout options: %s", typeid(*rawOpts).name());
 
@@ -323,6 +353,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::SameLine();
         if (ImGui::Button(U8STR(FEATHER_TRASH_2 " Remove Layout Options"))) {
             node->setLayoutOptions(nullptr);
+            return;
         }
         if (auto opts = typeinfo_cast<SimpleAxisLayoutOptions*>(rawOpts)) {
             bool updateLayout = false;
@@ -636,11 +667,9 @@ void DevTools::drawNodeAttributes(CCNode* node) {
             node->setLayoutOptions(AnchorLayoutOptions::create());
         }
     }
+}
 
-    ImGui::NewLine();
-    ImGui::Separator();
-    ImGui::NewLine();
-
+void DevTools::drawLayoutAttributes(CCNode* node){
     if (auto rawLayout = node->getLayout()) {
         ImGui::Text("Layout: %s", typeid(*rawLayout).name());
         
@@ -650,6 +679,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
         ImGui::SameLine();
         if (ImGui::Button(U8STR(FEATHER_TRASH_2 " Remove Layout"))) {
             node->setLayout(nullptr);
+            return;
         }
         ImGui::SameLine();
         if (ImGui::Button(U8STR(FEATHER_PLUS " Add Test Child"))) {
