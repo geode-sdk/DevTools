@@ -29,6 +29,11 @@ struct Settings {
     bool showModGraph = false;
     std::string theme = DARK_THEME;
     ccColor4B themeColor = {2, 119, 189, 255};
+    float buttonScale = 1.f;
+    int buttonOpacity = 255;
+    bool buttonInGameplay = false;
+    bool buttonInEditor = false;
+    CCPoint buttonPos = {0, 0};
 };
 
 class DevTools {
@@ -91,7 +96,8 @@ public:
     static DevTools* get();
     void loadSettings();
     void saveSettings();
-    Settings getSettings();
+    Settings &getSettings();
+
     bool shouldUseGDWindow() const;
 
     bool shouldPopGame() const;
