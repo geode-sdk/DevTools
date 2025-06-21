@@ -66,13 +66,7 @@ bool DragButton::ccTouchBegan(CCTouch *touch, CCEvent *evt) {
     m_moving = false;
 
     m_sprite->stopAllActions();
-
-    // For some reason I could not get a recreation of CCEaseSineOut working on ios.
-    #ifdef GEODE_IS_IOS
-    m_sprite->runAction(CCEaseOut::create(CCScaleTo::create(0.3f, .8 * m_scale * m_multiplier), 1.6f));
-    #else
     m_sprite->runAction(CCEaseSineOut::create(CCScaleTo::create(0.3f, .8 * m_scale * m_multiplier)));
-    #endif
     return true;
 }
 
@@ -82,13 +76,7 @@ void DragButton::ccTouchCancelled(CCTouch *touch, CCEvent *event) {
 
 void DragButton::ccTouchEnded(CCTouch *touch, CCEvent *evt) {
     m_sprite->stopAllActions();
-
-    // For some reason I could not get a recreation of CCEaseSineOut working on ios.
-    #ifdef GEODE_IS_IOS
-    m_sprite->runAction(CCEaseOut::create(CCScaleTo::create(0.3f, .8 * m_scale), 1.6f));
-    #else
     m_sprite->runAction(CCEaseSineOut::create(CCScaleTo::create(0.3f, .8 * m_scale)));
-    #endif
     if (m_moving) {
       DevTools::get()->getSettings().buttonPos = getPosition();
       return;
