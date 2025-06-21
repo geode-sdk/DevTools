@@ -72,7 +72,7 @@ void DevTools::loadSettings() {
     m_settings = Mod::get()->getSavedValue<Settings>("settings");
 }
 void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
-Settings DevTools::getSettings() { return m_settings; }
+Settings &DevTools::getSettings() { return m_settings; }
 
 bool DevTools::shouldPopGame() const {
     return m_visible && m_settings.GDInWindow;

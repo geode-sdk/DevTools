@@ -96,7 +96,7 @@ public:
     static DevTools* get();
     void loadSettings();
     void saveSettings();
-    Settings getSettings();
+    Settings &getSettings();
 
     bool shouldUseGDWindow() const;
 
