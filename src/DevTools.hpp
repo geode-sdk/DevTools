@@ -30,6 +30,8 @@ struct Settings {
     std::string theme = DARK_THEME;
     ccColor4B themeColor = {2, 119, 189, 255};
     CCPoint buttonPos = {50, 50};
+    bool buttonInEditor = false;
+    bool buttonInGame = false;
 };
 
 class DevTools {

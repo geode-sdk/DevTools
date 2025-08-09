@@ -5,9 +5,10 @@ using namespace geode::prelude;
 
 bool DragButton::init(CCNode* node, std::function<void()> onPress) {
 	if (!CCLayer::init()) return false;
-    this->setTouchEnabled(true);
+    	this->setTouchEnabled(true);
 	this->setAnchorPoint({.5f, .5f});
-    this->ignoreAnchorPointForPosition(false);
+    	this->ignoreAnchorPointForPosition(false);
+	this->scheduleUpdate();
 	if (node) {
 		this->setContentSize(node->getScaledContentSize());
 		this->addChildAtPosition(node, Anchor::Center, CCPoint{0, 0});
@@ -17,48 +18,48 @@ bool DragButton::init(CCNode* node, std::function<void()> onPress) {
 }
 
 bool DragButton::ccTouchBegan(CCTouch* touch, CCEvent* event) {
-	if (!m_bVisible) return false;
+	if (!this->m_bVisible) return false;
 	CCPoint local = convertToNodeSpace(touch->getLocation());
-	if (getContentWidth() > local.x && local.x > 0 && getContentHeight() > local.y && local.y > 0) {
+	if (this->getContentWidth() > local.x && local.x > 0 && this->getContentHeight() > local.y && local.y > 0) {
         this->stopActionByTag(123);
         auto action = CCEaseSineOut::create(CCScaleTo::create(.3f, .8f));
         action->setTag(123);
         this->runAction(action);
 
-		m_diff = getParent()->convertToNodeSpace(touch->getLocation()) - this->getPosition();
+		m_diff = this->getParent()->convertToNodeSpace(touch->getLocation()) - this->getPosition();
 		return true;
 	}
 	return false;
 }
 
 void DragButton::ccTouchMoved(CCTouch* touch, CCEvent* event) {
-    auto pos = getParent()->convertToNodeSpace(touch->getLocation()) - m_diff;
+    auto pos = this->getParent()->convertToNodeSpace(touch->getLocation()) - m_diff;
     auto winSize = CCDirector::get()->getWinSize();
     pos.x = std::clamp(pos.x, 0.f, winSize.width);
     pos.y = std::clamp(pos.y, 0.f, winSize.height);
-	setPosition(pos);
+	this->setPosition(pos);
 }
 
 void DragButton::ccTouchEnded(CCTouch* touch, CCEvent* event) {
-    this->stopActionByTag(123);
-    auto action = CCEaseSineOut::create(CCScaleTo::create(.3f, 1.f));
-    action->setTag(123);
-    this->runAction(action);
+    	this->stopActionByTag(123);
+    	auto action = CCEaseSineOut::create(CCScaleTo::create(.3f, 1.f));
+    	action->setTag(123);
+    	this->runAction(action);
 
 	if ((touch->getLocation() - touch->getStartLocation()).getLength() > 3.f) return;
-	if (m_onPress) m_onPress();
+	if (this->m_onPress) this->m_onPress();
 }
 
 void DragButton::ccTouchCancelled(CCTouch* touch, CCEvent* event) {
-	ccTouchEnded(touch, event);
+	this->ccTouchEnded(touch, event);
 }
 
 void DragButton::setCallback(std::function<void()> onPress) {
-	m_onPress = onPress;
+	this->m_onPress = onPress;
 }
 
 std::function<void()> DragButton::getCallback() {
-	return m_onPress;
+	return this->m_onPress;
 }
 
 void DragButton::registerWithTouchDispatcher() {
@@ -75,7 +76,17 @@ DragButton* DragButton::create(CCNode* node, std::function<void ()> onPress) {
 	return nullptr;
 }
 
-// aside from this method, this class should be basically useable in other mods
+void DragButton::update(float dt) {
+	const Settings& settings = DevTools::get()->getSettings();
+	if (PlayLayer::get() && !CCScene::get()->getChildByType<PauseLayer>(0) && !settings.buttonInGame) {
+		setVisible(false);
+	} else if (auto lel = LevelEditorLayer::get(); lel && ((lel->m_playbackMode == PlaybackMode::Playing && !settings.buttonInGame) || !settings.buttonInEditor)) {
+		setVisible(false);
+	} else {
+		setVisible(true);
+	}
+}
+
 DragButton* DragButton::get() {
     static DragButton* instance;
     if (!instance) {
