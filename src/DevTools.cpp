@@ -9,6 +9,7 @@
 #include <Geode/loader/Log.hpp>
 #include <Geode/loader/Mod.hpp>
 #include "ImGui.hpp"
+#include "nodes/DragButton.hpp"
 
 template<>
 struct matjson::Serialize<Settings> {
@@ -62,6 +63,7 @@ DevTools* DevTools::get() {
 
 void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
 void DevTools::saveSettings() {
+    m_settings.buttonPos = DragButton::get()->getPosition();
     Mod::get()->setSavedValue("settings", m_settings);
 }
 Settings DevTools::getSettings() { return m_settings; }
@@ -285,4 +287,5 @@ void DevTools::sceneChanged() {
 
 bool DevTools::shouldUseGDWindow() const {
     return Mod::get()->getSettingValue<bool>("should-use-gd-window");
+
 }
