@@ -3,6 +3,7 @@
 #include <Geode/modify/CCMouseDispatcher.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/CCIMEDispatcher.hpp>
+#include "Geode/cocos/text_input_node/CCIMEDelegate.h"
 #include "platform/platform.hpp"
 #include "DevTools.hpp"
 #include "ImGui.hpp"
@@ -67,6 +68,60 @@ void DevTools::setupPlatform() {
     #endif
 }
 
+#ifdef GEODE_IS_MOBILE
+
+class DevToolsIMEDelegate : public CCIMEDelegate {
+	protected:
+		bool m_attached = false;
+		std::string m_text;
+	public:
+		bool attachWithIME() override {
+			if (CCIMEDelegate::attachWithIME()) {
+				m_attached = true;
+				CCEGLView::get()->setIMEKeyboardState(true);
+				return true;
+			}
+			return false;
+		}
+		
+        	bool detachWithIME() override {
+			if (CCIMEDelegate::detachWithIME()) {
+				m_attached = false;
+				CCEGLView::get()->setIMEKeyboardState(false);
+				ImGui::ClearActiveID();
+				return true;
+			}
+			return false;
+		}
+
+	        bool canAttachWithIME() override {
+			return true;
+		}
+
+	        bool canDetachWithIME() override {
+			return true;
+		}
+
+      		char const* getContentText() override {
+			m_text = "";
+			for (auto str : ImGui::GetInputTextState(ImGui::GetFocusID())->TextA) {
+				m_text += str;
+			}
+			return m_text.c_str();
+		}
+
+		bool isAttached() {
+			return m_attached;
+		}
+
+		static DevToolsIMEDelegate* get() {
+			static DevToolsIMEDelegate* instance = new DevToolsIMEDelegate();
+			return instance;
+		}
+};
+
+#endif
+
 void DevTools::newFrame() {
     auto& io = ImGui::GetIO();
 
@@ -95,6 +150,15 @@ void DevTools::newFrame() {
     io.KeyAlt = kb->getAltKeyPressed() || kb->getCommandKeyPressed(); // look
     io.KeyCtrl = kb->getControlKeyPressed();
     io.KeyShift = kb->getShiftKeyPressed();
+
+#ifdef GEODE_IS_MOBILE
+    auto ime = DevToolsIMEDelegate::get();
+    if (io.WantTextInput && !ime->isAttached()) {
+	ime->attachWithIME();
+    } else if (!io.WantTextInput && ime->isAttached()) {
+	ime->detachWithIME();
+    }
+#endif
 }
 
 void DevTools::render(GLRenderCtx* ctx) {
