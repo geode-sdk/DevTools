@@ -4,6 +4,7 @@
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/CCIMEDispatcher.hpp>
 #include "Geode/cocos/text_input_node/CCIMEDelegate.h"
+#include "Geode/platform/cplatform.h"
 #include "platform/platform.hpp"
 #include "DevTools.hpp"
 #include "ImGui.hpp"
@@ -77,6 +78,11 @@ class DevToolsIMEDelegate : public CCIMEDelegate {
 	public:
 		bool attachWithIME() override {
 			if (CCIMEDelegate::attachWithIME()) {
+				// being anywhere but end of line ends up messing up the text, so this sends itnto the end of the line
+				#ifdef GEODE_IS_ANDROID
+					ImGui::GetIO().AddKeyEvent(ImGuiKey_End, true);
+					ImGui::GetIO().AddKeyEvent(ImGuiKey_End, false);
+				#endif
 				m_attached = true;
 				CCEGLView::get()->setIMEKeyboardState(true);
 				return true;
