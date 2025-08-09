@@ -68,7 +68,7 @@ void DevTools::drawBasicAttributes(CCNode* node) {
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_COPY " Copy"))) {
         clipboard::write(
-            utils::intToHex(reinterpret_cast<uintptr_t>(node))
+            fmt::format("{:#x}", reinterpret_cast<uintptr_t>(node))
         );
     }
     if (node->getUserData()) {

@@ -279,6 +279,18 @@ class $modify(CCMouseDispatcher) {
 #endif
 
 class $modify(CCTouchDispatcher) {
+    static void onModify(auto& self) {
+        /* 
+         * some mods hook this instead of using normal touch delegates for some reason 
+         * for example QOLMod, even in the rewrite
+         * so i added hook priority
+         */
+        Result<> res = self.setHookPriorityPre("cocos2d::CCTouchDispatcher::touches", Priority::First);
+        if (!res) {
+            geode::log::warn("Failed to set hook priority for CCTouchDispatcher::touches: {}", res.unwrapErr());
+        }
+    }
+
     void touches(CCSet* touches, CCEvent* event, unsigned int type) {
         auto& io = ImGui::GetIO();
         auto* touch = static_cast<CCTouch*>(touches->anyObject());
@@ -307,7 +319,12 @@ class $modify(CCTouchDispatcher) {
                     auto y = (1.f - relativePos.y / gdRect.GetHeight()) * win.y;
 
                     auto pos = toCocos(ImVec2(x, y));
-                    touch->setTouchInfo(touch->getID(), pos.x, pos.y);
+                    // setTouchInfo messes up the previous location (causes issues like texturer loader's draggable nodes breaking)
+                    touch->m_point = pos;
+                    if (type == CCTOUCHBEGAN) {
+                        // makes the start location in the touch correct
+                        touch->m_startPoint = CCPoint{pos.x, pos.y};
+                    }
                     CCTouchDispatcher::touches(touches, event, type);
 
                     ImGui::SetWindowFocus("Geometry Dash");
@@ -398,13 +415,6 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 }
 
 class $modify(CCKeyboardDispatcher) {
-    static void onModify(auto& self) {
-        Result<> res = self.setHookPriorityBeforePre("CCKeyboardDispatcher::updateModifierKeys", "geode.custom-keybinds");
-        if (!res) {
-            geode::log::warn("Failed to set hook priority for CCKeyboardDispatcher::updateModifierKeys: {}", res.unwrapErr());
-        }
-    }
-
     bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) {
 		auto& io = ImGui::GetIO();
 		const auto imKey = cocosToImGuiKey(key);
@@ -447,6 +457,13 @@ class $modify(CCKeyboardDispatcher) {
     }
 
     #if defined(GEODE_IS_MACOS) || defined(GEODE_IS_IOS)
+    static void onModify(auto& self) {
+        Result<> res = self.setHookPriorityBeforePre("CCKeyboardDispatcher::updateModifierKeys", "geode.custom-keybinds");
+        if (!res) {
+            geode::log::warn("Failed to set hook priority for CCKeyboardDispatcher::updateModifierKeys: {}", res.unwrapErr());
+        }
+    }
+
     void updateModifierKeys(bool shft, bool ctrl, bool alt, bool cmd) {
         auto& io = ImGui::GetIO();
         io.AddKeyEvent(ImGuiKey_ModShift, shft);

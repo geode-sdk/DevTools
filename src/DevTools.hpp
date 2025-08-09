@@ -29,6 +29,7 @@ struct Settings {
     bool showModGraph = false;
     std::string theme = DARK_THEME;
     ccColor4B themeColor = {2, 119, 189, 255};
+    CCPoint buttonPos = {50, 50};
 };
 
 class DevTools {

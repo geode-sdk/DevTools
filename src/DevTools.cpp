@@ -26,7 +26,11 @@ struct matjson::Serialize<Settings> {
             .showMemoryViewer = value["show_memory_viewer"].asBool().unwrapOr(std::move(defaults.showMemoryViewer)),
             .showModGraph = value["show_mod_graph"].asBool().unwrapOr(std::move(defaults.showModGraph)),
             .theme = value["theme"].asString().unwrapOr(std::move(defaults.theme)),
-            .themeColor = value["theme_color"].as<ccColor4B>().isOk() ? value["theme_color"].as<ccColor4B>().unwrap() : std::move(defaults.themeColor)
+            .themeColor = value["theme_color"].as<ccColor4B>().isOk() ? value["theme_color"].as<ccColor4B>().unwrap() : std::move(defaults.themeColor),
+            .buttonPos  = CCPoint{
+                value["button_x"].as<float>().isOk() ? value["button_x"].as<float>().unwrap() : std::move(defaults.buttonPos.x),
+                value["button_y"].as<float>().isOk() ? value["button_y"].as<float>().unwrap() : std::move(defaults.buttonPos.y)
+            }
         });
     }
 
@@ -43,6 +47,8 @@ struct matjson::Serialize<Settings> {
             { "show_mod_graph", settings.showModGraph },
             { "theme", settings.theme },
             { "theme_color", settings.themeColor },
+            { "button_x", settings.buttonPos.x },
+            { "button_y", settings.buttonPos.y },
         });
     }
 };
@@ -55,7 +61,9 @@ DevTools* DevTools::get() {
 }
 
 void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
-void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
+void DevTools::saveSettings() {
+    Mod::get()->setSavedValue("settings", m_settings);
+}
 Settings DevTools::getSettings() { return m_settings; }
 
 bool DevTools::shouldPopGame() const {
