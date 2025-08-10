@@ -32,8 +32,8 @@ struct matjson::Serialize<Settings> {
                 value["button_x"].as<float>().isOk() ? value["button_x"].as<float>().unwrap() : std::move(defaults.buttonPos.x),
                 value["button_y"].as<float>().isOk() ? value["button_y"].as<float>().unwrap() : std::move(defaults.buttonPos.y)
             },
-	    .buttonInEditor = value["button_editor"].asBool().isOk() ? value["button_editor"].asBool().unwrap() : std::move(defaults.buttonInEditor),
-	    .buttonInGame = value["button_game"].asBool().isOk() ? value["button_game"].asBool().unwrap() : std::move(defaults.buttonInGame)
+            .buttonInEditor = value["button_editor"].asBool().isOk() ? value["button_editor"].asBool().unwrap() : std::move(defaults.buttonInEditor),
+            .buttonInGame = value["button_game"].asBool().isOk() ? value["button_game"].asBool().unwrap() : std::move(defaults.buttonInGame)
         });
     }
 
@@ -52,8 +52,8 @@ struct matjson::Serialize<Settings> {
             { "theme_color", settings.themeColor },
             { "button_x", settings.buttonPos.x },
             { "button_y", settings.buttonPos.y },
-	    { "button_editor", settings.buttonInEditor },
-	    { "button_game", settings.buttonInGame },
+            { "button_editor", settings.buttonInEditor },
+            { "button_game", settings.buttonInGame },
         });
     }
 };
@@ -291,5 +291,4 @@ void DevTools::sceneChanged() {
 
 bool DevTools::shouldUseGDWindow() const {
     return Mod::get()->getSettingValue<bool>("should-use-gd-window");
-
 }

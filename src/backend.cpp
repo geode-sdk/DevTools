@@ -78,10 +78,10 @@ class DevToolsIMEDelegate : public CCIMEDelegate {
 	public:
 		bool attachWithIME() override {
 			if (CCIMEDelegate::attachWithIME()) {
-				// being anywhere but end of line ends up messing up the text, so this sends itnto the end of the line
+				// being anywhere but end of line ends up messing up the text, so this sends it to the end of the line
 				#ifdef GEODE_IS_ANDROID
-					ImGui::GetIO().AddKeyEvent(ImGuiKey_End, true);
-					ImGui::GetIO().AddKeyEvent(ImGuiKey_End, false);
+				ImGui::GetIO().AddKeyEvent(ImGuiKey_End, true);
+				ImGui::GetIO().AddKeyEvent(ImGuiKey_End, false);
 				#endif
 				m_attached = true;
 				CCEGLView::get()->setIMEKeyboardState(true);
@@ -90,7 +90,7 @@ class DevToolsIMEDelegate : public CCIMEDelegate {
 			return false;
 		}
 		
-        	bool detachWithIME() override {
+        bool detachWithIME() override {
 			if (CCIMEDelegate::detachWithIME()) {
 				m_attached = false;
 				CCEGLView::get()->setIMEKeyboardState(false);
@@ -100,15 +100,15 @@ class DevToolsIMEDelegate : public CCIMEDelegate {
 			return false;
 		}
 
-	        bool canAttachWithIME() override {
+	    bool canAttachWithIME() override {
 			return true;
 		}
 
-	        bool canDetachWithIME() override {
+	    bool canDetachWithIME() override {
 			return true;
 		}
 
-      		char const* getContentText() override {
+      	char const* getContentText() override {
 			m_text = "";
 			for (auto str : ImGui::GetInputTextState(ImGui::GetFocusID())->TextA) {
 				m_text += str;
@@ -160,9 +160,9 @@ void DevTools::newFrame() {
 #ifdef GEODE_IS_MOBILE
     auto ime = DevToolsIMEDelegate::get();
     if (io.WantTextInput && !ime->isAttached()) {
-	ime->attachWithIME();
+	    ime->attachWithIME();
     } else if (!io.WantTextInput && ime->isAttached()) {
-	ime->detachWithIME();
+	    ime->detachWithIME();
     }
 #endif
 }

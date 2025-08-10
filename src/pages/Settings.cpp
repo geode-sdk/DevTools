@@ -158,15 +158,15 @@ void DevTools::drawSettings() {
 #else
     ImGui::Checkbox("Button In Editor", &m_settings.buttonInEditor);
     if (ImGui::IsItemHovered()) {
-	ImGui::SetTooltip(
-		"Shows the mobile button in the editor."
-	);
+        ImGui::SetTooltip(
+            "Shows the mobile button in the editor."
+        );
     }
     ImGui::Checkbox("Button In Game", &m_settings.buttonInGame);
     if (ImGui::IsItemHovered()) {
-	ImGui::SetTooltip(
-		"Shows the mobile button in levels."
-	);
+        ImGui::SetTooltip(
+            "Shows the mobile button in levels."
+        );
     }
 #endif
 

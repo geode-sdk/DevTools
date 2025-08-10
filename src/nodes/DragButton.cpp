@@ -5,9 +5,9 @@ using namespace geode::prelude;
 
 bool DragButton::init(CCNode* node, std::function<void()> onPress) {
 	if (!CCLayer::init()) return false;
-    	this->setTouchEnabled(true);
+    this->setTouchEnabled(true);
 	this->setAnchorPoint({.5f, .5f});
-    	this->ignoreAnchorPointForPosition(false);
+    this->ignoreAnchorPointForPosition(false);
 	this->scheduleUpdate();
 	if (node) {
 		this->setContentSize(node->getScaledContentSize());
@@ -41,10 +41,10 @@ void DragButton::ccTouchMoved(CCTouch* touch, CCEvent* event) {
 }
 
 void DragButton::ccTouchEnded(CCTouch* touch, CCEvent* event) {
-    	this->stopActionByTag(123);
-    	auto action = CCEaseSineOut::create(CCScaleTo::create(.3f, 1.f));
-    	action->setTag(123);
-    	this->runAction(action);
+    this->stopActionByTag(123);
+    auto action = CCEaseSineOut::create(CCScaleTo::create(.3f, 1.f));
+    action->setTag(123);
+    this->runAction(action);
 
 	if ((touch->getLocation() - touch->getStartLocation()).getLength() > 3.f) return;
 	if (this->m_onPress) this->m_onPress();

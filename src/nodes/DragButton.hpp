@@ -14,7 +14,7 @@ class DragButton : public cocos2d::CCLayer {
 		void ccTouchEnded(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override;
 		void ccTouchCancelled(cocos2d::CCTouch* touch, cocos2d::CCEvent* event) override;
 
-	        void registerWithTouchDispatcher() override;
+	    void registerWithTouchDispatcher() override;
 
 		void update(float dt) override;
 	public:
