@@ -59,9 +59,9 @@ class $modify(CCEGLView) {
 
 #include "utils.hpp"
 
-void saveRenderToFile(std::vector<uint8_t> const& data, float width, float height, char const* filename) {
+void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, char const* filename) {
     auto img = new CCImage;
-    img->initWithImageData((void*)data.data(), data.size(), kCCImageFormatRGBA8888, width, height, 8);
+    img->initWithImageData((void*)data.data(), data.size(), CCImage::kFmtRawData, width, height, 8);
     img->saveToFile(filename);
 }
 

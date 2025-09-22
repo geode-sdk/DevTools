@@ -76,7 +76,7 @@ void DevTools::drawBasicAttributes(CCNode* node) {
                 int width, height;
                 auto bytes = renderToBytes(node, width, height);
 
-                saveRenderToFile(bytes, width, height, file->c_str());
+                saveRenderToFile(bytes, width, height, string::pathToString(*file).c_str());
             }
         });
     }
@@ -85,7 +85,7 @@ void DevTools::drawBasicAttributes(CCNode* node) {
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_COPY " Copy"))) {
         clipboard::write(
-            utils::intToHex(reinterpret_cast<uintptr_t>(node))
+            fmt::format("{:#x}", reinterpret_cast<uintptr_t>(node))
         );
     }
     if (node->getUserData()) {

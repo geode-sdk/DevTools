@@ -1,6 +1,10 @@
 #include "utils.hpp"
 
+#if defined(GEODE_IS_MACOS)
 #include <OpenGL/gl.h>
+#elif defined(GEODE_IS_IOS)
+#include <OpenGLES/ES2/gl.h>
+#endif
 #include <unordered_map>
 #include <cocos2d.h>
 
