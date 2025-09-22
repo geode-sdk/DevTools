@@ -21,7 +21,11 @@
 #import <Foundation/Foundation.h>
 
 #import <CoreGraphics/CoreGraphics.h>
+#ifdef GEODE_IS_MACOS
 #include <ImageIO/CGImageDestination.h>
+#else 
+#import <UIKit/UIKit.h>
+#endif
 
 static std::vector<struct dyld_image_info const*> getAllImages() {
     std::vector<struct dyld_image_info const*> images;
@@ -114,7 +118,7 @@ void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, c
         32,
         width * 4,
         colorSpace,
-        kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast,
+        kCGImageAlphaPremultipliedLast,
         provider,
         NULL,
         false,
@@ -128,6 +132,29 @@ void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, c
         return;
     }
 
+    #ifdef GEODE_IS_IOS
+    UIImage* image = [UIImage imageWithCGImage:cgImg];
+    if (!image) {
+        geode::log::error("Failed to create UIImage");
+        CGImageRelease(cgImg);
+        CGDataProviderRelease(provider);
+        CGColorSpaceRelease(colorSpace);
+        return;
+    }
+
+    NSData* pngData = UIImagePNGRepresentation(image);
+    if (!pngData) {
+        geode::log::error("Failed to create PNG data from UIImage");
+        CGImageRelease(cgImg);
+        CGDataProviderRelease(provider);
+        CGColorSpaceRelease(colorSpace);
+        return;
+    }
+
+    if (auto err = geode::utils::file::writeBinary(filename, { (uint8_t*)pngData.bytes, (uint8_t*)pngData.bytes + pngData.length }).err()) {
+        geode::log::error("Failed to write image to {}: {}", filename, err);
+    }
+    #else
     CFMutableDataRef pngData = CFDataCreateMutable(NULL, 0);
     CGImageDestinationRef destination = CGImageDestinationCreateWithData(pngData, kUTTypePNG, 1, NULL);
     if (!destination) {
@@ -160,6 +187,7 @@ void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, c
 
     CFRelease(destination);
     CFRelease(pngData);
+    #endif
     CGImageRelease(cgImg);
     CGColorSpaceRelease(colorSpace);
     CGDataProviderRelease(provider);
