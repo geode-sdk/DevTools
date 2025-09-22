@@ -27,3 +27,7 @@ static inline std::string getNodeName(cocos2d::CCObject* node) {
 std::string formatAddressIntoOffset(uintptr_t addr, bool module);
 
 std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module);
+
+
+std::vector<uint8_t> renderToBytes(cocos2d::CCNode* node, int& width, int& height);
+void saveRenderToFile(std::vector<uint8_t> const& data, float width, float height, char const* filename);

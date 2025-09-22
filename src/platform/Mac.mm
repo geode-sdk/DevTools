@@ -5,6 +5,8 @@
 #include "utils.hpp"
 
 #include <Geode/utils/string.hpp>
+#include <Geode/utils/file.hpp>
+#include <Geode/loader/Log.hpp>
 #include <array>
 #include <thread>
 #include <execinfo.h>
@@ -17,6 +19,9 @@
 #include <mach-o/dyld_images.h>
 #include <mach-o/dyld.h>
 #import <Foundation/Foundation.h>
+
+#import <CoreGraphics/CoreGraphics.h>
+#include <ImageIO/CGImageDestination.h>
 
 static std::vector<struct dyld_image_info const*> getAllImages() {
     std::vector<struct dyld_image_info const*> images;
@@ -85,5 +90,80 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
     if(module) return fmt::format("{} + {:#x}", imageName, addr - base);
     else return fmt::format("{:#x}", addr - base);
 }
+
+void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, char const* filename) {
+    assert(width * height * 4 == data.size());
+
+    CGDataProviderRef provider = CGDataProviderCreateWithData(NULL, &data[0], data.size(), NULL);
+    if (!provider) {
+        geode::log::error("Failed to create CGDataProvider");
+        return;
+    }
+
+    // create cgImg
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    if (!colorSpace) {
+        geode::log::error("Failed to create CGColorSpace");
+        CGDataProviderRelease(provider);
+        return;
+    }
+    CGImageRef cgImg = CGImageCreate(
+        width,
+        height,
+        8,
+        32,
+        width * 4,
+        colorSpace,
+        kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast,
+        provider,
+        NULL,
+        false,
+        kCGRenderingIntentDefault
+    );
+
+    if (!cgImg) {
+        geode::log::error("Failed to create CGImage");
+        CGDataProviderRelease(provider);
+        CGColorSpaceRelease(colorSpace);
+        return;
+    }
+
+    CFMutableDataRef pngData = CFDataCreateMutable(NULL, 0);
+    CGImageDestinationRef destination = CGImageDestinationCreateWithData(pngData, kUTTypePNG, 1, NULL);
+    if (!destination) {
+        geode::log::error("Failed to create CGImageDestination");
+        CFRelease(pngData);
+        CGImageRelease(cgImg);
+        CGDataProviderRelease(provider);
+        CGColorSpaceRelease(colorSpace);
+        return;
+    }
+
+    CGImageDestinationAddImage(destination, cgImg, nil);
+    if (!CGImageDestinationFinalize(destination)) {
+        geode::log::error("Failed to write image to data");
+        CFRelease(destination);
+        CFRelease(pngData);
+        CGImageRelease(cgImg);
+        CGDataProviderRelease(provider);
+        CGColorSpaceRelease(colorSpace);
+        return;
+    }
+
+    std::vector<uint8_t> vec;
+    vec.resize(CFDataGetLength(pngData));
+    CFDataGetBytes(pngData, CFRangeMake(0, vec.size()), vec.data());
+
+    if (auto err = geode::utils::file::writeBinary(filename, vec).err()) {
+        geode::log::error("Failed to write image to {}: {}", filename, err);
+    }
+
+    CFRelease(destination);
+    CFRelease(pngData);
+    CGImageRelease(cgImg);
+    CGColorSpaceRelease(colorSpace);
+    CGDataProviderRelease(provider);
+}
+
 
 #endif
