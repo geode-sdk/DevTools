@@ -30,4 +30,4 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module);
 
 
 std::vector<uint8_t> renderToBytes(cocos2d::CCNode* node, int& width, int& height);
-void saveRenderToFile(std::vector<uint8_t> const& data, float width, float height, char const* filename);
+void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, char const* filename);
