@@ -43,22 +43,23 @@ std::vector<uint8_t> renderToBytes(cocos2d::CCNode* node, int& width, int& heigh
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
 
+    // Unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Clear any data
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Flip Y axis when projecting
+    // Flip Y when projecting
     kmGLMatrixMode(KM_GL_PROJECTION);
     kmGLPushMatrix();
     kmGLLoadIdentity();
 
     kmMat4 ortho;
     kmMat4OrthographicProjection(&ortho,
-        0.0f, winSize.width,   // left, right
-        winSize.height, 0.0f,   // !!! Swap top and bottom
-        -1.0f, 1.0f     // near, far
+        0.0f, winSize.width,
+        winSize.height, 0.0f,
+        -1.0f, 1.0f
     );
     kmGLMultMatrix(&ortho);
 
