@@ -20,7 +20,7 @@ static void handleType() {
     });
 
     new EventListener<EventFilter<devtools::EnumerableFnEvent<T>>>(+[](devtools::EnumerableFnEvent<T>* event) {
-        event->fn = +[](const char* label, T* value, std::span<std::pair<T, const char*>> items) {
+        event->fn = +[](const char* label, T* value, std::span<std::pair<T, const char*> const> items) {
             ImGui::Text("%s:", label);
             size_t i = 0;
             bool changed = false;
