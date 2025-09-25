@@ -29,32 +29,29 @@ namespace devtools {
     };
 
     template <typename T>
-    struct HandlePropertyEvent final : geode::Event {
-        HandlePropertyEvent(const char* n, T* p) : prop(p), name(n) {}
-        T* prop;
-        const char* name = nullptr;
-        bool changed = false;
+    struct PropertyFnEvent final : geode::Event {
+        PropertyFnEvent() {}
+        using Fn = bool(const char* name, T&);
+        Fn* fn = nullptr;
     };
 
-    struct DrawLabelEvent final : geode::Event {
-        DrawLabelEvent(const char* t) : text(t) {}
-        const char* text = nullptr;
+    struct DrawLabelFnEvent final : geode::Event {
+        DrawLabelFnEvent() {}
+        using Fn = void(const char* text);
+        Fn* fn = nullptr;
     };
 
     template <typename T>
-    struct EnumerableEvent final : geode::Event {
-        EnumerableEvent(const char* l, T* v, std::initializer_list<std::pair<T, const char*>> i)
-            : label(l), value(v), items(i) {}
-        const char* label = nullptr;
-        T* value;
-        std::initializer_list<std::pair<T, const char*>> items;
-        bool changed = false;
+    struct EnumerableFnEvent final : geode::Event {
+        EnumerableFnEvent() {}
+        using Fn = bool(const char* label, T* value, std::span<std::pair<T, const char*> const> items);
+        Fn* fn = nullptr;
     };
 
-    struct ButtonEvent final : geode::Event {
-        ButtonEvent(const char* l) : label(l) {}
-        const char* label = nullptr;
-        bool clicked = false;
+    struct ButtonFnEvent final : geode::Event {
+        ButtonFnEvent() {}
+        using Fn = bool(const char* label);
+        Fn* fn = nullptr;
     };
 
     /// @brief Checks if DevTools is currently loaded.
@@ -101,16 +98,24 @@ namespace devtools {
     /// @warning This function should only ever be called from within a registered node callback.
     template <typename T> requires SupportedProperty<T>
     bool property(const char* name, T& prop) {
-        HandlePropertyEvent event(name, &prop);
-        event.post();
-        return event.changed;
+        static auto fn = ([] {
+            PropertyFnEvent<T> event;
+            event.post();
+            return event.fn;
+        })();
+        return fn ? fn(name, prop) : false;
     }
 
     /// @brief Renders a label in the DevTools UI.
     /// @param text The text to display in the label.
     /// @warning This function should only ever be called from within a registered node callback.
     inline void label(const char* text) {
-        DrawLabelEvent(text).post();
+        static auto fn = ([] {
+            DrawLabelFnEvent event;
+            event.post();
+            return event.fn;
+        })();
+        if (fn) fn(text);
     }
 
     /// @brief Renders an enumerable property editor using radio buttons for the given value in the DevTools UI.
@@ -122,12 +127,19 @@ namespace devtools {
     template <typename T> requires std::is_integral_v<std::underlying_type_t<T>>
     bool enumerable(const char* label, T& value, std::initializer_list<std::pair<T, const char*>> items) {
         using ValueType = std::underlying_type_t<T>;
-        EnumerableEvent<ValueType> event(
-            label, reinterpret_cast<ValueType*>(&value),
-            *reinterpret_cast<std::initializer_list<std::pair<ValueType, const char*>>*>(&items)
-        );
-        event.post();
-        return event.changed;
+        static auto fn = ([] {
+            EnumerableFnEvent<ValueType> event;
+            event.post();
+            return event.fn;
+        })();
+        return fn ? fn(
+            label,
+            reinterpret_cast<ValueType*>(&value),
+            std::span(
+                reinterpret_cast<std::pair<ValueType, const char*> const*>(&*items.begin()),
+                reinterpret_cast<std::pair<ValueType, const char*> const*>(&*items.end())
+            )
+        ) : false;
     }
 
     /// @brief Renders a button in the DevTools UI.
@@ -135,9 +147,12 @@ namespace devtools {
     /// @return True if the button was clicked, false otherwise.
     /// @warning This function should only ever be called from within a registered node callback.
     inline bool button(const char* label) {
-        ButtonEvent event(label);
-        event.post();
-        return event.clicked;
+        static auto fn = ([] {
+            ButtonFnEvent event;
+            event.post();
+            return event.fn;
+        })();
+        return fn ? fn(label) : false;
     }
 
     /// @brief Renders a button in the DevTools UI and calls the provided callback if the button is clicked.
