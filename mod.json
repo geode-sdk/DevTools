@@ -11,6 +11,7 @@
 	"name": "DevTools",
 	"developer": "Geode Team",
 	"description": "Developer tools for Geode",
+	"api": { "include": ["include/*.hpp"] },
 	"links": {
 		"source": "https://github.com/geode-sdk/DevTools"
 	},
