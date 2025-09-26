@@ -155,6 +155,19 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.width / ratio),
         static_cast<int>(frameSize.height / ratio)
     );
+#else
+    ImGui::Checkbox("Button In Editor", &m_settings.buttonInEditor);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Shows the mobile button in the editor."
+        );
+    }
+    ImGui::Checkbox("Button In Game", &m_settings.buttonInGame);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Shows the mobile button in levels."
+        );
+    }
 #endif
 
 #if 0

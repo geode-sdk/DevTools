@@ -1,4 +1,5 @@
 
+#include "Geode/ui/SceneManager.hpp"
 #include "platform/platform.hpp"
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>
@@ -8,6 +9,7 @@
 #include "DevTools.hpp"
 #include <imgui.h>
 #include "ImGui.hpp"
+#include "nodes/DragButton.hpp"
 
 using namespace geode::prelude;
 
@@ -34,8 +36,26 @@ class $modify(CCKeyboardDispatcher) {
 // lol
 #include <Geode/modify/MenuLayer.hpp>
 class $modify(MenuLayer) {
-    void onMoreGames(CCObject*) {
-        DevTools::get()->toggle();
+    bool init() {
+        if (!MenuLayer::init()) return false;
+        static bool first = true;
+        if (first) {
+            first = false;
+            DragButton::get();
+        }
+        return true;
+    }
+};
+
+#include <Geode/modify/CCScene.hpp>
+class $modify(CCScene) {
+    int getHighestChildZ() {
+        auto btn = DragButton::get();
+        int z = btn->getZOrder();
+        btn->setZOrder(-1);
+        int ret = CCScene::getHighestChildZ();
+        btn->setZOrder(z);
+        return ret;
     }
 };
 
@@ -112,3 +132,15 @@ class $modify(CCEGLView) {
         CCEGLView::swapBuffers();
     }
 };
+
+// For the one eclipse shortcut
+struct ToggleDevToolsEvent : geode::Event {
+    ToggleDevToolsEvent() {}
+};
+
+$on_mod(Loaded) {
+    new EventListener<EventFilter<ToggleDevToolsEvent>>(+[](ToggleDevToolsEvent* e) {
+        DevTools::get()->toggle();
+        return ListenerResult::Stop;
+    });
+}

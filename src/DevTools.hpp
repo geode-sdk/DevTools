@@ -29,6 +29,9 @@ struct Settings {
     bool showModGraph = false;
     std::string theme = DARK_THEME;
     ccColor4B themeColor = {2, 119, 189, 255};
+    CCPoint buttonPos = {50, 50};
+    bool buttonInEditor = false;
+    bool buttonInGame = false;
 };
 
 class DevTools {
@@ -49,6 +52,9 @@ protected:
     Ref<CCNode> m_selectedNode;
     std::vector<std::pair<CCNode*, HighlightMode>> m_toHighlight;
     std::vector<std::function<void(CCNode*)>> m_customCallbacks;
+    std::string m_searchQuery;
+    std::string m_prevQuery;
+    std::unordered_map<CCNode*, bool> m_nodeOpen;
 
     void setupFonts();
     void setupPlatform();
@@ -83,6 +89,8 @@ protected:
     void newFrame();
     void renderDrawData(ImDrawData*);
     void renderDrawDataFallback(ImDrawData*);
+
+    bool searchBranch(CCNode* node);
 
     bool hasExtension(const std::string& ext) const;
 
