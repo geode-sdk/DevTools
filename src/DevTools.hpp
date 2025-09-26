@@ -51,6 +51,7 @@ protected:
     CCTexture2D* m_fontTexture = nullptr;
     Ref<CCNode> m_selectedNode;
     std::vector<std::pair<CCNode*, HighlightMode>> m_toHighlight;
+    std::vector<std::function<void(CCNode*)>> m_customCallbacks;
 
     void setupFonts();
     void setupPlatform();
@@ -105,6 +106,8 @@ public:
     CCNode* getSelectedNode() const;
     void selectNode(CCNode* node);
     void highlightNode(CCNode* node, HighlightMode mode);
+
+    void addCustomCallback(std::function<void(CCNode*)> callback);
 
     void sceneChanged();
 

@@ -100,6 +100,10 @@ void DevTools::highlightNode(CCNode* node, HighlightMode mode) {
     m_toHighlight.push_back({ node, mode });
 }
 
+void DevTools::addCustomCallback(std::function<void(CCNode*)> callback) {
+    m_customCallbacks.push_back(std::move(callback));
+}
+
 void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
     if (ImGui::Begin(name, nullptr, ImGuiWindowFlags_HorizontalScrollbar)) {
         (this->*pageFun)();

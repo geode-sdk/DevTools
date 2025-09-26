@@ -1,8 +1,8 @@
 {
-	"geode": "4.7.0",
-	"version": "v1.9.1",
+	"geode": "4.8.0",
+	"version": "v1.10.0",
 	"gd": {
-		"win": "*",
+		"win": "2.2074",
 		"android": "*",
 		"mac": "2.2074",
 		"ios": "2.2074"
@@ -11,6 +11,7 @@
 	"name": "DevTools",
 	"developer": "Geode Team",
 	"description": "Developer tools for Geode",
+	"api": { "include": ["include/*.hpp"] },
 	"links": {
 		"source": "https://github.com/geode-sdk/DevTools"
 	},
