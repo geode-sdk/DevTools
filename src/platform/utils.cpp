@@ -41,7 +41,7 @@ std::vector<uint8_t> renderToBytes(cocos2d::CCNode* node, int& width, int& heigh
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // Create Framebuffer Obejct
+    // Create Framebuffer Object
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
