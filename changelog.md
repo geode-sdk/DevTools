@@ -1,3 +1,8 @@
+## v1.10.0
+* Add node properties api (#63)
+* Fix a crash when removing layouts and layout options (#58)
+* iOS support (#59)
+
 ## v1.9.0 && v1.9.1
 * Bump to Geode `v4.4.0`
 * Add support for `SimpleAxisLayout`

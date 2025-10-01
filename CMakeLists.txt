@@ -31,7 +31,7 @@ add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 CPMAddPackage("gh:ocornut/imgui@1.91.0-docking")
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${imgui_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${imgui_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 target_sources(${PROJECT_NAME} PRIVATE
     ${imgui_SOURCE_DIR}/imgui.cpp

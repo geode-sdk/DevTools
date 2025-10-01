@@ -41,7 +41,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     drawColorAttributes(node);
     drawLabelAttributes(node);
     drawAxisGapAttribute(node);
-    
+
     ImGui::NewLine();
     ImGui::Separator();
     ImGui::NewLine();
@@ -49,8 +49,18 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     drawTextureAttributes(node);
     drawMenuItemAttributes(node);
 
+    for (auto& callback : m_customCallbacks) {
+        ImGui::PushID(&callback);
+        callback(node);
+        ImGui::PopID();
+    }
+
+    ImGui::NewLine();
+    ImGui::Separator();
+    ImGui::NewLine();
+
     drawLayoutOptionsAttributes(node);
-        
+
     ImGui::NewLine();
     ImGui::Separator();
     ImGui::NewLine();
