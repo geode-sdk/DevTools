@@ -14,11 +14,4 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
     return fmt::format("{:#x}", addr);
 }
 
-void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, char const* filename) {
-    auto img = new CCImage;
-    img->initWithImageData((void*)data.data(), data.size(), CCImage::kFmtRawData, width, height, 8);
-    img->saveToFile(filename);
-}
-
-
 #endif

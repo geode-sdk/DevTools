@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <cocos2d.h>
 
+using namespace cocos2d;
+
 std::string formatAddressIntoOffset(uintptr_t addr, bool module) {
     static std::unordered_map<uintptr_t, std::pair<std::string, std::string>> formatted;
     auto it = formatted.find(addr);
@@ -104,4 +106,10 @@ std::vector<uint8_t> renderToBytes(cocos2d::CCNode* node, int& width, int& heigh
     glDeleteTextures(1, &texture);
 
     return pixels;
+}
+
+void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, char const* filename) {
+    auto img = new CCImage();
+    img->initWithImageData((void*)data.data(), data.size(), CCImage::kFmtRawData, width, height, 8);
+    img->saveToFile(filename);
 }

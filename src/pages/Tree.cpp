@@ -24,7 +24,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
         flags |= ImGuiTreeNodeFlags_OpenOnArrow;
     }
     std::stringstream name;
-    name << "[" << index << "] " << getNodeName(node) << " ";
+    name << "[" << index << "] " << geode::cocos::getObjectName(node) << " ";
     if (node->getTag() != -1) {
         name << "(" << node->getTag() << ") ";
     }

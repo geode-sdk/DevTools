@@ -74,7 +74,7 @@ void DevTools::drawBasicAttributes(CCNode* node) {
     }
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_COPY " Copy Class Name"))) {
-        clipboard::write(getNodeName(node));
+        clipboard::write(std::string(geode::cocos::getObjectName(node)));
     }
     ImGui::SameLine();
     if (ImGui::Button("Render")) {
