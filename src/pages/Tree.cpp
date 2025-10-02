@@ -100,7 +100,7 @@ void DevTools::drawTree() {
 bool DevTools::searchBranch(CCNode* node) {
     if (m_searchQuery.empty()) return true;
 
-    std::string name = getNodeName(node);
+    std::string name(geode::cocos::getObjectName(node));
     std::string id = node->getID();
     std::string query = m_searchQuery;
 
