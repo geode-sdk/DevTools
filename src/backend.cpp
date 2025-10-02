@@ -1,7 +1,10 @@
 #include <cocos2d.h>
 #include <Geode/modify/CCTouchDispatcher.hpp>
 #include <Geode/modify/CCMouseDispatcher.hpp>
+#include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/CCIMEDispatcher.hpp>
+#include "Geode/cocos/text_input_node/CCIMEDelegate.h"
+#include "Geode/platform/cplatform.h"
 #include "platform/platform.hpp"
 #include "DevTools.hpp"
 #include "ImGui.hpp"
@@ -66,6 +69,65 @@ void DevTools::setupPlatform() {
     #endif
 }
 
+#ifdef GEODE_IS_MOBILE
+
+class DevToolsIMEDelegate : public CCIMEDelegate {
+protected:
+    bool m_attached = false;
+    std::string m_text;
+public:
+    bool attachWithIME() override {
+        if (CCIMEDelegate::attachWithIME()) {
+            // being anywhere but end of line ends up messing up the text, so this sends it to the end of the line
+            #ifdef GEODE_IS_ANDROID
+            ImGui::GetIO().AddKeyEvent(ImGuiKey_End, true);
+            ImGui::GetIO().AddKeyEvent(ImGuiKey_End, false);
+            #endif
+            m_attached = true;
+            CCEGLView::get()->setIMEKeyboardState(true);
+            return true;
+        }
+        return false;
+    }
+    
+    bool detachWithIME() override {
+        if (CCIMEDelegate::detachWithIME()) {
+            m_attached = false;
+            CCEGLView::get()->setIMEKeyboardState(false);
+            ImGui::ClearActiveID();
+            return true;
+        }
+        return false;
+    }
+
+    bool canAttachWithIME() override {
+        return true;
+    }
+
+    bool canDetachWithIME() override {
+        return true;
+    }
+
+    char const* getContentText() override {
+        m_text = "";
+        for (auto str : ImGui::GetInputTextState(ImGui::GetFocusID())->TextA) {
+            m_text += str;
+        }
+        return m_text.c_str();
+    }
+
+    bool isAttached() {
+        return m_attached;
+    }
+
+    static DevToolsIMEDelegate* get() {
+        static DevToolsIMEDelegate* instance = new DevToolsIMEDelegate();
+        return instance;
+    }
+};
+
+#endif
+
 void DevTools::newFrame() {
     auto& io = ImGui::GetIO();
 
@@ -94,6 +156,15 @@ void DevTools::newFrame() {
     io.KeyAlt = kb->getAltKeyPressed() || kb->getCommandKeyPressed(); // look
     io.KeyCtrl = kb->getControlKeyPressed();
     io.KeyShift = kb->getShiftKeyPressed();
+
+#ifdef GEODE_IS_MOBILE
+    auto ime = DevToolsIMEDelegate::get();
+    if (io.WantTextInput && !ime->isAttached()) {
+	    ime->attachWithIME();
+    } else if (!io.WantTextInput && ime->isAttached()) {
+	    ime->detachWithIME();
+    }
+#endif
 }
 
 void DevTools::render(GLRenderCtx* ctx) {
@@ -278,6 +349,18 @@ class $modify(CCMouseDispatcher) {
 #endif
 
 class $modify(CCTouchDispatcher) {
+    static void onModify(auto& self) {
+        /* 
+         * some mods hook this instead of using normal touch delegates for some reason 
+         * for example QOLMod, even in the rewrite
+         * so i added hook priority
+         */
+        Result<> res = self.setHookPriorityPre("cocos2d::CCTouchDispatcher::touches", Priority::First);
+        if (!res) {
+            geode::log::warn("Failed to set hook priority for CCTouchDispatcher::touches: {}", res.unwrapErr());
+        }
+    }
+
     void touches(CCSet* touches, CCEvent* event, unsigned int type) {
         auto& io = ImGui::GetIO();
         auto* touch = static_cast<CCTouch*>(touches->anyObject());
@@ -290,6 +373,7 @@ class $modify(CCTouchDispatcher) {
         }
 
         const auto pos = toVec2(touch->getLocation());
+        GEODE_MOBILE(io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);)
         io.AddMousePosEvent(pos.x, pos.y);
         if (io.WantCaptureMouse) {
             bool didGDSwallow = false;
@@ -306,7 +390,12 @@ class $modify(CCTouchDispatcher) {
                     auto y = (1.f - relativePos.y / gdRect.GetHeight()) * win.y;
 
                     auto pos = toCocos(ImVec2(x, y));
-                    touch->setTouchInfo(touch->getID(), pos.x, pos.y);
+                    // setTouchInfo messes up the previous location (causes issues like texturer loader's draggable nodes breaking)
+                    touch->m_point = pos;
+                    if (type == CCTOUCHBEGAN) {
+                        // makes the start location in the touch correct
+                        touch->m_startPoint = pos;
+                    }
                     CCTouchDispatcher::touches(touches, event, type);
 
                     ImGui::SetWindowFocus("Geometry Dash");
@@ -318,6 +407,7 @@ class $modify(CCTouchDispatcher) {
             // TODO: dragging out of gd makes it click in imgui
             if (!didGDSwallow) {
                 if (type == CCTOUCHBEGAN || type == CCTOUCHMOVED) {
+                    GEODE_MOBILE(io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);)
                     io.AddMouseButtonEvent(0, true);
                 }
                 else {
@@ -355,4 +445,104 @@ class $modify(CCIMEDispatcher) {
         io.AddKeyEvent(ImGuiKey_Backspace, true);
         io.AddKeyEvent(ImGuiKey_Backspace, false);
     }
+};
+
+ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
+	if (key >= KEY_A && key <= KEY_Z) {
+		return static_cast<ImGuiKey>(ImGuiKey_A + (key - KEY_A));
+	}
+	if (key >= KEY_Zero && key <= KEY_Nine) {
+		return static_cast<ImGuiKey>(ImGuiKey_0 + (key - KEY_Zero));
+	}
+	switch (key) {
+		case KEY_Up: return ImGuiKey_UpArrow;
+		case KEY_Down: return ImGuiKey_DownArrow;
+		case KEY_Left: return ImGuiKey_LeftArrow;
+		case KEY_Right: return ImGuiKey_RightArrow;
+
+		case KEY_Control: return ImGuiKey_ModCtrl;
+        case KEY_LeftWindowsKey: return ImGuiKey_ModSuper;
+		case KEY_Shift: return ImGuiKey_ModShift;
+		case KEY_Alt: return ImGuiKey_ModAlt;
+		case KEY_Enter: return ImGuiKey_Enter;
+
+		case KEY_Home: return ImGuiKey_Home;
+		case KEY_End: return ImGuiKey_End;
+        // macos uses delete instead of backspace for some reason
+        #ifndef GEODE_IS_MACOS
+		case KEY_Delete: return ImGuiKey_Delete;
+        #endif
+		case KEY_Escape: return ImGuiKey_Escape;
+
+        // KEY_Control and KEY_Shift aren't called on android like windows or mac
+        #ifdef GEODE_IS_ANDROID
+        case KEY_LeftControl: return ImGuiKey_ModCtrl;
+        case KEY_RightContol: return ImGuiKey_ModCtrl;
+        case KEY_LeftShift: return ImGuiKey_ModShift;
+        case KEY_RightShift: return ImGuiKey_ModShift;
+        #endif
+
+		default: return ImGuiKey_None;
+	}
+}
+
+class $modify(CCKeyboardDispatcher) {
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) {
+		auto& io = ImGui::GetIO();
+		const auto imKey = cocosToImGuiKey(key);
+		if (imKey != ImGuiKey_None) {
+			io.AddKeyEvent(imKey, down);
+		}
+
+        // CCIMEDispatcher stuff only gets called on mobile if the virtual keyboard would be up.
+        // Similarly, CCKeyboardDispatcher doesn't get called if the virtual keyboard would be up.
+        #ifdef GEODE_IS_MOBILE
+        if (down) {
+            char c = 0;
+            if (key >= KEY_A && key <= KEY_Z) {
+                c = static_cast<char>(key);
+                if (!io.KeyShift) {
+                    c = static_cast<char>(tolower(c));
+                }
+            } else if (key >= KEY_Zero && key <= KEY_Nine) {
+                c = static_cast<char>('0' + (key - KEY_Zero));
+            } else if (key == KEY_Space) {
+                c = ' ';
+            }
+
+            if (c != 0) {
+                std::string str(1, c);
+                io.AddInputCharactersUTF8(str.c_str());
+            }
+        }
+        if (key == KEY_Backspace) {
+            io.AddKeyEvent(ImGuiKey_Backspace, true);
+            io.AddKeyEvent(ImGuiKey_Backspace, false);
+        }
+        #endif
+
+		if (io.WantCaptureKeyboard) {
+			return false;
+		} else {
+			return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat);
+		}
+    }
+
+    #if defined(GEODE_IS_MACOS) || defined(GEODE_IS_IOS)
+    static void onModify(auto& self) {
+        Result<> res = self.setHookPriorityBeforePre("CCKeyboardDispatcher::updateModifierKeys", "geode.custom-keybinds");
+        if (!res) {
+            geode::log::warn("Failed to set hook priority for CCKeyboardDispatcher::updateModifierKeys: {}", res.unwrapErr());
+        }
+    }
+
+    void updateModifierKeys(bool shft, bool ctrl, bool alt, bool cmd) {
+        auto& io = ImGui::GetIO();
+        io.AddKeyEvent(ImGuiKey_ModShift, shft);
+        io.AddKeyEvent(ImGuiKey_ModCtrl, ctrl);
+        io.AddKeyEvent(ImGuiKey_ModAlt, alt);
+        io.AddKeyEvent(ImGuiKey_ModSuper, cmd);
+        CCKeyboardDispatcher::updateModifierKeys(shft, ctrl, alt, cmd);
+    }
+    #endif
 };

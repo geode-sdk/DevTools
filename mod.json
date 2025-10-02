@@ -26,5 +26,10 @@
 			"description": "Determines if the DevTools should use a custom GD window or not. Required to disable for some exotic configurations (MacOS Wine).",
 			"default": true
 		}
+	},
+	"resources": {
+		"sprites": [
+			"resources/*.png"
+		]
 	}
 }
