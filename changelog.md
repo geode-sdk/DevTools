@@ -1,3 +1,8 @@
+## v1.11.0
+* Made properties api use drag inputs
+* Fix waitForDevTools on mods that load before DevTools
+* Add screenshot button to nodes (#65)
+
 ## v1.10.0
 * Add node properties api (#63)
 * Fix a crash when removing layouts and layout options (#58)

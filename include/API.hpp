@@ -68,7 +68,7 @@ namespace devtools {
             callback();
         } else {
             auto devtools = geode::Loader::get()->getInstalledMod("geode.devtools");
-            if (!devtools || !devtools->isEnabled()) return;
+            if (!devtools) return;
 
             new geode::EventListener(
                 [callback = std::forward<F>(callback)](geode::ModStateEvent*) {

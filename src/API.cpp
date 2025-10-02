@@ -9,12 +9,15 @@ template <typename T>
 static void handleType() {
     new EventListener<EventFilter<devtools::PropertyFnEvent<T>>>(+[](devtools::PropertyFnEvent<T>* event) {
         constexpr bool isSigned = std::is_signed_v<T>;
-        constexpr ImGuiDataType dataType = sizeof(T) == 1 ? (isSigned ? ImGuiDataType_S8 : ImGuiDataType_U8) :
-                                           sizeof(T) == 2 ? (isSigned ? ImGuiDataType_S16 : ImGuiDataType_U16) :
-                                           sizeof(T) == 4 ? (isSigned ? ImGuiDataType_S32 : ImGuiDataType_U32) :
-                                           isSigned ? ImGuiDataType_S64 : ImGuiDataType_U64;
+        constexpr ImGuiDataType dataType =
+            std::is_same_v<T, float> ? ImGuiDataType_Float :
+            std::is_same_v<T, double> ? ImGuiDataType_Double :
+            sizeof(T) == 1 ? (isSigned ? ImGuiDataType_S8 : ImGuiDataType_U8) :
+            sizeof(T) == 2 ? (isSigned ? ImGuiDataType_S16 : ImGuiDataType_U16) :
+            sizeof(T) == 4 ? (isSigned ? ImGuiDataType_S32 : ImGuiDataType_U32) :
+            isSigned ? ImGuiDataType_S64 : ImGuiDataType_U64;
         event->fn = +[](const char* name, T& prop) {
-            return ImGui::InputScalar(name, dataType, &prop);
+            return ImGui::DragScalar(name, dataType, &prop);
         };
         return ListenerResult::Stop;
     });
@@ -57,25 +60,13 @@ $execute {
     handleType<unsigned long long>();
     handleType<long>();
     handleType<unsigned long>();
+    handleType<float>();
+    handleType<double>();
 
     // checkbox
     new EventListener<EventFilter<devtools::PropertyFnEvent<bool>>>(+[](devtools::PropertyFnEvent<bool>* event) {
         event->fn = +[](const char* name, bool& prop) {
             return ImGui::Checkbox(name, &prop);
-        };
-        return ListenerResult::Stop;
-    });
-
-    // float and double
-    new EventListener<EventFilter<devtools::PropertyFnEvent<float>>>(+[](devtools::PropertyFnEvent<float>* event) {
-        event->fn = +[](const char* name, float& prop) {
-            return ImGui::InputFloat(name, &prop);
-        };
-        return ListenerResult::Stop;
-    });
-    new EventListener<EventFilter<devtools::PropertyFnEvent<double>>>(+[](devtools::PropertyFnEvent<double>* event) {
-        event->fn = +[](const char* name, double& prop) {
-            return ImGui::InputDouble(name, &prop);
         };
         return ListenerResult::Stop;
     });
@@ -136,20 +127,20 @@ $execute {
     // points/sizes
     new EventListener<EventFilter<devtools::PropertyFnEvent<CCPoint>>>(+[](devtools::PropertyFnEvent<CCPoint>* event) {
         event->fn = +[](const char* name, CCPoint& prop) {
-            return ImGui::InputFloat2(name, reinterpret_cast<float*>(&prop));
+            return ImGui::DragFloat2(name, reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
     });
 
     new EventListener<EventFilter<devtools::PropertyFnEvent<CCSize>>>(+[](devtools::PropertyFnEvent<CCSize>* event) {
         event->fn = +[](const char* name, CCSize& prop) {
-            return ImGui::InputFloat2(name, reinterpret_cast<float*>(&prop));
+            return ImGui::DragFloat2(name, reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
     });
     new EventListener<EventFilter<devtools::PropertyFnEvent<CCRect>>>(+[](devtools::PropertyFnEvent<CCRect>* event) {
         event->fn = +[](const char* name, CCRect& prop) {
-            return ImGui::InputFloat4(name, reinterpret_cast<float*>(&prop));
+            return ImGui::DragFloat4(name, reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
     });

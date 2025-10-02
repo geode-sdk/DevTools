@@ -27,7 +27,8 @@ public:
     };
 
     static void registerDevTools() {
-        // 
+        // The lambda provided will run every frame (given the node is selected)
+        // for any node that is typeinfo_cast able into MySprite
         devtools::registerNode<MySprite>([](MySprite* node) {
             devtools::label("My Sprite");
             devtools::property("Some Flag", node->m_someFlag);
@@ -60,6 +61,8 @@ private:
 $on_mod(Loaded) {
     // makes sure DevTools is loaded before registering
     devtools::waitForDevTools([] {
+        // use a static method on the class itself
+        // so it can access private members
         MySprite::registerDevTools();
     });
 }
