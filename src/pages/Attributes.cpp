@@ -77,8 +77,7 @@ void DevTools::drawBasicAttributes(CCNode* node) {
         clipboard::write(std::string(geode::cocos::getObjectName(node)));
     }
     ImGui::SameLine();
-    if (ImGui::Button("Render")) {
-
+    if (ImGui::Button(U8STR(FEATHER_SAVE " Screenshot"))) {
         file::pick(file::PickMode::SaveFile, file::FilePickOptions {
             .filters = {{ .description = "PNG Image", .files = {"*.png"} }}
         }).listen([node](auto choice) {
@@ -86,7 +85,11 @@ void DevTools::drawBasicAttributes(CCNode* node) {
                 int width, height;
                 auto bytes = renderToBytes(node, width, height);
 
-                saveRenderToFile(bytes, width, height, string::pathToString(*file).c_str());
+                auto path = string::pathToString(*file);
+                if (!path.ends_with(".png")) {
+                    path += ".png";
+                }
+                saveRenderToFile(bytes, width, height, path.c_str());
             }
         });
     }

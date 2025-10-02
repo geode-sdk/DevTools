@@ -44,8 +44,8 @@ class $modify(MenuLayer) {
 
 class $modify(GameToolbox) {
     static void preVisitWithClippingRect(CCNode* node, CCRect clipRect) {
-        if (!node->isVisible())
-            return;
+        if (!node->isVisible() || !DevTools::get()->isVisible())
+            return GameToolbox::preVisitWithClippingRect(node, clipRect);
 
         glEnable(GL_SCISSOR_TEST);
 
@@ -54,7 +54,7 @@ class $modify(GameToolbox) {
         kmMat4 mat;
         kmGLGetMatrix(KM_GL_PROJECTION, &mat);
         if (mat.mat[5] < 0) {
-            auto ws = CCDirector::sharedDirector()->getWinSize();
+            auto ws = CCDirector::get()->getWinSize();
             clipRect.origin.y = ws.height - (clipRect.origin.y + node->getContentSize().height);
         }
 

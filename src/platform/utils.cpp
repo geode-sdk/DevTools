@@ -26,11 +26,11 @@ std::string formatAddressIntoOffset(uintptr_t addr, bool module) {
     }
 }
 
-std::vector<uint8_t> renderToBytes(cocos2d::CCNode* node, int& width, int& height) {
+std::vector<uint8_t> renderToBytes(CCNode* node, int& width, int& height) {
     // Get scale from cocos2d units to opengl units
     GLint viewport[4];
     glGetIntegerv(GL_VIEWPORT, viewport);
-    auto winSize = cocos2d::CCDirector::sharedDirector()->getWinSize();
+    auto winSize = CCDirector::get()->getWinSize();
 
     width = node->getContentSize().width * (viewport[2] / winSize.width);
     height = node->getContentSize().height * (viewport[3] / winSize.height);
@@ -111,5 +111,5 @@ std::vector<uint8_t> renderToBytes(cocos2d::CCNode* node, int& width, int& heigh
 void saveRenderToFile(std::vector<uint8_t> const& data, int width, int height, char const* filename) {
     auto img = new CCImage();
     img->initWithImageData((void*)data.data(), data.size(), CCImage::kFmtRawData, width, height, 8);
-    img->saveToFile(filename);
+    img->saveToFile(filename, false);
 }
