@@ -17,6 +17,10 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES} src/platform/Mac.mm)
 
 set_source_files_properties(src/platform/Mac.mm PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
 
+if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS)
+    target_link_libraries(${PROJECT_NAME} "-framework CoreGraphics")
+endif()
+
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")
 else()

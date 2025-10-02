@@ -7,12 +7,14 @@
 #include <ccTypes.h>
 #include <Geode/ui/SimpleAxisLayout.hpp>
 #include <Geode/ui/Layout.hpp>
+#include <Geode/utils/file.hpp>
 
 using namespace geode::prelude;
 
 #define AXIS_GET(Name_) \
     &AxisLayoutOptions::get##Name_, \
     &AxisLayoutOptions::set##Name_
+
 
 template <class T, class R>
 bool checkbox(const char* text, T* ptr, bool(T::* get)(), R(T::* set)(bool)) {
@@ -72,13 +74,31 @@ void DevTools::drawBasicAttributes(CCNode* node) {
     }
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_COPY " Copy Class Name"))) {
-        clipboard::write(getNodeName(node));
+        clipboard::write(std::string(geode::cocos::getObjectName(node)));
     }
+    ImGui::SameLine();
+    if (ImGui::Button(U8STR(FEATHER_SAVE " Screenshot"))) {
+        file::pick(file::PickMode::SaveFile, file::FilePickOptions {
+            .filters = {{ .description = "PNG Image", .files = {"*.png"} }}
+        }).listen([node](auto choice) {
+            if (auto file = choice->ok()) {
+                int width, height;
+                auto bytes = renderToBytes(node, width, height);
+
+                auto path = string::pathToString(*file);
+                if (!path.ends_with(".png")) {
+                    path += ".png";
+                }
+                saveRenderToFile(bytes, width, height, path.c_str());
+            }
+        });
+    }
+
     ImGui::Text("Address: %s", fmt::to_string(fmt::ptr(node)).c_str());
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_COPY " Copy"))) {
         clipboard::write(
-            utils::intToHex(reinterpret_cast<uintptr_t>(node))
+            fmt::format("{:#x}", reinterpret_cast<uintptr_t>(node))
         );
     }
     if (node->getUserData()) {
