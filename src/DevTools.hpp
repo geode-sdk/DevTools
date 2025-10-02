@@ -124,4 +124,6 @@ public:
 
     void show(bool visible);
     void toggle();
+
+    bool isVisible();
 };

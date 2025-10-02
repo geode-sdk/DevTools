@@ -5,6 +5,8 @@
 #include "utils.hpp"
 
 #include <Geode/utils/string.hpp>
+#include <Geode/utils/file.hpp>
+#include <Geode/loader/Log.hpp>
 #include <array>
 #include <thread>
 #include <execinfo.h>
@@ -17,6 +19,13 @@
 #include <mach-o/dyld_images.h>
 #include <mach-o/dyld.h>
 #import <Foundation/Foundation.h>
+
+#import <CoreGraphics/CoreGraphics.h>
+#ifdef GEODE_IS_MACOS
+#include <ImageIO/CGImageDestination.h>
+#else 
+#import <UIKit/UIKit.h>
+#endif
 
 static std::vector<struct dyld_image_info const*> getAllImages() {
     std::vector<struct dyld_image_info const*> images;
@@ -85,5 +94,6 @@ std::string formatAddressIntoOffsetImpl(uintptr_t addr, bool module) {
     if(module) return fmt::format("{} + {:#x}", imageName, addr - base);
     else return fmt::format("{:#x}", addr - base);
 }
+
 
 #endif

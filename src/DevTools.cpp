@@ -289,6 +289,10 @@ void DevTools::toggle() {
     this->show(!m_visible);
 }
 
+bool DevTools::isVisible() {
+    return m_visible;
+}
+
 void DevTools::sceneChanged() {
     m_selectedNode = nullptr;
 }

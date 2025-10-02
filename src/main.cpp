@@ -6,6 +6,7 @@
 #include <Geode/modify/CCDirector.hpp>
 #include <Geode/modify/CCEGLView.hpp>
 #include <Geode/modify/CCNode.hpp>
+#include <Geode/modify/GameToolbox.hpp>
 #include "DevTools.hpp"
 #include <imgui.h>
 #include "ImGui.hpp"
@@ -55,6 +56,31 @@ class $modify(CCScene) {
 
 #endif
 
+class $modify(GameToolbox) {
+    static void preVisitWithClippingRect(CCNode* node, CCRect clipRect) {
+        if (!node->isVisible() || !DevTools::get()->isVisible())
+            return GameToolbox::preVisitWithClippingRect(node, clipRect);
+
+        glEnable(GL_SCISSOR_TEST);
+
+        clipRect.origin = node->convertToWorldSpace(clipRect.origin);
+
+        kmMat4 mat;
+        kmGLGetMatrix(KM_GL_PROJECTION, &mat);
+        if (mat.mat[5] < 0) {
+            auto ws = CCDirector::get()->getWinSize();
+            clipRect.origin.y = ws.height - (clipRect.origin.y + node->getContentSize().height);
+        }
+
+        CCEGLView::get()->setScissorInPoints(
+            clipRect.origin.x,
+            clipRect.origin.y,
+            clipRect.size.width,
+            clipRect.size.height
+        );
+    }
+
+};
 
 
 class $modify(CCDirector) {
