@@ -33,19 +33,13 @@ class $modify(CCKeyboardDispatcher) {
 };
 
 #ifdef GEODE_IS_MOBILE
-// lol
-#include <Geode/modify/MenuLayer.hpp>
-class $modify(MenuLayer) {
-    bool init() {
-        if (!MenuLayer::init()) return false;
-        static bool first = true;
-        if (first) {
-            first = false;
-            DragButton::get();
-        }
-        return true;
-    }
-};
+
+#include <Geode/loader/GameEvent.hpp>
+$execute {
+    new EventListener<GameEventFilter>(+[](GameEvent*) {
+        DragButton::get();
+    }, GameEventFilter(GameEventType::Loaded));
+}
 
 #include <Geode/modify/CCScene.hpp>
 class $modify(CCScene) {
@@ -60,6 +54,8 @@ class $modify(CCScene) {
 };
 
 #endif
+
+
 
 class $modify(CCDirector) {
     void willSwitchToScene(CCScene* scene) {

@@ -88,7 +88,7 @@ void DragButton::update(float dt) {
 }
 
 DragButton* DragButton::get() {
-    static DragButton* instance;
+    static DragButton* instance = nullptr;
     if (!instance) {
         auto spr = CircleButtonSprite::createWithSprite("devtools.png"_spr, 1, CircleBaseColor::Green, CircleBaseSize::MediumAlt);
         spr->setScale(.8f);

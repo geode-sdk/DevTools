@@ -30,7 +30,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     }
 
     if (m_searchQuery.empty()) {
-        ImGui::SetNextItemOpen(m_nodeOpen.contains(node) ? m_nodeOpen[node] : false);
+        ImGui::SetNextItemOpen(m_nodeOpen.contains(node) && m_nodeOpen[node]);
     }
     else if (m_searchQuery != m_prevQuery) {
         ImGui::SetNextItemOpen(true);
@@ -91,7 +91,8 @@ void DevTools::drawTree() {
     ImGui::Dummy({0.f, 60.f});
 #endif
     m_prevQuery = m_searchQuery;
-    ImGui::InputText("Search Tree", &m_searchQuery, 256);
+    ImGui::SetNextItemWidth(-1.f);
+    ImGui::InputTextWithHint("", U8STR(FEATHER_SEARCH " Search for a node..."), &m_searchQuery, ImGuiInputTextFlags_EnterReturnsTrue);
 
     this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0);
 }
@@ -103,9 +104,9 @@ bool DevTools::searchBranch(CCNode* node) {
     std::string id = node->getID();
     std::string query = m_searchQuery;
 
-    std::ranges::transform(name, name.begin(), ::tolower);
-    std::ranges::transform(id.begin(), id.end(), id.begin(), ::tolower);
-    std::ranges::transform(query.begin(), query.end(), query.begin(), ::tolower);
+    utils::string::toLowerIP(name);
+    utils::string::toLowerIP(id);
+    utils::string::toLowerIP(query);
 
     if (name.find(query) != std::string::npos || id.find(query) != std::string::npos) {
         return true;

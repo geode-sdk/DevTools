@@ -72,58 +72,58 @@ void DevTools::setupPlatform() {
 #ifdef GEODE_IS_MOBILE
 
 class DevToolsIMEDelegate : public CCIMEDelegate {
-	protected:
-		bool m_attached = false;
-		std::string m_text;
-	public:
-		bool attachWithIME() override {
-			if (CCIMEDelegate::attachWithIME()) {
-				// being anywhere but end of line ends up messing up the text, so this sends it to the end of the line
-				#ifdef GEODE_IS_ANDROID
-				ImGui::GetIO().AddKeyEvent(ImGuiKey_End, true);
-				ImGui::GetIO().AddKeyEvent(ImGuiKey_End, false);
-				#endif
-				m_attached = true;
-				CCEGLView::get()->setIMEKeyboardState(true);
-				return true;
-			}
-			return false;
-		}
-		
-        bool detachWithIME() override {
-			if (CCIMEDelegate::detachWithIME()) {
-				m_attached = false;
-				CCEGLView::get()->setIMEKeyboardState(false);
-				ImGui::ClearActiveID();
-				return true;
-			}
-			return false;
-		}
+protected:
+    bool m_attached = false;
+    std::string m_text;
+public:
+    bool attachWithIME() override {
+        if (CCIMEDelegate::attachWithIME()) {
+            // being anywhere but end of line ends up messing up the text, so this sends it to the end of the line
+            #ifdef GEODE_IS_ANDROID
+            ImGui::GetIO().AddKeyEvent(ImGuiKey_End, true);
+            ImGui::GetIO().AddKeyEvent(ImGuiKey_End, false);
+            #endif
+            m_attached = true;
+            CCEGLView::get()->setIMEKeyboardState(true);
+            return true;
+        }
+        return false;
+    }
+    
+    bool detachWithIME() override {
+        if (CCIMEDelegate::detachWithIME()) {
+            m_attached = false;
+            CCEGLView::get()->setIMEKeyboardState(false);
+            ImGui::ClearActiveID();
+            return true;
+        }
+        return false;
+    }
 
-	    bool canAttachWithIME() override {
-			return true;
-		}
+    bool canAttachWithIME() override {
+        return true;
+    }
 
-	    bool canDetachWithIME() override {
-			return true;
-		}
+    bool canDetachWithIME() override {
+        return true;
+    }
 
-      	char const* getContentText() override {
-			m_text = "";
-			for (auto str : ImGui::GetInputTextState(ImGui::GetFocusID())->TextA) {
-				m_text += str;
-			}
-			return m_text.c_str();
-		}
+    char const* getContentText() override {
+        m_text = "";
+        for (auto str : ImGui::GetInputTextState(ImGui::GetFocusID())->TextA) {
+            m_text += str;
+        }
+        return m_text.c_str();
+    }
 
-		bool isAttached() {
-			return m_attached;
-		}
+    bool isAttached() {
+        return m_attached;
+    }
 
-		static DevToolsIMEDelegate* get() {
-			static DevToolsIMEDelegate* instance = new DevToolsIMEDelegate();
-			return instance;
-		}
+    static DevToolsIMEDelegate* get() {
+        static DevToolsIMEDelegate* instance = new DevToolsIMEDelegate();
+        return instance;
+    }
 };
 
 #endif
@@ -393,7 +393,7 @@ class $modify(CCTouchDispatcher) {
                     touch->m_point = pos;
                     if (type == CCTOUCHBEGAN) {
                         // makes the start location in the touch correct
-                        touch->m_startPoint = CCPoint{pos.x, pos.y};
+                        touch->m_startPoint = pos;
                     }
                     CCTouchDispatcher::touches(touches, event, type);
 
