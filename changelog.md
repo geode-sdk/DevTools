@@ -2,6 +2,10 @@
 * Made properties api use drag inputs
 * Fix waitForDevTools on mods that load before DevTools
 * Add screenshot button to nodes (#65)
+* Improve keyboard support on mobile (#62)
+* Add floating button on mobile (#62)
+* Add search bar in node tree (#62)
+* Fix some touch issues in the GD window (#62)
 
 ## v1.10.0
 * Add node properties api (#63)
