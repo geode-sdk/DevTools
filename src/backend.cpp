@@ -373,6 +373,7 @@ class $modify(CCTouchDispatcher) {
         }
 
         const auto pos = toVec2(touch->getLocation());
+        GEODE_MOBILE(io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);)
         io.AddMousePosEvent(pos.x, pos.y);
         if (io.WantCaptureMouse) {
             bool didGDSwallow = false;
@@ -406,6 +407,7 @@ class $modify(CCTouchDispatcher) {
             // TODO: dragging out of gd makes it click in imgui
             if (!didGDSwallow) {
                 if (type == CCTOUCHBEGAN || type == CCTOUCHMOVED) {
+                    GEODE_MOBILE(io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);)
                     io.AddMouseButtonEvent(0, true);
                 }
                 else {

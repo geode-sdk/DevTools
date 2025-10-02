@@ -18,9 +18,8 @@ protected:
 
 	void update(float dt) override;
 public:
-	void setCallback(std::function<void()> onPress);
-	std::function<void()> getCallback();
-
 	static DragButton* create(cocos2d::CCNode* node, std::function<void()> onPress);
 	static DragButton* get();
+
+	void setPosition(cocos2d::CCPoint const& position) override;
 };

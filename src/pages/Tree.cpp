@@ -92,7 +92,7 @@ void DevTools::drawTree() {
 #endif
     m_prevQuery = m_searchQuery;
     ImGui::SetNextItemWidth(-1.f);
-    ImGui::InputTextWithHint("", U8STR(FEATHER_SEARCH " Search for a node..."), &m_searchQuery, ImGuiInputTextFlags_EnterReturnsTrue);
+    ImGui::InputTextWithHint("##search", U8STR(FEATHER_SEARCH " Search for a node..."), &m_searchQuery, ImGuiInputTextFlags_EnterReturnsTrue);
 
     this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0);
 }
