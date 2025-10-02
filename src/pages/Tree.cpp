@@ -91,8 +91,15 @@ void DevTools::drawTree() {
     ImGui::Dummy({0.f, 60.f});
 #endif
     m_prevQuery = m_searchQuery;
-    ImGui::SetNextItemWidth(-1.f);
+
+    auto space = ImGui::GetContentRegionAvail();
+    auto height = ImGui::GetFrameHeight();
+    ImGui::SetNextItemWidth(space.x - height);
     ImGui::InputTextWithHint("##search", U8STR(FEATHER_SEARCH " Search for a node..."), &m_searchQuery, ImGuiInputTextFlags_EnterReturnsTrue);
+    ImGui::SameLine(0, 0);
+    if (ImGui::Button(U8STR(FEATHER_X), ImVec2(height, height))) {
+        m_searchQuery.clear();
+    }
 
     this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0);
 }
