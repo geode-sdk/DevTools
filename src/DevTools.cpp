@@ -14,27 +14,29 @@
 template<>
 struct matjson::Serialize<Settings> {
     static Result<Settings> fromJson(const matjson::Value& value) {
-        Settings defaults;
+        Settings s;
 
-        return Ok(Settings {
-            .GDInWindow = value["game_in_window"].asBool().unwrapOr(std::move(defaults.GDInWindow)),
-            .attributesInTree = value["attributes_in_tree"].asBool().unwrapOr(std::move(defaults.attributesInTree)),
-            .alwaysHighlight = value["always_highlight"].asBool().unwrapOr(std::move(defaults.alwaysHighlight)),
-            .highlightLayouts = value["highlight_layouts"].asBool().unwrapOr(std::move(defaults.highlightLayouts)),
-            .arrowExpand = value["arrow_expand"].asBool().unwrapOr(std::move(defaults.arrowExpand)),
-            .orderChildren = value["order_children"].asBool().unwrapOr(std::move(defaults.orderChildren)),
-            .advancedSettings = value["advanced_settings"].asBool().unwrapOr(std::move(defaults.advancedSettings)),
-            .showMemoryViewer = value["show_memory_viewer"].asBool().unwrapOr(std::move(defaults.showMemoryViewer)),
-            .showModGraph = value["show_mod_graph"].asBool().unwrapOr(std::move(defaults.showModGraph)),
-            .theme = value["theme"].asString().unwrapOr(std::move(defaults.theme)),
-            .themeColor = value["theme_color"].as<ccColor4B>().isOk() ? value["theme_color"].as<ccColor4B>().unwrap() : std::move(defaults.themeColor),
-            .buttonPos  = CCPoint{
-                value["button_x"].as<float>().isOk() ? value["button_x"].as<float>().unwrap() : std::move(defaults.buttonPos.x),
-                value["button_y"].as<float>().isOk() ? value["button_y"].as<float>().unwrap() : std::move(defaults.buttonPos.y)
-            },
-            .buttonInEditor = value["button_editor"].asBool().isOk() ? value["button_editor"].asBool().unwrap() : std::move(defaults.buttonInEditor),
-            .buttonInGame = value["button_game"].asBool().isOk() ? value["button_game"].asBool().unwrap() : std::move(defaults.buttonInGame)
-        });
+        const auto assign = [](const matjson::Value& json, auto& prop) {
+            if (auto res = json.as<std::decay_t<decltype(prop)>>()) prop = res.unwrap();
+        };
+
+        assign(value["game_in_window"], s.GDInWindow);
+        assign(value["attributes_in_tree"], s.attributesInTree);
+        assign(value["always_highlight"], s.alwaysHighlight);
+        assign(value["highlight_layouts"], s.highlightLayouts);
+        assign(value["arrow_expand"], s.arrowExpand);
+        assign(value["order_children"], s.orderChildren);
+        assign(value["advanced_settings"], s.advancedSettings);
+        assign(value["show_memory_viewer"], s.showMemoryViewer);
+        assign(value["show_mod_graph"], s.showModGraph);
+        assign(value["theme"], s.theme);
+        assign(value["theme_color"], s.themeColor);
+        assign(value["button_x"], s.buttonPos.x);
+        assign(value["button_y"], s.buttonPos.y);
+        assign(value["button_editor"], s.buttonInEditor);
+        assign(value["button_game"], s.buttonInGame);
+
+        return Ok(s);
     }
 
     static matjson::Value toJson(const Settings& settings) {
@@ -181,7 +183,7 @@ void DevTools::drawPages() {
 
     if (m_settings.showMemoryViewer) {
         this->drawPage(
-            U8STR(FEATHER_TERMINAL " Memory viewer"), 
+            U8STR(FEATHER_TERMINAL " Memory viewer"),
             &DevTools::drawMemory
         );
     }
