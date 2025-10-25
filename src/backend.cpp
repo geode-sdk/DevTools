@@ -69,10 +69,8 @@ void DevTools::setupPlatform() {
     #endif
 
     // define geode's clipboard funcs for imgui
-    auto static read = geode::utils::clipboard::read();
     ImGui::GetPlatformIO().Platform_GetClipboardTextFn = [](ImGuiContext* ctx) {
-        read = geode::utils::clipboard::read();
-        return read.c_str();
+        return geode::utils::clipboard::read().c_str();
         };
     ImGui::GetPlatformIO().Platform_SetClipboardTextFn = [](ImGuiContext* ctx, const char* text) {
         geode::utils::clipboard::write(text);
