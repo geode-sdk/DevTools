@@ -14,6 +14,21 @@ using namespace cocos2d;
 
 // based off https://github.com/matcool/gd-imgui-cocos
 
+// little helper function to convert ImTexture2D <=> GLuint,
+// supporting both versions of imgui where this was a void* and is now a u64
+// (templated because c++ is stupid)
+template <class T = ImTextureID>
+static auto textureID(auto value) {
+    if constexpr (std::is_same_v<decltype(value), GLuint>) { // GLuint -> ImTextureID
+        if constexpr (std::is_same_v<T, void*>) return reinterpret_cast<T>(static_cast<std::uintptr_t>(value));
+        else return static_cast<T>(value);
+    }
+    else { // ImTextureID -> GLuint
+        if constexpr (std::is_same_v<T, void*>) return static_cast<GLuint>(reinterpret_cast<std::uintptr_t>(value));
+        else return static_cast<GLuint>(value);
+    }
+}
+
 static bool g_useNormalPos = false;
 
 CCPoint getMousePos_H() {
@@ -57,7 +72,7 @@ void DevTools::setupPlatform() {
     m_fontTexture->initWithData(pixels, kCCTexture2DPixelFormat_RGBA8888, width, height, CCSize(width, height));
     m_fontTexture->retain();
 
-    io.Fonts->SetTexID(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(m_fontTexture->getName())));
+    io.Fonts->SetTexID(textureID(m_fontTexture->getName()));
 
     // fixes getMousePos to be relative to the GD view
     #ifndef GEODE_IS_MOBILE
@@ -67,6 +82,16 @@ void DevTools::setupPlatform() {
         "geode::cocos::getMousePos"
     );
     #endif
+
+    // define geode's clipboard funcs for imgui
+    auto static read = geode::utils::clipboard::read();
+    ImGui::GetPlatformIO().Platform_GetClipboardTextFn = [](ImGuiContext* ctx) {
+        read = geode::utils::clipboard::read();
+        return read.c_str();
+        };
+    ImGui::GetPlatformIO().Platform_SetClipboardTextFn = [](ImGuiContext* ctx, const char* text) {
+        geode::utils::clipboard::write(text);
+        };
 }
 
 #ifdef GEODE_IS_MOBILE
@@ -219,7 +244,7 @@ void DevTools::renderDrawDataFallback(ImDrawData* draw_data) {
         auto* idxBuffer = list->IdxBuffer.Data;
         auto* vtxBuffer = list->VtxBuffer.Data;
         for (auto& cmd : list->CmdBuffer) {
-            ccGLBindTexture2D(static_cast<GLuint>(reinterpret_cast<intptr_t>(cmd.GetTexID())));
+            ccGLBindTexture2D(textureID(cmd.GetTexID()));
 
             const auto rect = cmd.ClipRect;
             const auto orig = toCocos(ImVec2(rect.x, rect.y));
@@ -306,7 +331,7 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, list->IdxBuffer.Size * sizeof(ImDrawIdx), list->IdxBuffer.Data, GL_STREAM_DRAW);
 
         for (auto& cmd : list->CmdBuffer) {
-            ccGLBindTexture2D(static_cast<GLuint>(reinterpret_cast<intptr_t>(cmd.GetTexID())));
+            ccGLBindTexture2D(textureID(cmd.GetTexID()));
 
             const auto rect = cmd.ClipRect;
             const auto orig = toCocos(ImVec2(rect.x, rect.y));

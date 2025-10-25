@@ -311,6 +311,10 @@ void applyCommon(ImGuiStyle& style) {
     // style.FrameRounding     = 2.0f;
     // style.WindowPadding     = { 3.f, 3.f };
     // style.ColorButtonPosition = ImGuiDir_Left;
+
+    //special sets for imgui 1.92.4 to keep old look of devtools
+    style.TabRounding = 0.f;
+    style.TabBarOverlineSize = 2.f;
 }
 
 ThemeDef getThemeDef(std::string const& name) {
