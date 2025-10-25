@@ -250,17 +250,16 @@ void DevTools::draw(GLRenderCtx* ctx) {
     if (cursor != lastCursor) {
         lastCursor = cursor;
         auto winCursor = IDC_ARROW;
-        switch (cursor)
-        {
-        case ImGuiMouseCursor_Arrow: winCursor = IDC_ARROW; break;
-        case ImGuiMouseCursor_TextInput: winCursor = IDC_IBEAM; break;
-        case ImGuiMouseCursor_ResizeAll: winCursor = IDC_SIZEALL; break;
-        case ImGuiMouseCursor_ResizeEW: winCursor = IDC_SIZEWE; break;
-        case ImGuiMouseCursor_ResizeNS: winCursor = IDC_SIZENS; break;
-        case ImGuiMouseCursor_ResizeNESW: winCursor = IDC_SIZENESW; break;
-        case ImGuiMouseCursor_ResizeNWSE: winCursor = IDC_SIZENWSE; break;
-        case ImGuiMouseCursor_Hand: winCursor = IDC_HAND; break;
-        case ImGuiMouseCursor_NotAllowed: winCursor = IDC_NO; break;
+        switch (cursor) {
+            case ImGuiMouseCursor_Arrow: winCursor = IDC_ARROW; break;
+            case ImGuiMouseCursor_TextInput: winCursor = IDC_IBEAM; break;
+            case ImGuiMouseCursor_ResizeAll: winCursor = IDC_SIZEALL; break;
+            case ImGuiMouseCursor_ResizeEW: winCursor = IDC_SIZEWE; break;
+            case ImGuiMouseCursor_ResizeNS: winCursor = IDC_SIZENS; break;
+            case ImGuiMouseCursor_ResizeNESW: winCursor = IDC_SIZENESW; break;
+            case ImGuiMouseCursor_ResizeNWSE: winCursor = IDC_SIZENWSE; break;
+            case ImGuiMouseCursor_Hand: winCursor = IDC_HAND; break;
+            case ImGuiMouseCursor_NotAllowed: winCursor = IDC_NO; break;
         }
         if (cursorField) {
             cursorField->cursor = LoadCursor(NULL, winCursor);
@@ -371,4 +370,5 @@ void DevTools::sceneChanged() {
 
 bool DevTools::shouldUseGDWindow() const {
     return Mod::get()->getSettingValue<bool>("should-use-gd-window");
+
 }
