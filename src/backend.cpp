@@ -67,14 +67,6 @@ void DevTools::setupPlatform() {
         "geode::cocos::getMousePos"
     );
     #endif
-
-    // define geode's clipboard funcs for imgui
-    ImGui::GetPlatformIO().Platform_GetClipboardTextFn = [](ImGuiContext* ctx) {
-        return geode::utils::clipboard::read().c_str();
-        };
-    ImGui::GetPlatformIO().Platform_SetClipboardTextFn = [](ImGuiContext* ctx, const char* text) {
-        geode::utils::clipboard::write(text);
-        };
 }
 
 #ifdef GEODE_IS_MOBILE
