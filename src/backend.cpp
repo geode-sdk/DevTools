@@ -14,21 +14,6 @@ using namespace cocos2d;
 
 // based off https://github.com/matcool/gd-imgui-cocos
 
-// little helper function to convert ImTexture2D <=> GLuint,
-// supporting both versions of imgui where this was a void* and is now a u64
-// (templated because c++ is stupid)
-template <class T = ImTextureID>
-static auto textureID(auto value) {
-    if constexpr (std::is_same_v<decltype(value), GLuint>) { // GLuint -> ImTextureID
-        if constexpr (std::is_same_v<T, void*>) return reinterpret_cast<T>(static_cast<std::uintptr_t>(value));
-        else return static_cast<T>(value);
-    }
-    else { // ImTextureID -> GLuint
-        if constexpr (std::is_same_v<T, void*>) return static_cast<GLuint>(reinterpret_cast<std::uintptr_t>(value));
-        else return static_cast<GLuint>(value);
-    }
-}
-
 static bool g_useNormalPos = false;
 
 CCPoint getMousePos_H() {
