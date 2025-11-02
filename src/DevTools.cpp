@@ -106,9 +106,36 @@ void DevTools::addCustomCallback(std::function<void(CCNode*)> callback) {
     m_customCallbacks.push_back(std::move(callback));
 }
 
+// Scroll when dragging empty space
+void mobileScrollBehavior() {
+    auto* ctx = ImGui::GetCurrentContext();
+    auto* window = ctx->CurrentWindow;
+    if (!window) return;
+
+    bool hovered = false;
+    bool held = false;
+    ImGuiID id = window->GetID("##scroll_dragging_overlay");
+    ImGui::KeepAliveID(id);
+    // If nothing hovered so far in the frame (not same as IsAnyItemHovered()!)
+    if (ctx->HoveredId == 0) {
+        ImGui::ButtonBehavior(window->Rect(), id, &hovered, &held, ImGuiButtonFlags_MouseButtonLeft);
+    }
+    if (held) {
+        ImVec2 delta = ImGui::GetIO().MouseDownDuration[0] > 0.1 ? -ImGui::GetIO().MouseDelta : ImVec2(0, 0);
+        if (std::abs(delta.x) >= 0.1f || std::abs(delta.y) >= 0.1f) {
+            ImGui::SetScrollX(window, window->Scroll.x + delta.x);
+            ImGui::SetScrollY(window, window->Scroll.y + delta.y);
+        }
+    }
+}
+
 void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
     if (ImGui::Begin(name, nullptr, ImGuiWindowFlags_HorizontalScrollbar)) {
         (this->*pageFun)();
+
+#ifdef GEODE_IS_MOBILE
+        mobileScrollBehavior();
+#endif
     }
     ImGui::End();
 }
@@ -208,6 +235,10 @@ void DevTools::draw(GLRenderCtx* ctx) {
         if (this->shouldUseGDWindow()) this->drawGD(ctx);
         ImGui::PopFont();
     }
+
+#ifdef GEODE_IS_WINDOWS
+    setMouseCursor();
+#endif
 }
 
 void DevTools::setupFonts() {
@@ -301,4 +332,5 @@ void DevTools::sceneChanged() {
 
 bool DevTools::shouldUseGDWindow() const {
     return Mod::get()->getSettingValue<bool>("should-use-gd-window");
+
 }

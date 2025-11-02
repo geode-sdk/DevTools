@@ -57,7 +57,7 @@ void DevTools::setupPlatform() {
     m_fontTexture->initWithData(pixels, kCCTexture2DPixelFormat_RGBA8888, width, height, CCSize(width, height));
     m_fontTexture->retain();
 
-    io.Fonts->SetTexID(reinterpret_cast<ImTextureID>(static_cast<intptr_t>(m_fontTexture->getName())));
+    io.Fonts->SetTexID(static_cast<ImTextureID>(m_fontTexture->getName()));
 
     // fixes getMousePos to be relative to the GD view
     #ifndef GEODE_IS_MOBILE
@@ -219,7 +219,7 @@ void DevTools::renderDrawDataFallback(ImDrawData* draw_data) {
         auto* idxBuffer = list->IdxBuffer.Data;
         auto* vtxBuffer = list->VtxBuffer.Data;
         for (auto& cmd : list->CmdBuffer) {
-            ccGLBindTexture2D(static_cast<GLuint>(reinterpret_cast<intptr_t>(cmd.GetTexID())));
+            ccGLBindTexture2D(static_cast<GLuint>(cmd.GetTexID()));
 
             const auto rect = cmd.ClipRect;
             const auto orig = toCocos(ImVec2(rect.x, rect.y));
@@ -306,7 +306,7 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, list->IdxBuffer.Size * sizeof(ImDrawIdx), list->IdxBuffer.Data, GL_STREAM_DRAW);
 
         for (auto& cmd : list->CmdBuffer) {
-            ccGLBindTexture2D(static_cast<GLuint>(reinterpret_cast<intptr_t>(cmd.GetTexID())));
+            ccGLBindTexture2D(static_cast<GLuint>(cmd.GetTexID()));
 
             const auto rect = cmd.ClipRect;
             const auto orig = toCocos(ImVec2(rect.x, rect.y));

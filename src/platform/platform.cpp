@@ -43,7 +43,7 @@ void GLRenderCtx::cleanup() {
 GLRenderCtx::GLRenderCtx(ImVec2 const& size) : m_size(size) {}
 
 ImTextureID GLRenderCtx::texture() const {
-    return reinterpret_cast<ImTextureID>(static_cast<uintptr_t>(m_texture));
+    return static_cast<ImTextureID>(m_texture);
 }
 
 ImVec2 GLRenderCtx::size() const {
