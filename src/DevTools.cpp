@@ -106,30 +106,36 @@ void DevTools::addCustomCallback(std::function<void(CCNode*)> callback) {
     m_customCallbacks.push_back(std::move(callback));
 }
 
+// Scroll when dragging empty space
+void mobileScrollBehavior() {
+    auto* ctx = ImGui::GetCurrentContext();
+    auto* window = ctx->CurrentWindow;
+    if (!window) return;
+
+    bool hovered = false;
+    bool held = false;
+    ImGuiID id = window->GetID("##scroll_dragging_overlay");
+    ImGui::KeepAliveID(id);
+    // If nothing hovered so far in the frame (not same as IsAnyItemHovered()!)
+    if (ctx->HoveredId == 0) {
+        ImGui::ButtonBehavior(window->Rect(), id, &hovered, &held, ImGuiButtonFlags_MouseButtonLeft);
+    }
+    if (held) {
+        ImVec2 delta = ImGui::GetIO().MouseDownDuration[0] > 0.1 ? -ImGui::GetIO().MouseDelta : ImVec2(0, 0);
+        if (std::abs(delta.x) >= 0.1f || std::abs(delta.y) >= 0.1f) {
+            ImGui::SetScrollX(window, window->Scroll.x + delta.x);
+            ImGui::SetScrollY(window, window->Scroll.y + delta.y);
+        }
+    }
+}
+
 void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
     if (ImGui::Begin(name, nullptr, ImGuiWindowFlags_HorizontalScrollbar)) {
-
-        // Fix wrapping after window resize
-        ImGui::PushTextWrapPos(ImGui::GetContentRegionAvail().x);
-
         (this->*pageFun)();
 
-        // Scroll when dragging (useful for android users)
-        auto mouse_dt = ImGui::GetIO().MouseDelta;
-        ImVec2 delta = ImGui::GetIO().MouseDownDuration[0] > 0.1 ? ImVec2(mouse_dt.x * -1, mouse_dt.y * -1) : ImVec2(0, 0);
-        ImGuiContext& g = *ImGui::GetCurrentContext();
-        ImGuiWindow* window = g.CurrentWindow;
-        if (!window) return;
-        bool hovered = false;
-        bool held = false;
-        ImGuiID id = window->GetID("##scrolldraggingoverlay");
-        ImGui::KeepAliveID(id);
-        ImGuiButtonFlags button_flags = ImGuiButtonFlags_MouseButtonLeft;
-        if (g.HoveredId == 0) // If nothing hovered so far in the frame (not same as IsAnyItemHovered()!)
-            ImGui::ButtonBehavior(window->Rect(), id, &hovered, &held, button_flags);
-        if (held && fabs(delta.x) >= 0.1f) ImGui::SetScrollX(window, window->Scroll.x + delta.x);
-        if (held && fabs(delta.y) >= 0.1f) ImGui::SetScrollY(window, window->Scroll.y + delta.y);
-
+#ifdef GEODE_IS_MOBILE
+        mobileScrollBehavior();
+#endif
     }
     ImGui::End();
 }
@@ -230,50 +236,9 @@ void DevTools::draw(GLRenderCtx* ctx) {
         ImGui::PopFont();
     }
 
-#ifdef GEODE_IS_WINDOWS // Windows exclusive cursor updates from imgui-cocos
-
-    // Shows imgui's cursor instead of hidden cursor if out of GD Window
-    auto isCursorVisible = false;
-    CURSORINFO ci = { sizeof(ci) }; //winapi
-    if (GetCursorInfo(&ci)) isCursorVisible = (ci.flags & CURSOR_SHOWING) != 0;
-    ImGui::GetIO().MouseDrawCursor = m_visible and !isCursorVisible and !shouldPassEventsToGDButTransformed();
-
-    struct GLFWCursorData {
-        void* next = nullptr;
-        HCURSOR cursor;
-    };
-    auto& cursorField = *reinterpret_cast<GLFWCursorData**>(reinterpret_cast<uintptr_t>(
-        CCEGLView::get()->getWindow()) + 0x50);
-
-    auto cursor = ImGui::GetIO().MouseDrawCursor ? ImGuiMouseCursor_None : ImGui::GetMouseCursor();
-    static ImGuiMouseCursor lastCursor = ImGuiMouseCursor_COUNT;
-    if (cursor != lastCursor) {
-        lastCursor = cursor;
-        auto winCursor = IDC_ARROW;
-        switch (cursor) {
-            case ImGuiMouseCursor_Arrow: winCursor = IDC_ARROW; break;
-            case ImGuiMouseCursor_TextInput: winCursor = IDC_IBEAM; break;
-            case ImGuiMouseCursor_ResizeAll: winCursor = IDC_SIZEALL; break;
-            case ImGuiMouseCursor_ResizeEW: winCursor = IDC_SIZEWE; break;
-            case ImGuiMouseCursor_ResizeNS: winCursor = IDC_SIZENS; break;
-            case ImGuiMouseCursor_ResizeNESW: winCursor = IDC_SIZENESW; break;
-            case ImGuiMouseCursor_ResizeNWSE: winCursor = IDC_SIZENWSE; break;
-            case ImGuiMouseCursor_Hand: winCursor = IDC_HAND; break;
-            case ImGuiMouseCursor_NotAllowed: winCursor = IDC_NO; break;
-        }
-        if (cursorField) {
-            cursorField->cursor = LoadCursor(NULL, winCursor);
-        }
-        else {
-            // must be heap allocated
-            cursorField = new GLFWCursorData{
-                .next = nullptr,
-                .cursor = LoadCursor(NULL, winCursor)
-            };
-        }
-    }
+#ifdef GEODE_IS_WINDOWS
+    setMouseCursor();
 #endif
-
 }
 
 void DevTools::setupFonts() {
@@ -321,9 +286,6 @@ void DevTools::setup() {
     io.ConfigDockingWithShift = false;
     // io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
     io.ConfigWindowsResizeFromEdges = true;
-
-    // Allow user scaling text of individual window with CTRL+Wheel.
-    io.FontAllowUserScaling = true;
 
     this->setupFonts();
     this->setupPlatform();

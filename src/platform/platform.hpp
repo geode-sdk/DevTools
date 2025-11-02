@@ -8,6 +8,7 @@
 #elif defined(GEODE_IS_IOS)
 #include <OpenGLES/ES2/gl.h>
 #endif
+#include <Geode/platform/cplatform.h>
 
 ImRect& getGDWindowRect();
 bool& shouldPassEventsToGDButTransformed();
@@ -35,3 +36,7 @@ public:
     bool begin();
     void end();
 };
+
+#ifdef GEODE_IS_WINDOWS
+void setMouseCursor();
+#endif
