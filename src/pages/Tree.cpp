@@ -3,13 +3,15 @@
 #include "../DevTools.hpp"
 #include "../platform/utils.hpp"
 #include <misc/cpp/imgui_stdlib.h>
+#include <Geode/utils/string.hpp>
+
 #ifndef GEODE_IS_WINDOWS
 #include <cxxabi.h>
 #endif
 
 using namespace geode::prelude;
 
-void DevTools::drawTreeBranch(CCNode* node, size_t index) {
+void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
     if (!searchBranch(node)) {
         return;
     }
@@ -20,13 +22,35 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     if (selected) {
         flags |= ImGuiTreeNodeFlags_Selected;
     }
-    if (!node->getChildrenCount())
-    {
+    if (!node->getChildrenCount()) {
         flags |= ImGuiTreeNodeFlags_Leaf;
     }
-    if (m_settings.arrowExpand)
-    {
+    if (m_settings.arrowExpand) {
         flags |= ImGuiTreeNodeFlags_OpenOnArrow;
+    }
+
+    if (auto dragged = DevTools::get()->getDraggedNode(); dragged && dragged != node && !drag) {
+        float mouse = ImGui::GetMousePos().y;
+        float cursor = ImGui::GetCursorPosY() + ImGui::GetWindowPos().y - ImGui::GetScrollY();
+
+        if (mouse <= cursor + 18 && mouse > cursor) {
+            flags |= ImGuiTreeNodeFlags_Selected;
+
+            if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+                for(CCNode* n = node;; n = n->getParent()) {
+                    if (n == dragged) { // can't drag a parent into its own child
+                        break;
+                    } else if (n == nullptr) {
+                        auto parent = dragged->getParent();
+                        dragged->removeFromParentAndCleanup(false);
+                        parent->updateLayout();
+                        node->addChild(dragged);
+                        node->updateLayout();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     if (m_searchQuery.empty()) {
@@ -49,6 +73,9 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
     }
     // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
     bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.str().c_str());
+    float height = ImGui::GetItemRectSize().y;
+
+
     if (ImGui::IsItemClicked()) {
         DevTools::get()->selectNode(node);
         selected = true;
@@ -61,9 +88,6 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
             }
         }
     }
-    if (ImGui::IsItemHovered() && (m_settings.alwaysHighlight || ImGui::IsKeyDown(ImGuiMod_Shift))) {
-        DevTools::get()->highlightNode(node, HighlightMode::Hovered);
-    }
     if (ImGui::IsItemToggledOpen() && (m_searchQuery.empty() || m_searchQuery == m_prevQuery)) {
         if (!m_searchQuery.empty() && expanded) {
             CCNode* parent = node->getParent();
@@ -74,13 +98,39 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index) {
         }
         m_nodeOpen[node] = expanded;
     }
+
+    if (ImGui::IsItemHovered() && (m_settings.alwaysHighlight || ImGui::IsKeyDown(ImGuiMod_Shift))) {
+        DevTools::get()->highlightNode(node, HighlightMode::Hovered);
+    }
+
+    bool isDrag = false;
+
+    if (m_settings.enableMoving) {
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0.75f));
+        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 4);
+
+        std::string btnText = (U8STR(FEATHER_MENU"##menu_")) + std::to_string((long)node);
+        ImGui::Button(btnText.c_str(), {0, height});
+
+        isDrag = ImGui::IsItemActive();
+        if (isDrag) {
+            DevTools::get()->setDraggedNode(node);
+        }
+        ImGui::PopStyleColor(3);
+        ImGui::PopStyleVar();
+    }
+
     if (expanded) {
         if (m_settings.attributesInTree) {
             this->drawNodeAttributes(node);
         }
         size_t i = 0;
         for (auto& child : CCArrayExt<CCNode*>(node->getChildren())) {
-            this->drawTreeBranch(child, i++);
+            this->drawTreeBranch(child, i++, drag || isDrag);
         }
         ImGui::TreePop();
     }
@@ -101,7 +151,11 @@ void DevTools::drawTree() {
         m_searchQuery.clear();
     }
 
-    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0);
+    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false);
+
+    if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
+        DevTools::get()->setDraggedNode(nullptr);
+    }
 }
 
 bool DevTools::searchBranch(CCNode* node) {

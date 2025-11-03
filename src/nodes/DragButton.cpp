@@ -1,6 +1,8 @@
 #include "DragButton.hpp"
 #include "../DevTools.hpp"
 
+#include <Geode/Geode.hpp>
+
 using namespace geode::prelude;
 
 bool DragButton::init(CCNode* node, std::function<void()> onPress) {

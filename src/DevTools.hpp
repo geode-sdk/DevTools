@@ -32,6 +32,7 @@ struct Settings {
     CCPoint buttonPos = {50, 50};
     bool buttonInEditor = false;
     bool buttonInGame = false;
+    bool enableMoving = false;
 };
 
 class DevTools {
@@ -50,6 +51,7 @@ protected:
     ImFont* m_boxFont      = nullptr;
     CCTexture2D* m_fontTexture = nullptr;
     Ref<CCNode> m_selectedNode;
+    Ref<CCNode> m_draggedNode;
     std::vector<std::pair<CCNode*, HighlightMode>> m_toHighlight;
     std::vector<std::function<void(CCNode*)>> m_customCallbacks;
     std::string m_searchQuery;
@@ -60,7 +62,7 @@ protected:
     void setupPlatform();
 
     void drawTree();
-    void drawTreeBranch(CCNode* node, size_t index);
+    void drawTreeBranch(CCNode* node, size_t index, bool drag);
     void drawSettings();
     void drawAdvancedSettings();
     void drawNodeAttributes(CCNode* node);
@@ -111,6 +113,8 @@ public:
     CCNode* getSelectedNode() const;
     void selectNode(CCNode* node);
     void highlightNode(CCNode* node, HighlightMode mode);
+    CCNode* getDraggedNode() const;
+    void setDraggedNode(CCNode* node);
 
     void addCustomCallback(std::function<void(CCNode*)> callback);
 

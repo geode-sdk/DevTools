@@ -35,6 +35,7 @@ struct matjson::Serialize<Settings> {
         assign(value["button_y"], s.buttonPos.y);
         assign(value["button_editor"], s.buttonInEditor);
         assign(value["button_game"], s.buttonInGame);
+        assign(value["enable_moving"], s.enableMoving);
 
         return Ok(s);
     }
@@ -56,6 +57,7 @@ struct matjson::Serialize<Settings> {
             { "button_y", settings.buttonPos.y },
             { "button_editor", settings.buttonInEditor },
             { "button_game", settings.buttonInGame },
+            { "enable_moving", settings.enableMoving }
         });
     }
 };
@@ -100,6 +102,14 @@ void DevTools::selectNode(CCNode* node) {
 
 void DevTools::highlightNode(CCNode* node, HighlightMode mode) {
     m_toHighlight.push_back({ node, mode });
+}
+
+CCNode* DevTools::getDraggedNode() const {
+    return m_draggedNode;
+}
+
+void DevTools::setDraggedNode(CCNode* node) {
+    m_draggedNode = node;
 }
 
 void DevTools::addCustomCallback(std::function<void(CCNode*)> callback) {

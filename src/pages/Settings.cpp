@@ -58,6 +58,12 @@ void DevTools::drawSettings() {
             "As a side effect to disabling this, things may render incorrectly."
         );
     }
+    ImGui::Checkbox("Enable Node Moving", &m_settings.enableMoving);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Adds a button to allow moving a node to a different parent via drag/drop"
+        );
+    }
     ImGui::Checkbox("Advanced Settings", &m_settings.advancedSettings);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(

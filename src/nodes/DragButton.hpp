@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Geode/cocos/base_nodes/CCNode.h"
+#include "Geode/cocos/layers_scenes_transitions_nodes/CCLayer.h"
 #include "Geode/cocos/touch_dispatcher/CCTouchDelegateProtocol.h"
 
 class DragButton : public cocos2d::CCLayer {
