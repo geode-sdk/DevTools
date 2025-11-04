@@ -4,6 +4,7 @@
 #include "../platform/utils.hpp"
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/utils/string.hpp>
+#include "../ImGui.hpp"
 
 #ifndef GEODE_IS_WINDOWS
 #include <cxxabi.h>
@@ -11,8 +12,22 @@
 
 using namespace geode::prelude;
 
+std::string formatNodeName(CCNode* node, size_t index) {
+    std::string name = fmt::format("[{}] {} ", index, geode::cocos::getObjectName(node));
+    if (node->getTag() != -1) {
+        name += fmt::format("({}) ", node->getTag());
+    }
+    if (node->getID().size()) {
+        name += fmt::format("\"{}\" ", node->getID());
+    }
+    if (node->getChildrenCount()) {
+        name += fmt::format("<{}> ", node->getChildrenCount());
+    }
+    return name;
+}
+
 void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
-    if (!searchBranch(node)) {
+    if (!this->searchBranch(node)) {
         return;
     }
 
@@ -32,19 +47,21 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
     if (auto dragged = DevTools::get()->getDraggedNode(); dragged && dragged != node && !drag) {
         float mouse = ImGui::GetMousePos().y;
         float cursor = ImGui::GetCursorPosY() + ImGui::GetWindowPos().y - ImGui::GetScrollY();
+        float height = ImGui::GetTextLineHeight();
 
-        if (mouse <= cursor + 18 && mouse > cursor) {
+        if (mouse <= cursor + height && mouse > cursor) {
             flags |= ImGuiTreeNodeFlags_Selected;
 
             if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-                for(CCNode* n = node;; n = n->getParent()) {
-                    if (n == dragged) { // can't drag a parent into its own child
+                for (CCNode* n = node;; n = n->getParent()) {
+                    if (n == dragged) {
+                        // can't drag a parent into its own child
                         break;
                     } else if (n == nullptr) {
                         auto parent = dragged->getParent();
                         dragged->removeFromParentAndCleanup(false);
-                        parent->updateLayout();
                         node->addChild(dragged);
+                        parent->updateLayout();
                         node->updateLayout();
                         break;
                     }
@@ -60,21 +77,10 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
         ImGui::SetNextItemOpen(true);
     }
 
-    std::stringstream name;
-    name << "[" << index << "] " << geode::cocos::getObjectName(node) << " ";
-    if (node->getTag() != -1) {
-        name << "(" << node->getTag() << ") ";
-    }
-    if (node->getID().size()) {
-        name << "\"" << node->getID() << "\" ";
-    }
-    if (node->getChildrenCount()) {
-        name << "<" << node->getChildrenCount() << "> ";
-    }
+    const auto name = formatNodeName(node, index);
     // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
-    bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.str().c_str());
+    bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.c_str());
     float height = ImGui::GetItemRectSize().y;
-
 
     if (ImGui::IsItemClicked()) {
         DevTools::get()->selectNode(node);
@@ -113,8 +119,9 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
         ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0.75f));
         ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 4);
 
-        std::string btnText = (U8STR(FEATHER_MENU"##menu_")) + std::to_string((long)node);
-        ImGui::Button(btnText.c_str(), {0, height});
+        ImGui::PushID(node);
+        ImGui::Button(U8STR(FEATHER_MENU), {0, height});
+        ImGui::PopID();
 
         isDrag = ImGui::IsItemActive();
         if (isDrag) {
@@ -152,6 +159,19 @@ void DevTools::drawTree() {
     }
 
     this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false);
+
+    if (auto* dragged = this->getDraggedNode()) {
+        const auto name = formatNodeName(dragged, 0);
+        auto bgColor = ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Header]);
+        auto textColor = ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Text]);
+
+        auto textSize = ImGui::CalcTextSize(name.c_str());
+        auto pos = ImGui::GetMousePos() - textSize / 2.f;
+
+        auto* drawing = ImGui::GetWindowDrawList();
+        drawing->AddRectFilled(pos, pos + textSize, bgColor);
+        drawing->AddText(pos, textColor, name.c_str(), name.c_str() + name.size());
+    }
 
     if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
         DevTools::get()->setDraggedNode(nullptr);
