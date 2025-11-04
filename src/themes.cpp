@@ -315,6 +315,7 @@ void applyCommon(ImGuiStyle& style) {
     //special sets for imgui 1.92.4 to keep old look of devtools
     style.TabRounding = 0.f;
     style.TabBarOverlineSize = 2.f;
+    style.TreeLinesFlags = ImGuiTreeNodeFlags_DrawLinesFull;
 }
 
 ThemeDef getThemeDef(std::string const& name) {
