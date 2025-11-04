@@ -35,7 +35,7 @@ struct matjson::Serialize<Settings> {
         assign(value["button_y"], s.buttonPos.y);
         assign(value["button_editor"], s.buttonInEditor);
         assign(value["button_game"], s.buttonInGame);
-        assign(value["enable_moving"], s.enableMoving);
+        assign(value["tree_drag_reorder"], s.treeDragReorder);
 
         return Ok(s);
     }
@@ -57,7 +57,7 @@ struct matjson::Serialize<Settings> {
             { "button_y", settings.buttonPos.y },
             { "button_editor", settings.buttonInEditor },
             { "button_game", settings.buttonInGame },
-            { "enable_moving", settings.enableMoving }
+            { "tree_drag_reorder", settings.treeDragReorder }
         });
     }
 };

@@ -137,7 +137,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
 
     bool isDrag = false;
 
-    if (m_settings.enableMoving && ImGui::IsItemActive()) {
+    if (m_settings.treeDragReorder && ImGui::IsItemActive()) {
         if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, height / 2.f)) {
             isDrag = true;
             if (this->getDraggedNode() != node) {

@@ -32,7 +32,7 @@ struct Settings {
     CCPoint buttonPos = {50, 50};
     bool buttonInEditor = false;
     bool buttonInGame = false;
-    bool enableMoving = false;
+    bool treeDragReorder = false;
 };
 
 class DevTools {

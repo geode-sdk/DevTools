@@ -58,10 +58,10 @@ void DevTools::drawSettings() {
             "As a side effect to disabling this, things may render incorrectly."
         );
     }
-    ImGui::Checkbox("Enable Node Moving", &m_settings.enableMoving);
+    ImGui::Checkbox("Node Tree Reordering", &m_settings.treeDragReorder);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
-            "Adds a button to allow moving a node to a different parent via drag/drop"
+            "(Experimental)\nAllows you to drag/drop nodes in the node tree, changing\ntheir parents or ordering."
         );
     }
     ImGui::Checkbox("Advanced Settings", &m_settings.advancedSettings);
@@ -87,7 +87,7 @@ void DevTools::drawSettings() {
     ImGui::Separator();
 
     ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 0.01f, 1.0f, 3.0f);
-    
+
 #ifdef GEODE_IS_DESKTOP
 
     ImGui::Separator();
