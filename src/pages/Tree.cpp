@@ -26,6 +26,15 @@ std::string formatNodeName(CCNode* node, size_t index) {
     return name;
 }
 
+bool isNodeParentOf(CCNode* parent, CCNode* child) {
+    for (CCNode* cur = child; cur != nullptr; cur = cur->getParent()) {
+        if (cur == parent) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
     if (!this->searchBranch(node)) {
         return;
@@ -44,26 +53,43 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
         flags |= ImGuiTreeNodeFlags_OpenOnArrow;
     }
 
-    if (auto dragged = DevTools::get()->getDraggedNode(); dragged && dragged != node && !drag) {
-        float mouse = ImGui::GetMousePos().y;
-        float cursor = ImGui::GetCursorPosY() + ImGui::GetWindowPos().y - ImGui::GetScrollY();
+    bool drawSeparator = false;
+
+    if (auto dragged = this->getDraggedNode(); dragged && dragged != node && !drag) {
+        float mouseY = ImGui::GetMousePos().y;
+        float cursorY = ImGui::GetCursorPosY() + ImGui::GetWindowPos().y - ImGui::GetScrollY();
         float height = ImGui::GetTextLineHeight();
+        float spacing = ImGui::GetStyle().FramePadding.y;
 
-        if (mouse <= cursor + height && mouse > cursor) {
-            flags |= ImGuiTreeNodeFlags_Selected;
+        if (mouseY > cursorY && mouseY <= cursorY + height + spacing) {
+            if (mouseY <= cursorY + height) {
+                flags |= ImGuiTreeNodeFlags_Selected;
 
-            if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-                for (CCNode* n = node;; n = n->getParent()) {
-                    if (n == dragged) {
-                        // can't drag a parent into its own child
-                        break;
-                    } else if (n == nullptr) {
-                        auto parent = dragged->getParent();
+                if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && !isNodeParentOf(dragged, node)) {
+                    auto parent = dragged->getParent();
+                    dragged->removeFromParentAndCleanup(false);
+                    node->addChild(dragged);
+                    parent->updateLayout();
+                    node->updateLayout();
+                }
+            } else {
+                drawSeparator = true;
+
+                if (!ImGui::IsMouseDown(ImGuiMouseButton_Left) && !isNodeParentOf(dragged, node)) {
+                    // place the dragged node right after `node`
+                    auto newParent = node->getParent();
+                    if (newParent) {
+                        auto oldParent = dragged->getParent();
+                        auto children = newParent->getChildrenExt();
+                        for (int i = index + 1; i < children.size(); i++) {
+                            children[i]->m_uOrderOfArrival++;
+                        }
                         dragged->removeFromParentAndCleanup(false);
-                        node->addChild(dragged);
-                        parent->updateLayout();
-                        node->updateLayout();
-                        break;
+                        newParent->addChild(dragged, node->getZOrder());
+                        dragged->m_uOrderOfArrival = node->m_uOrderOfArrival + 1;
+
+                        if (oldParent != newParent) oldParent->updateLayout();
+                        newParent->updateLayout();
                     }
                 }
             }
@@ -111,24 +137,13 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
 
     bool isDrag = false;
 
-    if (m_settings.enableMoving) {
-        ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0, 0.75f));
-        ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 4);
-
-        ImGui::PushID(node);
-        ImGui::Button(U8STR(FEATHER_MENU), {0, height});
-        ImGui::PopID();
-
-        isDrag = ImGui::IsItemActive();
-        if (isDrag) {
-            DevTools::get()->setDraggedNode(node);
+    if (m_settings.enableMoving && ImGui::IsItemActive()) {
+        if (ImGui::IsMouseDragging(ImGuiMouseButton_Left, height / 2.f)) {
+            isDrag = true;
+            if (this->getDraggedNode() != node) {
+                this->setDraggedNode(node);
+            }
         }
-        ImGui::PopStyleColor(3);
-        ImGui::PopStyleVar();
     }
 
     if (expanded) {
@@ -140,6 +155,10 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
             this->drawTreeBranch(child, i++, drag || isDrag);
         }
         ImGui::TreePop();
+    }
+    // on leaf nodes expanded is true
+    if (drawSeparator && (!expanded || !node->getChildrenCount())) {
+        ImGui::Separator();
     }
 }
 
@@ -174,7 +193,7 @@ void DevTools::drawTree() {
     }
 
     if (!ImGui::IsMouseDown(ImGuiMouseButton_Left)) {
-        DevTools::get()->setDraggedNode(nullptr);
+        this->setDraggedNode(nullptr);
     }
 }
 
