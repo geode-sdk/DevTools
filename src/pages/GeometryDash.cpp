@@ -6,6 +6,7 @@
 #include <Geode/binding/GJDropDownLayer.hpp>
 #include <Geode/ui/Layout.hpp>
 #include <Geode/ui/SimpleAxisLayout.hpp>
+#include "../fonts/FeatherIcons.hpp"
 
 void drawRowAxisArrow(
     ImDrawList& foreground,
@@ -384,7 +385,48 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
             "Geometry Dash ({}x{})###devtools/geometry-dash",
             winSize.width, winSize.height
         );
-        if (ImGui::Begin(title.c_str())) {
+        bool gameStayAlive = true;
+        if (ImGui::Begin(title.c_str(), &gameStayAlive, ImGuiWindowFlags_MenuBar)) {
+
+            if (!gameStayAlive) game::exit(true);
+
+            if (ImGui::BeginMenuBar()) {
+                if (ImGui::MenuItem(U8STR(FEATHER_SAVE " Save"))) {
+                    AppDelegate::get()->trySaveGame(0);
+                }
+
+                ImGui::SameLine();
+
+                static float time;
+                auto currentTime = CCDirector::get()->getScheduler()->getTimeScale();
+                time = currentTime > 0 ? currentTime : time;
+
+                if (ImGui::MenuItem(U8STR(
+                    m_pauseGame ? FEATHER_LOCK " Resume" : FEATHER_UNLOCK " Pause"
+                ))) {
+                    m_pauseGame ^= 1;
+                    if (m_pauseGame) {
+                        FMODAudioEngine::sharedEngine()->pauseAllAudio();
+                        CCDirector::get()->getScheduler()->setTimeScale(0.0f);
+                    }
+                    else {
+                        FMODAudioEngine::sharedEngine()->resumeAllAudio();
+                        CCDirector::get()->getScheduler()->setTimeScale(time);
+                    }
+                }
+
+                ImGui::SameLine();
+                if (ImGui::MenuItem(U8STR(FEATHER_PACKAGE " Reload"))) {
+                    GameManager::get()->reloadAll(0, 0, 0);
+                }
+
+                ImGui::SameLine();
+                if (ImGui::MenuItem(U8STR(FEATHER_REFRESH_CW " Restart"))) {
+                    game::restart(true);
+                }
+            }
+            ImGui::EndMenuBar();
+
             auto list = ImGui::GetWindowDrawList();
             auto ratio = gdCtx->size().x / gdCtx->size().y;
 
