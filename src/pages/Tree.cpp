@@ -40,7 +40,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
         return;
     }
 
-    visible = node->isVisible() and visible;
+    visible = node->isVisible() && visible;
 
     auto selected = DevTools::get()->getSelectedNode() == node;
 
@@ -230,4 +230,5 @@ bool DevTools::searchBranch(CCNode* node) {
         }
     }
     return false;
+
 }
