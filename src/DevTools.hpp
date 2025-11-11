@@ -62,7 +62,7 @@ protected:
     void setupPlatform();
 
     void drawTree();
-    void drawTreeBranch(CCNode* node, size_t index, bool drag);
+    void drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible);
     void drawSettings();
     void drawAdvancedSettings();
     void drawNodeAttributes(CCNode* node);
