@@ -35,10 +35,12 @@ bool isNodeParentOf(CCNode* parent, CCNode* child) {
     return false;
 }
 
-void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
+void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible) {
     if (!this->searchBranch(node)) {
         return;
     }
+
+    visible = node->isVisible() && visible;
 
     auto selected = DevTools::get()->getSelectedNode() == node;
 
@@ -103,10 +105,21 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
         ImGui::SetNextItemOpen(true);
     }
 
+    auto alpha = ImGui::GetStyle().DisabledAlpha;
+    ImGui::GetStyle().DisabledAlpha = node->isVisible() ? alpha + 0.15f : alpha;
+
+    ImGui::BeginDisabled(!visible);
+    ImGui::PushItemFlag(ImGuiItemFlags_Disabled, false); // Bypass iteract blocking in imgui
+
     const auto name = formatNodeName(node, index);
     // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
     bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.c_str());
     float height = ImGui::GetItemRectSize().y;
+
+
+    ImGui::GetStyle().DisabledAlpha = alpha;
+    ImGui::PopItemFlag(); //ImGuiItemFlags_Disabled
+    ImGui::EndDisabled();
 
     if (ImGui::IsItemClicked()) {
         DevTools::get()->selectNode(node);
@@ -152,7 +165,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag) {
         }
         size_t i = 0;
         for (auto& child : CCArrayExt<CCNode*>(node->getChildren())) {
-            this->drawTreeBranch(child, i++, drag || isDrag);
+            this->drawTreeBranch(child, i++, drag || isDrag, visible);
         }
         ImGui::TreePop();
     }
@@ -177,7 +190,7 @@ void DevTools::drawTree() {
         m_searchQuery.clear();
     }
 
-    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false);
+    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false, true);
 
     if (auto* dragged = this->getDraggedNode()) {
         const auto name = formatNodeName(dragged, 0);
@@ -217,4 +230,5 @@ bool DevTools::searchBranch(CCNode* node) {
         }
     }
     return false;
+
 }
