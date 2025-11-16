@@ -162,7 +162,6 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.height / ratio)
     );
     if (ImGui::Checkbox("Button Enabled", &m_settings.buttonEnabled)) {
-        log::info("Test");
         if (m_settings.buttonEnabled) setupDragButton();
         else removeDragButton();
     }
@@ -274,3 +273,4 @@ void DevTools::drawSettings() {
         }
     }
 };*/
+
