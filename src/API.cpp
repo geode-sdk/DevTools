@@ -1,3 +1,4 @@
+#define GEODE_DEFINE_EVENT_EXPORTS
 #include <API.hpp>
 #include "DevTools.hpp"
 #include "ImGui.hpp"
@@ -41,6 +42,34 @@ static void handleType() {
         };
         return ListenerResult::Stop;
     });
+}
+
+void devtools::newLine() {
+    ImGui::NewLine();
+}
+void devtools::sameLine() {
+    ImGui::SameLine();
+}
+void devtools::separator() {
+    ImGui::Separator();
+}
+void devtools::nextItemWidth(float width) {
+    ImGui::SetNextItemWidth(width);
+}
+bool devtools::combo(char const* label, int& current, std::span<char const*> items, int maxHeight) {
+    return ImGui::Combo(
+        label,
+        &current,
+        &*items.begin(),
+        static_cast<int>(items.size()),
+        maxHeight
+    );
+}
+bool devtools::radio(const char* label, int& current, int num) {
+    return ImGui::RadioButton(label, &current, num);
+}
+void devtools::inputMultiline(const char* label, std::string& str) {
+    ImGui::InputTextMultiline(label, &str);
 }
 
 $execute {

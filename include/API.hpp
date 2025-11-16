@@ -7,6 +7,8 @@
 #include <initializer_list>
 #include <string>
 #include <type_traits>
+#include <Geode/loader/Dispatch.hpp>
+#define MY_MOD_ID "geode.devtools"
 
 namespace devtools {
     template <typename T>
@@ -21,6 +23,9 @@ namespace devtools {
                                 std::is_same_v<T, cocos2d::CCPoint> ||
                                 std::is_same_v<T, cocos2d::CCSize> ||
                                 std::is_same_v<T, cocos2d::CCRect>;
+
+    template <typename T>
+    concept UnderlyingIntegral = std::is_integral_v<T> || std::is_integral_v<std::underlying_type_t<T>>;
 
     struct RegisterNodeEvent final : geode::Event {
         RegisterNodeEvent(std::function<void(cocos2d::CCNode*)>&& callback)
@@ -124,7 +129,7 @@ namespace devtools {
     /// @param items A list of pairs where each pair contains a value and its corresponding label.
     /// @return True if the value was changed, false otherwise.
     /// @warning This function should only ever be called from within a registered node callback.
-    template <typename T> requires std::is_integral_v<std::underlying_type_t<T>>
+    template <UnderlyingIntegral T>
     bool enumerable(const char* label, T& value, std::initializer_list<std::pair<T, const char*>> items) {
         using ValueType = std::underlying_type_t<T>;
         static auto fn = ([] {
@@ -165,4 +170,38 @@ namespace devtools {
             callback();
         }
     }
+
+    inline void newLine() GEODE_EVENT_EXPORT_NORES(&newLine, ());
+    inline void sameLine() GEODE_EVENT_EXPORT_NORES(&sameLine, ());
+    inline void separator() GEODE_EVENT_EXPORT_NORES(&separator, ());
+    inline void nextItemWidth(float width) GEODE_EVENT_EXPORT_NORES(&nextItemWidth, (width));
+
+    inline bool combo(
+        char const* label,
+        int& current,
+        std::span<char const*> items,
+        int maxHeight = -1
+    ) GEODE_EVENT_EXPORT_NORES(&combo, (label, current, items, maxHeight));
+
+    template <UnderlyingIntegral T, typename R = std::initializer_list<char const*>>
+        requires
+            std::ranges::range<R> &&
+            std::same_as<std::remove_pointer_t<decltype(&*std::declval<R>().begin())> const, char const* const>
+    bool combo(char const* label, T& current, R&& range, int maxHeight = -1) {
+        return combo(
+            label,
+            reinterpret_cast<int&>(current),
+            std::span(const_cast<char const**>(&*range.begin()), const_cast<char const**>(&*range.end())),
+            maxHeight
+        );
+    }
+
+    inline bool radio(char const* label, int& current, int num) GEODE_EVENT_EXPORT_NORES(&radio, (label, current, num));
+
+    template <UnderlyingIntegral T, UnderlyingIntegral U>
+    bool radio(char const* label, T& current, U value) {
+        return radio(label, reinterpret_cast<int&>(current), reinterpret_cast<int&>(value));
+    } 
+
+    inline void inputMultiline(char const* label, std::string& text) GEODE_EVENT_EXPORT_NORES(&inputMultiline, (label, text));
 }
