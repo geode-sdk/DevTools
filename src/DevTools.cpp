@@ -34,7 +34,7 @@ struct matjson::Serialize<Settings> {
         assign(value["button_y"], s.buttonPos.y);
         assign(value["button_editor"], s.buttonInEditor);
         assign(value["button_game"], s.buttonInGame);
-        GEODE_DESKTOP(assign(value["button_enabled"], s.buttonEnabled);)
+        assign(value["button_enabled"], s.buttonEnabled);
         assign(value["tree_drag_reorder"], s.treeDragReorder);
 
         return Ok(s);
@@ -57,7 +57,7 @@ struct matjson::Serialize<Settings> {
             { "button_y", settings.buttonPos.y },
             { "button_editor", settings.buttonInEditor },
             { "button_game", settings.buttonInGame },
-            GEODE_DESKTOP({ "button_enabled", settings.buttonEnabled },)
+            { "button_enabled", settings.buttonEnabled },
             { "tree_drag_reorder", settings.treeDragReorder }
         });
     }
@@ -137,6 +137,14 @@ void DevTools::removeDragButton() {
         m_dragButton->removeFromParent();
         m_dragButton = nullptr;
     }
+}
+
+bool DevTools::isButtonEnabled() {
+#ifdef GEODE_IS_MOBILE
+    return true;
+#else
+    return m_settings.buttonEnabled;
+#endif
 }
 
 // Scroll when dragging empty space

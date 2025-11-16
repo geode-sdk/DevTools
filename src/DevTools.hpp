@@ -34,7 +34,7 @@ struct Settings {
     CCPoint buttonPos = {50, 50};
     bool buttonInEditor = false;
     bool buttonInGame = false;
-    GEODE_DESKTOP(bool buttonEnabled = false;)
+    bool buttonEnabled = false;
     bool treeDragReorder = false;
 };
 
@@ -126,6 +126,7 @@ public:
     DragButton* getDragButton();
     void setupDragButton();
     void removeDragButton();
+    bool isButtonEnabled();
 
     void sceneChanged();
 

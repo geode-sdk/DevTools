@@ -36,7 +36,7 @@ class $modify(CCKeyboardDispatcher) {
 #include <Geode/loader/GameEvent.hpp>
 $execute {
     new EventListener<GameEventFilter>(+[](GameEvent*) {
-        GEODE_DESKTOP(if (DevTools::get()->getSettings().buttonEnabled)) DevTools::get()->setupDragButton();
+        if (DevTools::get()->isButtonEnabled()) DevTools::get()->setupDragButton();
     }, GameEventFilter(GameEventType::Loaded));
 }
 

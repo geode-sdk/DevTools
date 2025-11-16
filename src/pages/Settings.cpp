@@ -170,8 +170,8 @@ void DevTools::drawSettings() {
             "Shows the mobile button."
         );
     }
-    if (m_settings.buttonEnabled) {
 #endif
+    if (isButtonEnabled()) {
         ImGui::Checkbox("Button In Editor", &m_settings.buttonInEditor);
         if (ImGui::IsItemHovered()) {
             ImGui::SetTooltip(
@@ -184,9 +184,7 @@ void DevTools::drawSettings() {
                 "Shows the mobile button in levels."
             );
         }
-#ifdef GEODE_IS_DESKTOP
     }
-#endif
 
 #if 0
     static Ref<CCSet> PAUSED_TARGETS = nullptr;
