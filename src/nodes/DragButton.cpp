@@ -2,6 +2,7 @@
 #include "../DevTools.hpp"
 
 #include <Geode/Geode.hpp>
+#include <utility>
 
 using namespace geode::prelude;
 
@@ -15,7 +16,7 @@ bool DragButton::init(CCNode* node, std::function<void()> onPress) {
         this->setContentSize(node->getScaledContentSize());
         this->addChildAtPosition(node, Anchor::Center, CCPoint{0, 0});
     }
-    this->m_onPress = onPress;
+    this->m_onPress = std::move(onPress);
     return true;
 }
 
@@ -59,7 +60,7 @@ void DragButton::registerWithTouchDispatcher() {
 
 DragButton* DragButton::create(CCNode* node, std::function<void ()> onPress) {
     auto ret = new DragButton;
-    if (ret->init(node, onPress)) {
+    if (ret->init(node, std::move(onPress))) {
         ret->autorelease();
         return ret;
     }
@@ -84,22 +85,6 @@ void DragButton::setPosition(cocos2d::CCPoint const& pos_) {
     auto pos = pos_;
     pos.x = std::clamp(pos.x, pad, winSize.width - pad);
     pos.y = std::clamp(pos.y, pad, winSize.height - pad);
+    DevTools::get()->setBallPosition(pos);
     CCNode::setPosition(pos);
-}
-
-DragButton* DragButton::get() {
-    static DragButton* instance = nullptr;
-    if (!instance) {
-        auto spr = CircleButtonSprite::createWithSprite("devtools.png"_spr, 1, CircleBaseColor::Green, CircleBaseSize::MediumAlt);
-        spr->setScale(.8f);
-        instance = DragButton::create(spr, [](){
-            DevTools::get()->toggle();
-        });
-        instance->setPosition(DevTools::get()->getSettings().buttonPos);
-        instance->setZOrder(10000);
-        instance->setID("devtools-button"_spr);
-        CCScene::get()->addChild(instance);
-        SceneManager::get()->keepAcrossScenes(instance);
-    }
-    return instance;
 }

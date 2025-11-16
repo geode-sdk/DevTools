@@ -161,18 +161,31 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.width / ratio),
         static_cast<int>(frameSize.height / ratio)
     );
-#else
-    ImGui::Checkbox("Button In Editor", &m_settings.buttonInEditor);
+    if (ImGui::Checkbox("Button Enabled", &m_settings.buttonEnabled)) {
+        log::info("Test");
+        if (m_settings.buttonEnabled) setupDragButton();
+        else removeDragButton();
+    }
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
-            "Shows the mobile button in the editor."
+            "Shows the mobile button."
         );
     }
-    ImGui::Checkbox("Button In Game", &m_settings.buttonInGame);
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip(
-            "Shows the mobile button in levels."
-        );
+    if (m_settings.buttonEnabled) {
+#endif
+        ImGui::Checkbox("Button In Editor", &m_settings.buttonInEditor);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip(
+                "Shows the mobile button in the editor."
+            );
+        }
+        ImGui::Checkbox("Button In Game", &m_settings.buttonInGame);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip(
+                "Shows the mobile button in levels."
+            );
+        }
+#ifdef GEODE_IS_DESKTOP
     }
 #endif
 

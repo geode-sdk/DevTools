@@ -9,6 +9,8 @@
 #include <Geode/loader/Loader.hpp>
 #include <Geode/loader/ModMetadata.hpp>
 
+#include "nodes/DragButton.hpp"
+
 using namespace geode::prelude;
 
 enum class HighlightMode {
@@ -32,6 +34,7 @@ struct Settings {
     CCPoint buttonPos = {50, 50};
     bool buttonInEditor = false;
     bool buttonInGame = false;
+    GEODE_DESKTOP(bool buttonEnabled = false;)
     bool treeDragReorder = false;
 };
 
@@ -57,6 +60,7 @@ protected:
     std::string m_searchQuery;
     std::string m_prevQuery;
     std::unordered_map<CCNode*, bool> m_nodeOpen;
+    DragButton* m_dragButton = nullptr;
 
     void setupFonts();
     void setupPlatform();
@@ -103,6 +107,7 @@ public:
     void loadSettings();
     void saveSettings();
     Settings getSettings();
+    void setBallPosition(CCPoint pos);
     bool shouldUseGDWindow() const;
 
     bool shouldPopGame() const;
@@ -117,6 +122,10 @@ public:
     void setDraggedNode(CCNode* node);
 
     void addCustomCallback(std::function<void(CCNode*)> callback);
+
+    DragButton* getDragButton();
+    void setupDragButton();
+    void removeDragButton();
 
     void sceneChanged();
 

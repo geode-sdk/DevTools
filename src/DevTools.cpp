@@ -9,7 +9,6 @@
 #include <Geode/loader/Log.hpp>
 #include <Geode/loader/Mod.hpp>
 #include "ImGui.hpp"
-#include "nodes/DragButton.hpp"
 
 template<>
 struct matjson::Serialize<Settings> {
@@ -35,6 +34,7 @@ struct matjson::Serialize<Settings> {
         assign(value["button_y"], s.buttonPos.y);
         assign(value["button_editor"], s.buttonInEditor);
         assign(value["button_game"], s.buttonInGame);
+        GEODE_DESKTOP(assign(value["button_enabled"], s.buttonEnabled);)
         assign(value["tree_drag_reorder"], s.treeDragReorder);
 
         return Ok(s);
@@ -57,6 +57,7 @@ struct matjson::Serialize<Settings> {
             { "button_y", settings.buttonPos.y },
             { "button_editor", settings.buttonInEditor },
             { "button_game", settings.buttonInGame },
+            GEODE_DESKTOP({ "button_enabled", settings.buttonEnabled },)
             { "tree_drag_reorder", settings.treeDragReorder }
         });
     }
@@ -70,11 +71,9 @@ DevTools* DevTools::get() {
 }
 
 void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
-void DevTools::saveSettings() {
-    m_settings.buttonPos = DragButton::get()->getPosition();
-    Mod::get()->setSavedValue("settings", m_settings);
-}
+void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
 Settings DevTools::getSettings() { return m_settings; }
+void DevTools::setBallPosition(CCPoint pos) { m_settings.buttonPos = std::move(pos); }
 
 bool DevTools::shouldPopGame() const {
     return m_visible && m_settings.GDInWindow;
@@ -114,6 +113,30 @@ void DevTools::setDraggedNode(CCNode* node) {
 
 void DevTools::addCustomCallback(std::function<void(CCNode*)> callback) {
     m_customCallbacks.push_back(std::move(callback));
+}
+
+DragButton* DevTools::getDragButton() {
+    return m_dragButton;
+}
+
+void DevTools::setupDragButton() {
+    auto spr = CircleButtonSprite::createWithSprite("devtools.png"_spr, 1, CircleBaseColor::Green, CircleBaseSize::MediumAlt);
+    spr->setScale(.8f);
+    m_dragButton = DragButton::create(spr, [this](){
+        this->toggle();
+    });
+    m_dragButton->setPosition(m_settings.buttonPos);
+    m_dragButton->setZOrder(10000);
+    m_dragButton->setID("devtools-button"_spr);
+    SceneManager::get()->keepAcrossScenes(m_dragButton);
+}
+
+void DevTools::removeDragButton() {
+    if (m_dragButton) {
+        SceneManager::get()->forget(m_dragButton);
+        m_dragButton->removeFromParent();
+        m_dragButton = nullptr;
+    }
 }
 
 // Scroll when dragging empty space
