@@ -2,7 +2,6 @@
 
 #include "Geode/cocos/base_nodes/CCNode.h"
 #include "Geode/cocos/layers_scenes_transitions_nodes/CCLayer.h"
-#include "Geode/cocos/touch_dispatcher/CCTouchDelegateProtocol.h"
 
 class DragButton : public cocos2d::CCLayer {
 protected:
@@ -20,7 +19,6 @@ protected:
 	void update(float dt) override;
 public:
 	static DragButton* create(cocos2d::CCNode* node, std::function<void()> onPress);
-	static DragButton* get();
 
 	void setPosition(cocos2d::CCPoint const& position) override;
 };

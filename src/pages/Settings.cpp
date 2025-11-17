@@ -161,20 +161,30 @@ void DevTools::drawSettings() {
         static_cast<int>(frameSize.width / ratio),
         static_cast<int>(frameSize.height / ratio)
     );
-#else
-    ImGui::Checkbox("Button In Editor", &m_settings.buttonInEditor);
-    if (ImGui::IsItemHovered()) {
-        ImGui::SetTooltip(
-            "Shows the mobile button in the editor."
-        );
+    if (ImGui::Checkbox("Button Enabled", &m_settings.buttonEnabled)) {
+        if (m_settings.buttonEnabled) setupDragButton();
+        else removeDragButton();
     }
-    ImGui::Checkbox("Button In Game", &m_settings.buttonInGame);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
-            "Shows the mobile button in levels."
+            "Shows the mobile button."
         );
     }
 #endif
+    if (isButtonEnabled()) {
+        ImGui::Checkbox("Button In Editor", &m_settings.buttonInEditor);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip(
+                "Shows the mobile button in the editor."
+            );
+        }
+        ImGui::Checkbox("Button In Game", &m_settings.buttonInGame);
+        if (ImGui::IsItemHovered()) {
+            ImGui::SetTooltip(
+                "Shows the mobile button in levels."
+            );
+        }
+    }
 
 #if 0
     static Ref<CCSet> PAUSED_TARGETS = nullptr;
@@ -261,3 +271,4 @@ void DevTools::drawSettings() {
         }
     }
 };*/
+

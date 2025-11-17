@@ -33,19 +33,18 @@ class $modify(CCKeyboardDispatcher) {
     }
 };
 
-#ifdef GEODE_IS_MOBILE
-
 #include <Geode/loader/GameEvent.hpp>
 $execute {
     new EventListener<GameEventFilter>(+[](GameEvent*) {
-        DragButton::get();
+        if (DevTools::get()->isButtonEnabled()) DevTools::get()->setupDragButton();
     }, GameEventFilter(GameEventType::Loaded));
 }
 
 #include <Geode/modify/CCScene.hpp>
 class $modify(CCScene) {
     int getHighestChildZ() {
-        auto btn = DragButton::get();
+        auto btn = DevTools::get()->getDragButton();
+        if (!btn) return CCScene::getHighestChildZ();
         int z = btn->getZOrder();
         btn->setZOrder(-1);
         int ret = CCScene::getHighestChildZ();
@@ -53,8 +52,6 @@ class $modify(CCScene) {
         return ret;
     }
 };
-
-#endif
 
 class $modify(GameToolbox) {
     static void preVisitWithClippingRect(CCNode* node, CCRect clipRect) {
