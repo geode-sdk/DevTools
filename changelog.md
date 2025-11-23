@@ -1,3 +1,10 @@
+## v1.12.0
+* Add ability to restructure the node tree via drag/drop
+* Add more api functions for more advanced UI control
+* Visualize node visibility in tree graph (#68)
+* Show ImGui cursor when mouse is out of GD window on Windows (#67)
+* Improved dragging on mobile (#67)
+
 ## v1.11.0
 * Made properties api use drag inputs
 * Fix waitForDevTools on mods that load before DevTools
