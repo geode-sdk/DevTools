@@ -12,7 +12,7 @@ void DevTools::drawAdvancedSettings() {
 
 void DevTools::drawModGraph() {
     // TODO: function to get loader mod
-    this->drawModGraphNode(Mod::get()->getMetadataRef().getDependencies()[0].mod);
+    this->drawModGraphNode(Mod::get()->getMetadata().getDependencies()[0].getMod());
 }
 
 namespace {
@@ -57,20 +57,20 @@ namespace {
         return {(size_t)major, (size_t)minor, (size_t)patch, tag};
     }
 
-    std::optional<ModMetadata::IssuesInfo> inputIssues(std::optional<ModMetadata::IssuesInfo> x) {
+    /*std::optional<ModMetadata::IssuesInfo> inputIssues(std::optional<ModMetadata::IssuesInfo> x) {
         ModMetadata::IssuesInfo a = x ? *x : ModMetadata::IssuesInfo{"", std::nullopt};
-        std::string url = a.url ? *a.url : "";
-        bool inputInfo = ImGui::InputText("issues.info", &a.info);
+        std::string url = a.getURL() ? *a.getURL() : "";
+        bool inputInfo = ImGui::InputText("issues.info", &a.getInfo());
         bool inputUrl = ImGui::InputText("issues.url", &url);
         if (inputUrl)
             a.url = url;
         return inputInfo || inputUrl ? a : x;
-    }
+    }*/
 }
 
 ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
     metadata.setVersion(inputVersion(metadata.getVersion()));
-    metadata.setName(inputText("name", metadata.getName()));
+    metadata.setName(inputText("name", std::string(metadata.getName())));
     metadata.setDeveloper(inputText("developer", metadata.getDevelopers()[0]));
     metadata.setDescription(inputTextMultiline("description", metadata.getDescription()));
     metadata.setDetails(inputTextMultiline("details", metadata.getDetails()));
@@ -79,31 +79,31 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
     metadata.setRepository(inputTextMultiline("community", metadata.getLinks().getCommunityURL()));
     metadata.setRepository(inputTextMultiline("homepage", metadata.getLinks().getHomepageURL()));
     metadata.setRepository(inputTextMultiline("source", metadata.getLinks().getSourceURL()));
-    metadata.setIssues(inputIssues(metadata.getIssues()));
+    //metadata.setIssues(inputIssues(metadata.getIssues()));
     metadata.setNeedsEarlyLoad(inputBool("needsEarlyLoad", metadata.needsEarlyLoad()));
     metadata.setIsAPI(inputBool("isAPI", metadata.isAPI()));
 
     if (ImGui::TreeNode(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(treePtr) + 1), "dependencies")) {
         for (auto const& item : metadata.getDependencies()) {
-            if (item.mod) {
-                if (!ImGui::TreeNode(item.mod, "%s", item.id.c_str()))
+            if (item.getMod()) {
+                if (!ImGui::TreeNode(item.getMod(), "%s", item.getID().c_str()))
                     continue;
             }
             else {
-                if (!ImGui::TreeNode(item.id.data(), "%s", item.id.c_str()))
+                if (!ImGui::TreeNode(item.getID().data(), "%s", item.getID().c_str()))
                     continue;
             }
-            ImGui::Text("version: %s", item.version.toString().c_str());
+            ImGui::Text("version: %s", item.getVersion().toString().c_str());
             const char* importance = "";
-            switch (item.importance) {
+            switch (item.getImportance()) {
                 case geode::ModMetadata::Dependency::Importance::Required: importance = "required"; break;
                 case geode::ModMetadata::Dependency::Importance::Recommended: importance = "recommended"; break;
                 case geode::ModMetadata::Dependency::Importance::Suggested: importance = "suggested"; break;
             }
             ImGui::Text("importance: %s", importance);
             ImGui::Text("isResolved: %s", item.isResolved() ? "true" : "false");
-            if (item.mod)
-                drawModGraphNode(item.mod);
+            if (item.getMod())
+                drawModGraphNode(item.getMod());
             ImGui::TreePop();
         }
         ImGui::TreePop();
@@ -111,25 +111,25 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
 
     if (ImGui::TreeNode(reinterpret_cast<void*>(reinterpret_cast<uintptr_t>(treePtr) + 2), "incompatibilities")) {
         for (auto const& item : metadata.getIncompatibilities()) {
-            if (item.mod) {
-                if (!ImGui::TreeNode(item.mod, "%s", item.id.c_str()))
+            if (item.getMod()) {
+                if (!ImGui::TreeNode(item.getMod(), "%s", item.getID().c_str()))
                     continue;
             }
             else {
-                if (!ImGui::TreeNode(item.id.data(), "%s", item.id.c_str()))
+                if (!ImGui::TreeNode(item.getID().data(), "%s", item.getID().c_str()))
                     continue;
             }
-            ImGui::Text("version: %s", item.version.toString().c_str());
+            ImGui::Text("version: %s", item.getVersion().toString().c_str());
             const char* importance = "";
-            switch (item.importance) {
+            switch (item.getImportance()) {
                 case geode::ModMetadata::Incompatibility::Importance::Breaking: importance = "breaking"; break;
                 case geode::ModMetadata::Incompatibility::Importance::Conflicting: importance = "conflicting"; break;
                 case geode::ModMetadata::Incompatibility::Importance::Superseded: importance = "superseded"; break;
             }
             ImGui::Text("importance: %s", importance);
             ImGui::Text("isResolved: %s", item.isResolved() ? "true" : "false");
-            if (item.mod)
-                drawModGraphNode(item.mod);
+            if (item.getMod())
+                drawModGraphNode(item.getMod());
             ImGui::TreePop();
         }
         ImGui::TreePop();
@@ -175,7 +175,7 @@ void DevTools::drawModGraphNode(Mod* node) {
     if (!treeNode)
         return;
 
-    node->setMetadata(this->inputMetadata(node, node->getMetadataRef()));
+    node->setMetadata(this->inputMetadata(node, node->getMetadata()));
 
     ImGui::Text("isInternal: %s", node->isInternal() ? "true" : "false");
     ImGui::Text("early: %s", node->needsEarlyLoad() ? "true" : "false");
