@@ -488,6 +488,8 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 
 class $modify(CCKeyboardDispatcher) {
     bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat, double a4) {
+        if(!DevTools::get()->isSetup()) return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat, a4);
+
 		auto& io = ImGui::GetIO();
 		const auto imKey = cocosToImGuiKey(key);
 		if (imKey != ImGuiKey_None) {
