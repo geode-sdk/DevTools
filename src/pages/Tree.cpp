@@ -2,6 +2,7 @@
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
 #include "../platform/utils.hpp"
+#include <Geode/ui/OverlayManager.hpp>
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/utils/string.hpp>
 #include "../ImGui.hpp"
@@ -191,6 +192,7 @@ void DevTools::drawTree() {
     }
 
     this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false, true);
+    this->drawTreeBranch(OverlayManager::get(), 1, false, true);
 
     if (auto* dragged = this->getDraggedNode()) {
         const auto name = formatNodeName(dragged, 0);
@@ -230,5 +232,4 @@ bool DevTools::searchBranch(CCNode* node) {
         }
     }
     return false;
-
 }
