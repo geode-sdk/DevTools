@@ -8,7 +8,7 @@ using namespace geode::prelude;
 
 template <typename T>
 static void handleType() {
-    new EventListener<EventFilter<devtools::PropertyFnEvent<T>>>(+[](devtools::PropertyFnEvent<T>* event) {
+    devtools::PropertyFnEvent<T>().listen([](typename devtools::PropertyFnEvent<T>::Fn*& fnPtr) {
         constexpr bool isSigned = std::is_signed_v<T>;
         constexpr ImGuiDataType dataType =
             std::is_same_v<T, float> ? ImGuiDataType_Float :
@@ -17,14 +17,14 @@ static void handleType() {
             sizeof(T) == 2 ? (isSigned ? ImGuiDataType_S16 : ImGuiDataType_U16) :
             sizeof(T) == 4 ? (isSigned ? ImGuiDataType_S32 : ImGuiDataType_U32) :
             isSigned ? ImGuiDataType_S64 : ImGuiDataType_U64;
-        event->fn = +[](const char* name, T& prop) {
+        fnPtr = +[](const char* name, T& prop) {
             return ImGui::DragScalar(name, dataType, &prop);
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<devtools::EnumerableFnEvent<T>>>(+[](devtools::EnumerableFnEvent<T>* event) {
-        event->fn = +[](const char* label, T* value, std::span<std::pair<T, const char*> const> items) {
+    devtools::EnumerableFnEvent<T>().listen([](typename devtools::EnumerableFnEvent<T>::Fn*& fnPtr) {
+        fnPtr = +[](const char* label, T* value, std::span<std::pair<T, const char*> const> items) {
             ImGui::Text("%s:", label);
             size_t i = 0;
             bool changed = false;
@@ -41,7 +41,7 @@ static void handleType() {
             return changed;
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 }
 
 void devtools::newLine() {
@@ -73,10 +73,10 @@ void devtools::inputMultiline(const char* label, std::string& str) {
 }
 
 $execute {
-    new EventListener<EventFilter<devtools::RegisterNodeEvent>>(+[](devtools::RegisterNodeEvent* event) {
-        DevTools::get()->addCustomCallback(std::move(event->callback));
+    devtools::RegisterNodeEvent().listen([](Function<void(CCNode*)> callback) {
+        DevTools::get()->addCustomCallback(std::move(callback));
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // Scalars & Enums
     handleType<char>();
@@ -93,24 +93,24 @@ $execute {
     handleType<double>();
 
     // checkbox
-    new EventListener<EventFilter<devtools::PropertyFnEvent<bool>>>(+[](devtools::PropertyFnEvent<bool>* event) {
-        event->fn = +[](const char* name, bool& prop) {
+    devtools::PropertyFnEvent<bool>().listen([](devtools::PropertyFnEvent<bool>::Fn*& fnPtr) {
+        fnPtr = +[](const char* name, bool& prop) {
             return ImGui::Checkbox(name, &prop);
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // string
-    new EventListener<EventFilter<devtools::PropertyFnEvent<std::string>>>(+[](devtools::PropertyFnEvent<std::string>* event) {
-        event->fn = +[](const char* name, std::string& prop) {
+    devtools::PropertyFnEvent<std::string>().listen([](devtools::PropertyFnEvent<std::string>::Fn*& fnPtr) {
+        fnPtr = +[](const char* name, std::string& prop) {
             return ImGui::InputText(name, &prop);
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // colors
-    new EventListener<EventFilter<devtools::PropertyFnEvent<ccColor3B>>>(+[](devtools::PropertyFnEvent<ccColor3B>* event) {
-        event->fn = +[](const char* name, ccColor3B& prop) {
+    devtools::PropertyFnEvent<ccColor3B>().listen([](devtools::PropertyFnEvent<ccColor3B>::Fn*& fnPtr) {
+        fnPtr = +[](const char* name, ccColor3B& prop) {
             auto color = ImVec4(
                 prop.r / 255.f,
                 prop.g / 255.f,
@@ -126,9 +126,9 @@ $execute {
             return false;
         };
         return ListenerResult::Stop;
-    });
-    new EventListener<EventFilter<devtools::PropertyFnEvent<ccColor4B>>>(+[](devtools::PropertyFnEvent<ccColor4B>* event) {
-        event->fn = +[](const char* name, ccColor4B& prop) {
+    }).leak();
+    devtools::PropertyFnEvent<ccColor4B>().listen([](devtools::PropertyFnEvent<ccColor4B>::Fn*& fnPtr) {
+        fnPtr = +[](const char* name, ccColor4B& prop) {
             auto color = ImVec4(
                 prop.r / 255.f,
                 prop.g / 255.f,
@@ -145,48 +145,48 @@ $execute {
             return false;
         };
         return ListenerResult::Stop;
-    });
-    new EventListener<EventFilter<devtools::PropertyFnEvent<ccColor4F>>>(+[](devtools::PropertyFnEvent<ccColor4F>* event) {
-        event->fn = +[](const char* name, ccColor4F& prop) {
+    }).leak();
+    devtools::PropertyFnEvent<ccColor4F>().listen([](devtools::PropertyFnEvent<ccColor4F>::Fn*& fnPtr) {
+        fnPtr = +[](const char* name, ccColor4F& prop) {
             return ImGui::ColorEdit4(name, reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // points/sizes
-    new EventListener<EventFilter<devtools::PropertyFnEvent<CCPoint>>>(+[](devtools::PropertyFnEvent<CCPoint>* event) {
-        event->fn = +[](const char* name, CCPoint& prop) {
+    devtools::PropertyFnEvent<CCPoint>().listen([](devtools::PropertyFnEvent<CCPoint>::Fn*& fnPtr) {
+        fnPtr = +[](const char* name, CCPoint& prop) {
             return ImGui::DragFloat2(name, reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<devtools::PropertyFnEvent<CCSize>>>(+[](devtools::PropertyFnEvent<CCSize>* event) {
-        event->fn = +[](const char* name, CCSize& prop) {
+    devtools::PropertyFnEvent<CCSize>().listen([](devtools::PropertyFnEvent<CCSize>::Fn*& fnPtr) {
+        fnPtr = +[](const char* name, CCSize& prop) {
             return ImGui::DragFloat2(name, reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
-    });
-    new EventListener<EventFilter<devtools::PropertyFnEvent<CCRect>>>(+[](devtools::PropertyFnEvent<CCRect>* event) {
-        event->fn = +[](const char* name, CCRect& prop) {
+    }).leak();
+    devtools::PropertyFnEvent<CCRect>().listen([](devtools::PropertyFnEvent<CCRect>::Fn*& fnPtr) {
+        fnPtr = +[](const char* name, CCRect& prop) {
             return ImGui::DragFloat4(name, reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // label
-    new EventListener<EventFilter<devtools::DrawLabelFnEvent>>(+[](devtools::DrawLabelFnEvent* event) {
-        event->fn = +[](const char* text) {
+    devtools::DrawLabelFnEvent().listen([](devtools::DrawLabelFnEvent::Fn*& fnPtr) {
+        fnPtr = +[](const char* text) {
             ImGui::Text("%s", text);
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // button
-    new EventListener<EventFilter<devtools::ButtonFnEvent>>(+[](devtools::ButtonFnEvent* event) {
-        event->fn = +[](const char* label) {
+    devtools::ButtonFnEvent().listen([](devtools::ButtonFnEvent::Fn*& fnPtr) {
+        fnPtr = +[](const char* label) {
             return ImGui::Button(label);
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 }

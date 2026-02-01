@@ -33,9 +33,9 @@ class $modify(CCKeyboardDispatcher) {
 
 #include <Geode/loader/GameEvent.hpp>
 $execute {
-    new EventListener<GameEventFilter>(+[](GameEvent*) {
+    GameEvent(GameEventType::Loaded).listen([] {
         if (DevTools::get()->isButtonEnabled()) DevTools::get()->setupDragButton();
-    }, GameEventFilter(GameEventType::Loaded));
+    }).leak();
 }
 
 #include <Geode/modify/CCScene.hpp>
@@ -151,13 +151,13 @@ class $modify(CCEGLView) {
 };
 
 // For the one eclipse shortcut
-struct ToggleDevToolsEvent : geode::Event {
-    ToggleDevToolsEvent() {}
+struct ToggleDevToolsEvent : SimpleEvent<ToggleDevToolsEvent> {
+    using SimpleEvent::SimpleEvent;
 };
 
-$on_mod(Loaded) {
-    new EventListener<EventFilter<ToggleDevToolsEvent>>(+[](ToggleDevToolsEvent* e) {
+$execute {
+    ToggleDevToolsEvent().listen([] {
         DevTools::get()->toggle();
         return ListenerResult::Stop;
-    });
+    }).leak();
 }

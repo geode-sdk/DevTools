@@ -78,20 +78,28 @@ void DevTools::drawBasicAttributes(CCNode* node) {
     }
     ImGui::SameLine();
     if (ImGui::Button(U8STR(FEATHER_SAVE " Screenshot"))) {
-        file::pick(file::PickMode::SaveFile, file::FilePickOptions {
-            .filters = {{ .description = "PNG Image", .files = {"*.png"} }}
-        }).listen([node](auto choice) {
-            if (auto file = choice->ok()) {
-                int width, height;
-                auto bytes = renderToBytes(node, width, height);
+        async::spawn(
+            file::pick(file::PickMode::SaveFile, file::FilePickOptions {
+                .filters = {{ .description = "PNG Image", .files = {"*.png"} }}
+            }),
+            [node = WeakRef(node)](Result<std::optional<std::filesystem::path>> result) {
+                auto nodePtr = node.lock();
+                if (!nodePtr) return;
 
-                auto path = string::pathToString(*file);
-                if (!path.ends_with(".png")) {
-                    path += ".png";
+                if (result.isOk()) {
+                    if (auto file = std::move(result).unwrap()) {
+                        int width, height;
+                        auto bytes = renderToBytes(nodePtr, width, height);
+
+                        auto path = string::pathToString(*file);
+                        if (!path.ends_with(".png")) {
+                            path += ".png";
+                        }
+                        saveRenderToFile(bytes, width, height, path.c_str());
+                    }
                 }
-                saveRenderToFile(bytes, width, height, path.c_str());
             }
-        });
+        );
     }
 
     ImGui::Text("Address: %s", fmt::to_string(fmt::ptr(node)).c_str());
