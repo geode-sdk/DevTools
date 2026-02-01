@@ -6,7 +6,7 @@
 
 using namespace geode::prelude;
 
-bool DragButton::init(CCNode* node, std::function<void()> onPress) {
+bool DragButton::init(CCNode* node, Function<void()> onPress) {
     if (!CCLayer::init()) return false;
     this->setTouchEnabled(true);
     this->setAnchorPoint({.5f, .5f});
@@ -58,7 +58,7 @@ void DragButton::registerWithTouchDispatcher() {
     CCTouchDispatcher::get()->addTargetedDelegate(this, -512, true);
 }
 
-DragButton* DragButton::create(CCNode* node, std::function<void ()> onPress) {
+DragButton* DragButton::create(CCNode* node, geode::Function<void ()> onPress) {
     auto ret = new DragButton;
     if (ret->init(node, std::move(onPress))) {
         ret->autorelease();

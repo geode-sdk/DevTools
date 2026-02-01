@@ -56,7 +56,7 @@ protected:
     Ref<CCNode> m_selectedNode;
     Ref<CCNode> m_draggedNode;
     std::vector<std::pair<CCNode*, HighlightMode>> m_toHighlight;
-    std::vector<std::function<void(CCNode*)>> m_customCallbacks;
+    std::vector<Function<void(CCNode*)>> m_customCallbacks;
     std::string m_searchQuery;
     std::string m_prevQuery;
     std::unordered_map<CCNode*, bool> m_nodeOpen;
@@ -121,7 +121,7 @@ public:
     CCNode* getDraggedNode() const;
     void setDraggedNode(CCNode* node);
 
-    void addCustomCallback(std::function<void(CCNode*)> callback);
+    void addCustomCallback(Function<void(CCNode*)>&& callback);
 
     DragButton* getDragButton();
     void setupDragButton();

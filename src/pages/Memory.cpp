@@ -330,7 +330,7 @@ void DevTools::drawMemory() {
     static std::vector<std::string> textSaving;
     if (ImGui::Button("Save to file")) {
         auto timeEpoch = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        auto name = fmt::format("Memory Dump {:%Y-%m-%d %H.%M.%S}.txt", fmt::localtime(timeEpoch));
+        auto name = fmt::format("Memory Dump {:%Y-%m-%d %H.%M.%S}.txt", geode::localtime(timeEpoch));
         (void) utils::file::writeString(Mod::get()->getSaveDir() / name, fmt::to_string(fmt::join(textSaving, "\n")));
     }
 

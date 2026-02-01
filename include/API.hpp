@@ -27,36 +27,30 @@ namespace devtools {
     template <typename T>
     concept UnderlyingIntegral = std::is_integral_v<T> || std::is_integral_v<std::underlying_type_t<T>>;
 
-    struct RegisterNodeEvent final : geode::Event {
-        RegisterNodeEvent(std::function<void(cocos2d::CCNode*)>&& callback)
-            : callback(std::move(callback)) {}
-        std::function<void(cocos2d::CCNode*)> callback;
+    struct RegisterNodeEvent final : geode::SimpleEvent<RegisterNodeEvent, geode::Function<void(cocos2d::CCNode*)>> {
+        using SimpleEvent::SimpleEvent;
     };
 
     template <typename T>
-    struct PropertyFnEvent final : geode::Event {
-        PropertyFnEvent() {}
+    struct PropertyFnEvent final : geode::SimpleEvent<PropertyFnEvent<T>, bool(*&)(const char* name, T&)> {
         using Fn = bool(const char* name, T&);
-        Fn* fn = nullptr;
+        using geode::SimpleEvent<PropertyFnEvent, Fn*&>::SimpleEvent;
     };
 
-    struct DrawLabelFnEvent final : geode::Event {
-        DrawLabelFnEvent() {}
+    struct DrawLabelFnEvent final : geode::SimpleEvent<DrawLabelFnEvent, void(*&)(const char* text)> {
         using Fn = void(const char* text);
-        Fn* fn = nullptr;
+        using SimpleEvent::SimpleEvent;
     };
 
     template <typename T>
-    struct EnumerableFnEvent final : geode::Event {
-        EnumerableFnEvent() {}
-        using Fn = bool(const char* label, T* value, std::span<std::pair<T, const char*> const> items);
-        Fn* fn = nullptr;
+    struct EnumerableFnEvent final : geode::SimpleEvent<EnumerableFnEvent<T>, bool(*&)(const char* label, T* value, std::span<std::pair<T, const char*> const>)> {
+        using Fn = bool(const char* label, T* value, std::span<std::pair<T, const char*> const>);
+        using geode::SimpleEvent<EnumerableFnEvent, Fn*&>::SimpleEvent;
     };
 
-    struct ButtonFnEvent final : geode::Event {
-        ButtonFnEvent() {}
+    struct ButtonFnEvent final : geode::SimpleEvent<ButtonFnEvent, bool(*&)(const char* label)> {
         using Fn = bool(const char* label);
-        Fn* fn = nullptr;
+        using SimpleEvent::SimpleEvent;
     };
 
     /// @brief Checks if DevTools is currently loaded.
@@ -75,12 +69,11 @@ namespace devtools {
             auto devtools = geode::Loader::get()->getInstalledMod("geode.devtools");
             if (!devtools) return;
 
-            new geode::EventListener(
-                [callback = std::forward<F>(callback)](geode::ModStateEvent*) {
+            geode::ModStateEvent(geode::ModEventType::Loaded, devtools).listen(
+                [callback = std::forward<F>(callback)]() {
                     callback();
-                },
-                geode::ModStateFilter(devtools, geode::ModEventType::Loaded)
-            );
+                }
+            ).leak();
         }
     }
 
@@ -89,11 +82,11 @@ namespace devtools {
     /// @see `devtools::property`, `devtools::label`, `devtools::enumerable`, `devtools::button`
     template <typename T, std::invocable<std::remove_pointer_t<T>*> F> requires IsCCNode<T>
     void registerNode(F&& callback) {
-        RegisterNodeEvent([callback = std::forward<F>(callback)](cocos2d::CCNode* node) {
+        RegisterNodeEvent().send([callback = std::forward<F>(callback)](cocos2d::CCNode* node) {
             if (auto casted = geode::cast::typeinfo_cast<std::remove_pointer_t<T>*>(node)) {
                 callback(casted);
             }
-        }).post();
+        });
     }
 
     /// @brief Renders a property editor for the given value in the DevTools UI.
@@ -104,9 +97,9 @@ namespace devtools {
     template <typename T> requires SupportedProperty<T>
     bool property(const char* name, T& prop) {
         static auto fn = ([] {
-            PropertyFnEvent<T> event;
-            event.post();
-            return event.fn;
+            typename PropertyFnEvent<T>::Fn* fnPtr = nullptr;
+            PropertyFnEvent<T>().send(fnPtr);
+            return fnPtr;
         })();
         return fn ? fn(name, prop) : false;
     }
@@ -116,9 +109,9 @@ namespace devtools {
     /// @warning This function should only ever be called from within a registered node callback.
     inline void label(const char* text) {
         static auto fn = ([] {
-            DrawLabelFnEvent event;
-            event.post();
-            return event.fn;
+            DrawLabelFnEvent::Fn* fnPtr = nullptr;
+            DrawLabelFnEvent().send(fnPtr);
+            return fnPtr;
         })();
         if (fn) fn(text);
     }
@@ -133,9 +126,9 @@ namespace devtools {
     bool enumerable(const char* label, T& value, std::initializer_list<std::pair<T, const char*>> items) {
         using ValueType = std::underlying_type_t<T>;
         static auto fn = ([] {
-            EnumerableFnEvent<ValueType> event;
-            event.post();
-            return event.fn;
+            typename EnumerableFnEvent<ValueType>::Fn* fnPtr = nullptr;
+            EnumerableFnEvent<ValueType>().send(fnPtr);
+            return fnPtr;
         })();
         return fn ? fn(
             label,
@@ -153,9 +146,9 @@ namespace devtools {
     /// @warning This function should only ever be called from within a registered node callback.
     inline bool button(const char* label) {
         static auto fn = ([] {
-            ButtonFnEvent event;
-            event.post();
-            return event.fn;
+            ButtonFnEvent::Fn* fnPtr = nullptr;
+            ButtonFnEvent().send(fnPtr);
+            return fnPtr;
         })();
         return fn ? fn(label) : false;
     }
@@ -201,7 +194,7 @@ namespace devtools {
     template <UnderlyingIntegral T, UnderlyingIntegral U>
     bool radio(char const* label, T& current, U value) {
         return radio(label, reinterpret_cast<int&>(current), reinterpret_cast<int&>(value));
-    } 
+    }
 
     inline void inputMultiline(char const* label, std::string& text) GEODE_EVENT_EXPORT_NORES(&inputMultiline, (label, text));
 }
