@@ -56,6 +56,12 @@ void devtools::separator() {
 void devtools::nextItemWidth(float width) {
     ImGui::SetNextItemWidth(width);
 }
+void devtools::indent() {
+    ImGui::Indent(16.f);
+}
+void devtools::unindent() {
+    ImGui::Unindent(16.f);
+}
 bool devtools::combo(char const* label, int& current, std::span<char const*> items, int maxHeight) {
     return ImGui::Combo(
         label,
