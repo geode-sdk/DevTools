@@ -1,4 +1,3 @@
-
 #include "platform/platform.hpp"
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>

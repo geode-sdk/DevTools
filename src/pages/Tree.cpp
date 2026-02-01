@@ -191,6 +191,7 @@ void DevTools::drawTree() {
     }
 
     this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false, true);
+    this->drawTreeBranch(OverlayManager::get(), 1, false, true);
 
     if (auto* dragged = this->getDraggedNode()) {
         const auto name = formatNodeName(dragged, 0);
