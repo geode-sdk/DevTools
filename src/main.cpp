@@ -1,5 +1,4 @@
 
-#include "Geode/ui/SceneManager.hpp"
 #include "platform/platform.hpp"
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>
@@ -90,7 +89,7 @@ class $modify(CCDirector) {
         if (!DevTools::get()->shouldUseGDWindow()) {
             return CCDirector::drawScene();
         }
-        
+
         DevTools::get()->setup();
 
         static GLRenderCtx* gdTexture = nullptr;
