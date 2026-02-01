@@ -2,6 +2,7 @@
 #include <Geode/utils/cocos.hpp>
 #include "../DevTools.hpp"
 #include "../platform/utils.hpp"
+#include <Geode/ui/OverlayManager.hpp>
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/utils/string.hpp>
 #include "../ImGui.hpp"
