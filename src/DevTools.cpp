@@ -128,12 +128,11 @@ void DevTools::setupDragButton() {
     m_dragButton->setPosition(m_settings.buttonPos);
     m_dragButton->setZOrder(10000);
     m_dragButton->setID("devtools-button"_spr);
-    SceneManager::get()->keepAcrossScenes(m_dragButton);
+    OverlayManager::get()->addChild(m_dragButton);
 }
 
 void DevTools::removeDragButton() {
     if (m_dragButton) {
-        SceneManager::get()->forget(m_dragButton);
         m_dragButton->removeFromParent();
         m_dragButton = nullptr;
     }
