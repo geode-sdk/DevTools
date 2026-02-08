@@ -486,6 +486,7 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 	}
 }
 
+#ifndef GEODE_IS_IOS
 class $modify(CCKeyboardDispatcher) {
     bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat, double a4) {
         if(!DevTools::get()->isSetup()) return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat, a4);
@@ -530,7 +531,7 @@ class $modify(CCKeyboardDispatcher) {
 		}
     }
 
-    #if defined(GEODE_IS_MACOS) || defined(GEODE_IS_IOS)
+    #if defined(GEODE_IS_MACOS)
     static void onModify(auto& self) {
         Result<> res = self.setHookPriorityBeforePre("CCKeyboardDispatcher::updateModifierKeys", "geode.custom-keybinds");
         if (!res) {
@@ -548,3 +549,4 @@ class $modify(CCKeyboardDispatcher) {
     }
     #endif
 };
+#endif

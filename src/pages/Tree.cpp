@@ -232,5 +232,4 @@ bool DevTools::searchBranch(CCNode* node) {
         }
     }
     return false;
-
 }
