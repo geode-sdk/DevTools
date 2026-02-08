@@ -90,7 +90,7 @@ class $modify(CCDirector) {
         if (!DevTools::get()->shouldUseGDWindow()) {
             return CCDirector::drawScene();
         }
-        
+
         DevTools::get()->setup();
 
         static GLRenderCtx* gdTexture = nullptr;
@@ -153,8 +153,8 @@ class $modify(CCEGLView) {
 };
 
 // For the one eclipse shortcut
-struct ToggleDevToolsEvent : SimpleEvent<ToggleDevToolsEvent> {
-    using SimpleEvent::SimpleEvent;
+struct ToggleDevToolsEvent : Event<ToggleDevToolsEvent, bool()> {
+    using Event::Event;
 };
 
 $execute {

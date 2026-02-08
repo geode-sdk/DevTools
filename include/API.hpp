@@ -27,30 +27,20 @@ namespace devtools {
     template <typename T>
     concept UnderlyingIntegral = std::is_integral_v<T> || std::is_integral_v<std::underlying_type_t<T>>;
 
-    struct RegisterNodeEvent final : geode::SimpleEvent<RegisterNodeEvent, geode::Function<void(cocos2d::CCNode*)>> {
-        using SimpleEvent::SimpleEvent;
+    struct RegisterNodeEvent final : geode::Event<RegisterNodeEvent, bool(geode::Function<void(cocos2d::CCNode*)>)> {
+        using Event::Event;
     };
 
     template <typename T>
-    struct PropertyFnEvent final : geode::SimpleEvent<PropertyFnEvent<T>, bool(*&)(const char* name, T&)> {
-        using Fn = bool(const char* name, T&);
-        using geode::SimpleEvent<PropertyFnEvent, Fn*&>::SimpleEvent;
-    };
-
-    struct DrawLabelFnEvent final : geode::SimpleEvent<DrawLabelFnEvent, void(*&)(const char* text)> {
-        using Fn = void(const char* text);
-        using SimpleEvent::SimpleEvent;
+    struct PropertyFnEvent final : geode::Event<PropertyFnEvent<T>, bool(bool(*&)(geode::ZStringView name, T&))> {
+        using Fn = bool(geode::ZStringView name, T&);
+        using geode::Event<PropertyFnEvent, bool(Fn*&)>::Event;
     };
 
     template <typename T>
-    struct EnumerableFnEvent final : geode::SimpleEvent<EnumerableFnEvent<T>, bool(*&)(const char* label, T* value, std::span<std::pair<T, const char*> const>)> {
-        using Fn = bool(const char* label, T* value, std::span<std::pair<T, const char*> const>);
-        using geode::SimpleEvent<EnumerableFnEvent, Fn*&>::SimpleEvent;
-    };
-
-    struct ButtonFnEvent final : geode::SimpleEvent<ButtonFnEvent, bool(*&)(const char* label)> {
-        using Fn = bool(const char* label);
-        using SimpleEvent::SimpleEvent;
+    struct EnumerableFnEvent final : geode::Event<EnumerableFnEvent<T>, bool(bool(*&)(geode::ZStringView label, T* value, std::span<std::pair<T, geode::ZStringView> const>))> {
+        using Fn = bool(geode::ZStringView label, T* value, std::span<std::pair<T, geode::ZStringView> const>);
+        using geode::Event<EnumerableFnEvent, bool(Fn*&)>::Event;
     };
 
     /// @brief Checks if DevTools is currently loaded.
@@ -95,7 +85,7 @@ namespace devtools {
     /// @return True if the property was changed, false otherwise.
     /// @warning This function should only ever be called from within a registered node callback.
     template <typename T> requires SupportedProperty<T>
-    bool property(const char* name, T& prop) {
+    bool property(geode::ZStringView name, T& prop) {
         static auto fn = ([] {
             typename PropertyFnEvent<T>::Fn* fnPtr = nullptr;
             PropertyFnEvent<T>().send(fnPtr);
@@ -107,14 +97,7 @@ namespace devtools {
     /// @brief Renders a label in the DevTools UI.
     /// @param text The text to display in the label.
     /// @warning This function should only ever be called from within a registered node callback.
-    inline void label(const char* text) {
-        static auto fn = ([] {
-            DrawLabelFnEvent::Fn* fnPtr = nullptr;
-            DrawLabelFnEvent().send(fnPtr);
-            return fnPtr;
-        })();
-        if (fn) fn(text);
-    }
+    inline void label(geode::ZStringView text) GEODE_EVENT_EXPORT_NORES(&label, (text));
 
     /// @brief Renders an enumerable property editor using radio buttons for the given value in the DevTools UI.
     /// @param label The label for the enumerable property.
@@ -123,7 +106,7 @@ namespace devtools {
     /// @return True if the value was changed, false otherwise.
     /// @warning This function should only ever be called from within a registered node callback.
     template <UnderlyingIntegral T>
-    bool enumerable(const char* label, T& value, std::initializer_list<std::pair<T, const char*>> items) {
+    bool enumerable(geode::ZStringView label, T& value, std::initializer_list<std::pair<T, geode::ZStringView>> items) {
         using ValueType = std::underlying_type_t<T>;
         static auto fn = ([] {
             typename EnumerableFnEvent<ValueType>::Fn* fnPtr = nullptr;
@@ -134,8 +117,8 @@ namespace devtools {
             label,
             reinterpret_cast<ValueType*>(&value),
             std::span(
-                reinterpret_cast<std::pair<ValueType, const char*> const*>(&*items.begin()),
-                reinterpret_cast<std::pair<ValueType, const char*> const*>(&*items.end())
+                reinterpret_cast<std::pair<ValueType, geode::ZStringView> const*>(&*items.begin()),
+                reinterpret_cast<std::pair<ValueType, geode::ZStringView> const*>(&*items.end())
             )
         ) : false;
     }
@@ -144,21 +127,14 @@ namespace devtools {
     /// @param label The label for the button.
     /// @return True if the button was clicked, false otherwise.
     /// @warning This function should only ever be called from within a registered node callback.
-    inline bool button(const char* label) {
-        static auto fn = ([] {
-            ButtonFnEvent::Fn* fnPtr = nullptr;
-            ButtonFnEvent().send(fnPtr);
-            return fnPtr;
-        })();
-        return fn ? fn(label) : false;
-    }
+    inline bool button(geode::ZStringView label) GEODE_EVENT_EXPORT_NORES(&button, (label));
 
     /// @brief Renders a button in the DevTools UI and calls the provided callback if the button is clicked.
     /// @param label The label for the button.
     /// @param callback The function to call when the button is clicked.
     /// @warning This function should only ever be called from within a registered node callback.
     template <typename F>
-    void button(const char* label, F&& callback) {
+    void button(geode::ZStringView label, F&& callback) {
         if (button(label)) {
             callback();
         }
@@ -172,31 +148,31 @@ namespace devtools {
     inline void unindent() GEODE_EVENT_EXPORT_NORES(&unindent, ());
 
     inline bool combo(
-        char const* label,
+        geode::ZStringView label,
         int& current,
         std::span<char const*> items,
         int maxHeight = -1
     ) GEODE_EVENT_EXPORT_NORES(&combo, (label, current, items, maxHeight));
 
-    template <UnderlyingIntegral T, typename R = std::initializer_list<char const*>>
+    template <UnderlyingIntegral T, typename R = std::initializer_list<geode::ZStringView>>
         requires
             std::ranges::range<R> &&
-            std::same_as<std::remove_pointer_t<decltype(&*std::declval<R>().begin())> const, char const* const>
-    bool combo(char const* label, T& current, R&& range, int maxHeight = -1) {
+            std::same_as<std::remove_pointer_t<decltype(&*std::declval<R>().begin())> const, geode::ZStringView const>
+    bool combo(geode::ZStringView label, T& current, R&& range, int maxHeight = -1) {
         return combo(
             label,
             reinterpret_cast<int&>(current),
-            std::span(const_cast<char const**>(&*range.begin()), const_cast<char const**>(&*range.end())),
+            std::span(const_cast<geode::ZStringView*>(&*range.begin()), const_cast<geode::ZStringView*>(&*range.end())),
             maxHeight
         );
     }
 
-    inline bool radio(char const* label, int& current, int num) GEODE_EVENT_EXPORT_NORES(&radio, (label, current, num));
+    inline bool radio(geode::ZStringView label, int& current, int num) GEODE_EVENT_EXPORT_NORES(&radio, (label, current, num));
 
     template <UnderlyingIntegral T, UnderlyingIntegral U>
-    bool radio(char const* label, T& current, U value) {
+    bool radio(geode::ZStringView label, T& current, U value) {
         return radio(label, reinterpret_cast<int&>(current), reinterpret_cast<int&>(value));
     }
 
-    inline void inputMultiline(char const* label, std::string& text) GEODE_EVENT_EXPORT_NORES(&inputMultiline, (label, text));
+    inline void inputMultiline(geode::ZStringView label, std::string& text) GEODE_EVENT_EXPORT_NORES(&inputMultiline, (label, text));
 }
