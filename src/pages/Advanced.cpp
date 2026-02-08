@@ -94,13 +94,7 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
                     continue;
             }
             ImGui::Text("version: %s", item.getVersion().toString().c_str());
-            const char* importance = "";
-            switch (item.getImportance()) {
-                case geode::ModMetadata::Dependency::Importance::Required: importance = "required"; break;
-                case geode::ModMetadata::Dependency::Importance::Recommended: importance = "recommended"; break;
-                case geode::ModMetadata::Dependency::Importance::Suggested: importance = "suggested"; break;
-            }
-            ImGui::Text("importance: %s", importance);
+            ImGui::Text("required: %s", item.isRequired() ? "true" : "false");
             ImGui::Text("isResolved: %s", item.isResolved() ? "true" : "false");
             if (item.getMod())
                 drawModGraphNode(item.getMod());
@@ -120,13 +114,7 @@ ModMetadata DevTools::inputMetadata(void* treePtr, ModMetadata metadata) {
                     continue;
             }
             ImGui::Text("version: %s", item.getVersion().toString().c_str());
-            const char* importance = "";
-            switch (item.getImportance()) {
-                case geode::ModMetadata::Incompatibility::Importance::Breaking: importance = "breaking"; break;
-                case geode::ModMetadata::Incompatibility::Importance::Conflicting: importance = "conflicting"; break;
-                case geode::ModMetadata::Incompatibility::Importance::Superseded: importance = "superseded"; break;
-            }
-            ImGui::Text("importance: %s", importance);
+            ImGui::Text("breaking: %s", item.isBreaking() ? "true" : "false");
             ImGui::Text("isResolved: %s", item.isResolved() ? "true" : "false");
             if (item.getMod())
                 drawModGraphNode(item.getMod());
@@ -165,7 +153,7 @@ void DevTools::drawModGraphNode(Mod* node) {
     ImColor color = ImColor(1.f, 1.f, 1.f);
     if (node->isUninstalled())
         color = ImColor(0.1f, 0.1f, 0.1f);
-    else if (!node->isEnabled())
+    else if (!node->isLoaded())
         color = ImColor(0.7f, 0.7f, 0.7f);
 
     ImGui::PushStyleColor(ImGuiCol_Text, (ImU32)color);

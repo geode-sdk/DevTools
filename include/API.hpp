@@ -27,30 +27,30 @@ namespace devtools {
     template <typename T>
     concept UnderlyingIntegral = std::is_integral_v<T> || std::is_integral_v<std::underlying_type_t<T>>;
 
-    struct RegisterNodeEvent final : geode::SimpleEvent<RegisterNodeEvent, geode::Function<void(cocos2d::CCNode*)>> {
-        using SimpleEvent::SimpleEvent;
+    struct RegisterNodeEvent final : geode::Event<RegisterNodeEvent, bool(geode::Function<void(cocos2d::CCNode*)>)> {
+        using Event::Event;
     };
 
     template <typename T>
-    struct PropertyFnEvent final : geode::SimpleEvent<PropertyFnEvent<T>, bool(*&)(const char* name, T&)> {
+    struct PropertyFnEvent final : geode::Event<PropertyFnEvent<T>, bool(bool(*&)(const char* name, T&))> {
         using Fn = bool(const char* name, T&);
-        using geode::SimpleEvent<PropertyFnEvent, Fn*&>::SimpleEvent;
+        using geode::Event<PropertyFnEvent, bool(Fn*&)>::Event;
     };
 
-    struct DrawLabelFnEvent final : geode::SimpleEvent<DrawLabelFnEvent, void(*&)(const char* text)> {
+    struct DrawLabelFnEvent final : geode::Event<DrawLabelFnEvent, bool(void(*&)(const char* text))> {
         using Fn = void(const char* text);
-        using SimpleEvent::SimpleEvent;
+        using Event::Event;
     };
 
     template <typename T>
-    struct EnumerableFnEvent final : geode::SimpleEvent<EnumerableFnEvent<T>, bool(*&)(const char* label, T* value, std::span<std::pair<T, const char*> const>)> {
+    struct EnumerableFnEvent final : geode::Event<EnumerableFnEvent<T>, bool(bool(*&)(const char* label, T* value, std::span<std::pair<T, const char*> const>))> {
         using Fn = bool(const char* label, T* value, std::span<std::pair<T, const char*> const>);
-        using geode::SimpleEvent<EnumerableFnEvent, Fn*&>::SimpleEvent;
+        using geode::Event<EnumerableFnEvent, bool(Fn*&)>::Event;
     };
 
-    struct ButtonFnEvent final : geode::SimpleEvent<ButtonFnEvent, bool(*&)(const char* label)> {
+    struct ButtonFnEvent final : geode::Event<ButtonFnEvent, bool(bool(*&)(const char* label))> {
         using Fn = bool(const char* label);
-        using SimpleEvent::SimpleEvent;
+        using Event::Event;
     };
 
     /// @brief Checks if DevTools is currently loaded.

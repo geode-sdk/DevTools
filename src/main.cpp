@@ -153,8 +153,8 @@ class $modify(CCEGLView) {
 };
 
 // For the one eclipse shortcut
-struct ToggleDevToolsEvent : SimpleEvent<ToggleDevToolsEvent> {
-    using SimpleEvent::SimpleEvent;
+struct ToggleDevToolsEvent : Event<ToggleDevToolsEvent, bool()> {
+    using Event::Event;
 };
 
 $execute {
