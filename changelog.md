@@ -1,3 +1,6 @@
+## v1.13.0
+* Updated for Geode v5.0.0 and Geometry Dash 2.2081
+
 ## v1.12.0
 * Add ability to restructure the node tree via drag/drop
 * Add more api functions for more advanced UI control
