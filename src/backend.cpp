@@ -329,25 +329,6 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
     glDisable(GL_SCISSOR_TEST);
 }
 
-static float SCROLL_SENSITIVITY = 10;
-
-#ifndef GEODE_IS_IOS
-class $modify(CCMouseDispatcher) {
-    bool dispatchScrollMSG(float y, float x) {
-        if(!DevTools::get()->isSetup()) return true;
-
-        auto& io = ImGui::GetIO();
-        io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, -y / SCROLL_SENSITIVITY);
-
-        if (!io.WantCaptureMouse || shouldPassEventsToGDButTransformed()) {
-            return CCMouseDispatcher::dispatchScrollMSG(y, x);
-        }
-
-        return true;
-    }
-};
-#endif
-
 class $modify(CCTouchDispatcher) {
     static void onModify(auto& self) {
         /* 
@@ -486,15 +467,16 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 	}
 }
 
-#ifndef GEODE_IS_IOS
-class $modify(CCKeyboardDispatcher) {
-    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat, double a4) {
-        if(!DevTools::get()->isSetup()) return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat, a4);
+static float SCROLL_SENSITIVITY = 10;
+
+$on_mod(Loaded) {
+    KeyboardInputEvent().listen([](KeyboardInputData& data){
+        if(!DevTools::get()->isSetup()) return ListenerResult::Propagate;
 
 		auto& io = ImGui::GetIO();
-		const auto imKey = cocosToImGuiKey(key);
+		const auto imKey = cocosToImGuiKey(data.key);
 		if (imKey != ImGuiKey_None) {
-			io.AddKeyEvent(imKey, down);
+			io.AddKeyEvent(imKey, data.action != KeyboardInputData::Action::Release);
 		}
 
         // CCIMEDispatcher stuff only gets called on mobile if the virtual keyboard would be up.
@@ -525,13 +507,28 @@ class $modify(CCKeyboardDispatcher) {
         #endif
 
 		if (io.WantCaptureKeyboard) {
-			return false;
+			return ListenerResult::Stop;
 		} else {
-			return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat, a4);
+			return ListenerResult::Propagate;
 		}
-    }
+    }).leak();
 
-    #if defined(GEODE_IS_MACOS)
+    ScrollWheelEvent().listen([](float x, float y) {
+        if(!DevTools::get()->isSetup()) return true;
+
+        auto& io = ImGui::GetIO();
+        io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, -y / SCROLL_SENSITIVITY);
+
+        if (!io.WantCaptureMouse || shouldPassEventsToGDButTransformed()) {
+            return ListenerResult::Propagate;
+        }
+
+        return ListenerResult::Stop;
+    }).leak();
+}
+
+#if defined(GEODE_IS_MACOS)
+class $modify(CCKeyboardDispatcher) {
     static void onModify(auto& self) {
         Result<> res = self.setHookPriorityBeforePre("CCKeyboardDispatcher::updateModifierKeys", "geode.custom-keybinds");
         if (!res) {
@@ -547,6 +544,5 @@ class $modify(CCKeyboardDispatcher) {
         io.AddKeyEvent(ImGuiKey_ModSuper, cmd);
         CCKeyboardDispatcher::updateModifierKeys(shft, ctrl, alt, cmd);
     }
-    #endif
 };
 #endif
