@@ -1,5 +1,5 @@
 {
-	"geode": "5.0.0-beta.1",
+	"geode": "5.0.0-beta.4",
 	"version": "v1.13.0",
 	"gd": {
 		"win": "2.2081",
@@ -25,6 +25,17 @@
 			"name": "Use GD window",
 			"description": "Determines if the DevTools should use a custom GD window or not. Required to disable for some exotic configurations (MacOS Wine).",
 			"default": true
+		},
+		"open-bind": {
+			"type": "keybind",
+			"name": "DevTools Keybind",
+			"descriptions": "The keybind to open DevTools",
+			"default": {
+				"win": "F11",
+				"mac": ["F10", "F11"],
+				"android": "F11",
+				"ios": "F11"
+			}
 		}
 	},
 	"resources": {
