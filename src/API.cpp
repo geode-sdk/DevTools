@@ -44,6 +44,9 @@ static void handleType() {
     }).leak();
 }
 
+bool devtools::isOpen() {
+    return DevTools::get()->isVisible();
+}
 void devtools::newLine() {
     ImGui::NewLine();
 }
@@ -89,11 +92,6 @@ bool devtools::button(ZStringView label) {
 $execute {
     devtools::RegisterNodeEvent().listen([](Function<void(CCNode*)> callback) {
         DevTools::get()->addCustomCallback(std::move(callback));
-        return ListenerResult::Stop;
-    }).leak();
-
-    devtools::IsOpenEvent().listen([](bool& isOpen) {
-        isOpen = DevTools::get()->isVisible();
         return ListenerResult::Stop;
     }).leak();
 
