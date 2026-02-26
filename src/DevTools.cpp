@@ -70,8 +70,23 @@ DevTools* DevTools::get() {
     return inst;
 }
 
-void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
-void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
+// i wish i didnt have to do this but none of the lead devs have 4k monitors apparently!?!?!?
+void DevTools::loadSettings() {
+    if (!m_mod) {
+        m_mod = Mod::get();
+    }
+
+    m_settings = m_mod->getSavedValue<Settings>("settings");
+    m_settings.fontScale = m_mod->getSavedValue<float>("font-scale", m_settings.fontScale);
+}
+void DevTools::saveSettings() {
+    if (!m_mod) {
+        m_mod = Mod::get();
+    }
+
+    m_mod->setSavedValue("settings", m_settings);
+    m_mod->setSavedValue("font-scale", m_settings.fontScale);
+}
 Settings DevTools::getSettings() { return m_settings; }
 void DevTools::setBallPosition(CCPoint pos) { m_settings.buttonPos = std::move(pos); }
 
@@ -321,6 +336,7 @@ void DevTools::setup() {
     ImGui::CreateContext();
 
     auto& io = ImGui::GetIO();
+    io.FontGlobalScale = m_settings.fontScale;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     // if this is true then it just doesnt work :( why
     io.ConfigDockingWithShift = false;
@@ -331,7 +347,6 @@ void DevTools::setup() {
     this->setupPlatform();
 
 #ifdef GEODE_IS_MOBILE
-    ImGui::GetIO().FontGlobalScale = 2.f;
     ImGui::GetStyle().ScrollbarSize = 60.f;
     // ImGui::GetStyle().TabBarBorderSize = 60.f;
 #endif
