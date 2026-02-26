@@ -90,7 +90,7 @@ bool devtools::button(ZStringView label) {
 }
 
 $execute {
-    devtools::RegisterNodeEvent().listen([](Function<void(CCNode*)> callback) {
+    devtools::RegisterNodeEvent().listen([](Function<void(CCNode*)>& callback) {
         DevTools::get()->addCustomCallback(std::move(callback));
         return ListenerResult::Stop;
     }).leak();
