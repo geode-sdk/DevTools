@@ -31,6 +31,10 @@ namespace devtools {
         using Event::Event;
     };
 
+    struct IsOpenEvent final : geode::Event<IsOpenEvent, bool(bool&)> {
+        using Event::Event;
+    };
+
     template <typename T>
     struct PropertyFnEvent final : geode::Event<PropertyFnEvent<T>, bool(bool(*&)(geode::ZStringView name, T&))> {
         using Fn = bool(geode::ZStringView name, T&);
@@ -47,6 +51,14 @@ namespace devtools {
     /// @return True if DevTools is loaded, false otherwise.
     inline bool isLoaded() {
         return geode::Loader::get()->getLoadedMod("geode.devtools") != nullptr;
+    }
+
+    /// @brief Checks if DevTools is currently open.
+    /// @return True if DevTools is open, false otherwise.
+    inline bool isOpen() {
+        bool isOpen = false;
+        IsOpenEvent().send(isOpen);
+        return isOpen;
     }
 
     /// @brief Waits for DevTools to be loaded and then calls the provided callback.

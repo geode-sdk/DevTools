@@ -92,6 +92,11 @@ $execute {
         return ListenerResult::Stop;
     }).leak();
 
+    devtools::IsOpenEvent().listen([](bool& isOpen) {
+        isOpen = DevTools::get()->isVisible();
+        return ListenerResult::Stop;
+    }).leak();
+
     // Scalars & Enums
     handleType<char>();
     handleType<unsigned char>();
