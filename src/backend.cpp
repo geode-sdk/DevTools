@@ -482,16 +482,16 @@ $on_mod(Loaded) {
         // CCIMEDispatcher stuff only gets called on mobile if the virtual keyboard would be up.
         // Similarly, CCKeyboardDispatcher doesn't get called if the virtual keyboard would be up.
         #ifdef GEODE_IS_MOBILE
-        if (down) {
+        if (data.action != KeyboardEventData::Action::Release) {
             char c = 0;
-            if (key >= KEY_A && key <= KEY_Z) {
-                c = static_cast<char>(key);
+            if (data.key >= KEY_A && data.key <= KEY_Z) {
+                c = static_cast<char>(data.key);
                 if (!io.KeyShift) {
                     c = static_cast<char>(tolower(c));
                 }
-            } else if (key >= KEY_Zero && key <= KEY_Nine) {
-                c = static_cast<char>('0' + (key - KEY_Zero));
-            } else if (key == KEY_Space) {
+            } else if (data.key >= KEY_Zero && data.key <= KEY_Nine) {
+                c = static_cast<char>('0' + (data.key - KEY_Zero));
+            } else if (data.key == KEY_Space) {
                 c = ' ';
             }
 
@@ -500,7 +500,7 @@ $on_mod(Loaded) {
                 io.AddInputCharactersUTF8(str.c_str());
             }
         }
-        if (key == KEY_Backspace) {
+        if (data.key == KEY_Backspace) {
             io.AddKeyEvent(ImGuiKey_Backspace, true);
             io.AddKeyEvent(ImGuiKey_Backspace, false);
         }
