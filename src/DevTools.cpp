@@ -28,6 +28,7 @@ struct matjson::Serialize<Settings> {
         assign(value["advanced_settings"], s.advancedSettings);
         assign(value["show_memory_viewer"], s.showMemoryViewer);
         assign(value["show_mod_graph"], s.showModGraph);
+        assign(value["font_scale"], s.fontScale);
         assign(value["theme"], s.theme);
         assign(value["theme_color"], s.themeColor);
         assign(value["button_x"], s.buttonPos.x);
@@ -51,6 +52,7 @@ struct matjson::Serialize<Settings> {
             { "advanced_settings", settings.advancedSettings },
             { "show_memory_viewer", settings.showMemoryViewer },
             { "show_mod_graph", settings.showModGraph },
+            { "font_scale", settings.fontScale },
             { "theme", settings.theme },
             { "theme_color", settings.themeColor },
             { "button_x", settings.buttonPos.x },
@@ -321,6 +323,7 @@ void DevTools::setup() {
     ImGui::CreateContext();
 
     auto& io = ImGui::GetIO();
+    io.FontGlobalScale = m_settings.fontScale;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     // if this is true then it just doesnt work :( why
     io.ConfigDockingWithShift = false;
@@ -331,7 +334,6 @@ void DevTools::setup() {
     this->setupPlatform();
 
 #ifdef GEODE_IS_MOBILE
-    ImGui::GetIO().FontGlobalScale = 2.f;
     ImGui::GetStyle().ScrollbarSize = 60.f;
     // ImGui::GetStyle().TabBarBorderSize = 60.f;
 #endif
