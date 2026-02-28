@@ -28,6 +28,7 @@ struct matjson::Serialize<Settings> {
         assign(value["advanced_settings"], s.advancedSettings);
         assign(value["show_memory_viewer"], s.showMemoryViewer);
         assign(value["show_mod_graph"], s.showModGraph);
+        assign(value["font_scale"], s.fontScale);
         assign(value["theme"], s.theme);
         assign(value["theme_color"], s.themeColor);
         assign(value["button_x"], s.buttonPos.x);
@@ -36,7 +37,6 @@ struct matjson::Serialize<Settings> {
         assign(value["button_game"], s.buttonInGame);
         assign(value["button_enabled"], s.buttonEnabled);
         assign(value["tree_drag_reorder"], s.treeDragReorder);
-        assign(value["font_scale"], s.fontScale);
 
         return Ok(s);
     }
@@ -52,6 +52,7 @@ struct matjson::Serialize<Settings> {
             { "advanced_settings", settings.advancedSettings },
             { "show_memory_viewer", settings.showMemoryViewer },
             { "show_mod_graph", settings.showModGraph },
+            { "font_scale", settings.fontScale },
             { "theme", settings.theme },
             { "theme_color", settings.themeColor },
             { "button_x", settings.buttonPos.x },
@@ -59,8 +60,7 @@ struct matjson::Serialize<Settings> {
             { "button_editor", settings.buttonInEditor },
             { "button_game", settings.buttonInGame },
             { "button_enabled", settings.buttonEnabled },
-            { "tree_drag_reorder", settings.treeDragReorder },
-            { "font_scale", settings.fontScale }
+            { "tree_drag_reorder", settings.treeDragReorder }
         });
     }
 };
