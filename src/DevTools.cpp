@@ -72,20 +72,12 @@ DevTools* DevTools::get() {
 
 // i wish i didnt have to do this but none of the lead devs have 4k monitors apparently!?!?!?
 void DevTools::loadSettings() {
-    if (!m_mod) {
-        m_mod = Mod::get();
-    }
-
-    m_settings = m_mod->getSavedValue<Settings>("settings");
-    m_settings.fontScale = m_mod->getSavedValue<float>("font-scale", m_settings.fontScale);
+    m_settings = Mod::get()->getSavedValue<Settings>("settings");
+    m_settings.fontScale = Mod::get()->getSavedValue<float>("font-scale", m_settings.fontScale);
 }
 void DevTools::saveSettings() {
-    if (!m_mod) {
-        m_mod = Mod::get();
-    }
-
-    m_mod->setSavedValue("settings", m_settings);
-    m_mod->setSavedValue("font-scale", m_settings.fontScale);
+    Mod::get()->setSavedValue("settings", m_settings);
+    Mod::get()->setSavedValue("font-scale", m_settings.fontScale);
 }
 Settings DevTools::getSettings() { return m_settings; }
 void DevTools::setBallPosition(CCPoint pos) { m_settings.buttonPos = std::move(pos); }

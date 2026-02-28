@@ -52,7 +52,6 @@ protected:
     bool m_showModGraph = false;
     bool m_pauseGame = false;
     Settings m_settings;
-    Mod* m_mod = nullptr;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
     ImFont* m_smallFont    = nullptr;
