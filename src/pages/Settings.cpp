@@ -88,10 +88,6 @@ void DevTools::drawSettings() {
 
     if (ImGui::DragFloat("Font Size", &m_settings.fontScale, 0.01f, 1.0f, 3.0f)) {
         ImGui::GetIO().FontGlobalScale = m_settings.fontScale;
-        DevTools::get()->saveSettings();
-    }
-    if (ImGui::IsItemActive()) {
-        ImGui::GetIO().FontGlobalScale = m_settings.fontScale;
     }
 
 #ifdef GEODE_IS_DESKTOP
