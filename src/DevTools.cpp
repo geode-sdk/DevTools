@@ -36,6 +36,7 @@ struct matjson::Serialize<Settings> {
         assign(value["button_game"], s.buttonInGame);
         assign(value["button_enabled"], s.buttonEnabled);
         assign(value["tree_drag_reorder"], s.treeDragReorder);
+        assign(value["font_scale"], s.fontScale);
 
         return Ok(s);
     }
@@ -58,7 +59,8 @@ struct matjson::Serialize<Settings> {
             { "button_editor", settings.buttonInEditor },
             { "button_game", settings.buttonInGame },
             { "button_enabled", settings.buttonEnabled },
-            { "tree_drag_reorder", settings.treeDragReorder }
+            { "tree_drag_reorder", settings.treeDragReorder },
+            { "font_scale", settings.fontScale }
         });
     }
 };
@@ -70,15 +72,8 @@ DevTools* DevTools::get() {
     return inst;
 }
 
-// i wish i didnt have to do this but none of the lead devs have 4k monitors apparently!?!?!?
-void DevTools::loadSettings() {
-    m_settings = Mod::get()->getSavedValue<Settings>("settings");
-    m_settings.fontScale = Mod::get()->getSavedValue<float>("font-scale", m_settings.fontScale);
-}
-void DevTools::saveSettings() {
-    Mod::get()->setSavedValue("settings", m_settings);
-    Mod::get()->setSavedValue("font-scale", m_settings.fontScale);
-}
+void DevTools::loadSettings() { m_settings = Mod::get()->getSavedValue<Settings>("settings"); }
+void DevTools::saveSettings() { Mod::get()->setSavedValue("settings", m_settings); }
 Settings DevTools::getSettings() { return m_settings; }
 void DevTools::setBallPosition(CCPoint pos) { m_settings.buttonPos = std::move(pos); }
 
