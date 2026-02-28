@@ -112,7 +112,7 @@ void DevTools::setDraggedNode(CCNode* node) {
 }
 
 void DevTools::addCustomCallback(Function<void(CCNode*)>&& callback) {
-    m_customCallbacks.push_back(std::forward<Function<void(CCNode*)>>(callback));
+    m_customCallbacks.push_back(std::move(callback));
 }
 
 DragButton* DevTools::getDragButton() {
