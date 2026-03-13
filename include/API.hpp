@@ -27,7 +27,7 @@ namespace devtools {
     template <typename T>
     concept UnderlyingIntegral = std::is_integral_v<T> || std::is_integral_v<std::underlying_type_t<T>>;
 
-    struct RegisterNodeEvent final : geode::Event<RegisterNodeEvent, bool(geode::Function<void(cocos2d::CCNode*)>)> {
+    struct RegisterNodeEvent final : geode::Event<RegisterNodeEvent, bool(geode::Function<void(cocos2d::CCNode*)>&)> {
         using Event::Event;
     };
 
@@ -48,6 +48,10 @@ namespace devtools {
     inline bool isLoaded() {
         return geode::Loader::get()->getLoadedMod("geode.devtools") != nullptr;
     }
+
+    /// @brief Checks if DevTools is currently open.
+    /// @return True if DevTools is open, false otherwise.
+    inline bool isOpen() GEODE_EVENT_EXPORT_NORES(&isOpen, ());
 
     /// @brief Waits for DevTools to be loaded and then calls the provided callback.
     /// @param callback The function to call once DevTools is loaded.
@@ -72,11 +76,13 @@ namespace devtools {
     /// @see `devtools::property`, `devtools::label`, `devtools::enumerable`, `devtools::button`
     template <typename T, std::invocable<std::remove_pointer_t<T>*> F> requires IsCCNode<T>
     void registerNode(F&& callback) {
-        RegisterNodeEvent().send([callback = std::forward<F>(callback)](cocos2d::CCNode* node) {
+        geode::Function<void(cocos2d::CCNode*)> func = [callback = std::forward<F>(callback)](cocos2d::CCNode* node) {
             if (auto casted = geode::cast::typeinfo_cast<std::remove_pointer_t<T>*>(node)) {
                 callback(casted);
             }
-        });
+        };
+
+        RegisterNodeEvent().send(func);
     }
 
     /// @brief Renders a property editor for the given value in the DevTools UI.
