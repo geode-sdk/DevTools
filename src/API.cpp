@@ -1,3 +1,4 @@
+#define GEODE_DEFINE_EVENT_EXPORTS
 #include <API.hpp>
 #include "DevTools.hpp"
 #include "ImGui.hpp"
@@ -7,7 +8,7 @@ using namespace geode::prelude;
 
 template <typename T>
 static void handleType() {
-    new EventListener<EventFilter<devtools::PropertyFnEvent<T>>>(+[](devtools::PropertyFnEvent<T>* event) {
+    devtools::PropertyFnEvent<T>().listen([](typename devtools::PropertyFnEvent<T>::Fn*& fnPtr) {
         constexpr bool isSigned = std::is_signed_v<T>;
         constexpr ImGuiDataType dataType =
             std::is_same_v<T, float> ? ImGuiDataType_Float :
@@ -16,19 +17,19 @@ static void handleType() {
             sizeof(T) == 2 ? (isSigned ? ImGuiDataType_S16 : ImGuiDataType_U16) :
             sizeof(T) == 4 ? (isSigned ? ImGuiDataType_S32 : ImGuiDataType_U32) :
             isSigned ? ImGuiDataType_S64 : ImGuiDataType_U64;
-        event->fn = +[](const char* name, T& prop) {
-            return ImGui::DragScalar(name, dataType, &prop);
+        fnPtr = +[](ZStringView name, T& prop) {
+            return ImGui::DragScalar(name.c_str(), dataType, &prop);
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<devtools::EnumerableFnEvent<T>>>(+[](devtools::EnumerableFnEvent<T>* event) {
-        event->fn = +[](const char* label, T* value, std::span<std::pair<T, const char*> const> items) {
-            ImGui::Text("%s:", label);
+    devtools::EnumerableFnEvent<T>().listen([](typename devtools::EnumerableFnEvent<T>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView label, T* value, std::span<std::pair<T, ZStringView> const> items) {
+            ImGui::Text("%s:", label.c_str());
             size_t i = 0;
             bool changed = false;
             for (auto& [itemValue, itemLabel] : items) {
-                if (ImGui::RadioButton(itemLabel, *value == itemValue)) {
+                if (ImGui::RadioButton(itemLabel.c_str(), *value == itemValue)) {
                     *value = itemValue;
                     changed = true;
                 }
@@ -40,14 +41,59 @@ static void handleType() {
             return changed;
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
+}
+
+bool devtools::isOpen() {
+    return DevTools::get()->isVisible();
+}
+void devtools::newLine() {
+    ImGui::NewLine();
+}
+void devtools::sameLine() {
+    ImGui::SameLine();
+}
+void devtools::separator() {
+    ImGui::Separator();
+}
+void devtools::nextItemWidth(float width) {
+    ImGui::SetNextItemWidth(width);
+}
+void devtools::indent() {
+    ImGui::Indent(16.f);
+}
+void devtools::unindent() {
+    ImGui::Unindent(16.f);
+}
+bool devtools::combo(ZStringView label, int& current, std::span<char const*> items, int maxHeight) {
+    return ImGui::Combo(
+        label.c_str(),
+        &current,
+        &*items.begin(),
+        static_cast<int>(items.size()),
+        maxHeight
+    );
+}
+bool devtools::radio(ZStringView label, int& current, int num) {
+    return ImGui::RadioButton(label.c_str(), &current, num);
+}
+void devtools::inputMultiline(ZStringView label, std::string& str) {
+    ImGui::InputTextMultiline(label.c_str(), &str);
+}
+
+void devtools::label(ZStringView text) {
+    ImGui::Text("%s", text.c_str());
+}
+
+bool devtools::button(ZStringView label) {
+    return ImGui::Button(label.c_str());
 }
 
 $execute {
-    new EventListener<EventFilter<devtools::RegisterNodeEvent>>(+[](devtools::RegisterNodeEvent* event) {
-        DevTools::get()->addCustomCallback(std::move(event->callback));
+    devtools::RegisterNodeEvent().listen([](Function<void(CCNode*)>& callback) {
+        DevTools::get()->addCustomCallback(std::move(callback));
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // Scalars & Enums
     handleType<char>();
@@ -64,31 +110,31 @@ $execute {
     handleType<double>();
 
     // checkbox
-    new EventListener<EventFilter<devtools::PropertyFnEvent<bool>>>(+[](devtools::PropertyFnEvent<bool>* event) {
-        event->fn = +[](const char* name, bool& prop) {
-            return ImGui::Checkbox(name, &prop);
+    devtools::PropertyFnEvent<bool>().listen([](devtools::PropertyFnEvent<bool>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView name, bool& prop) {
+            return ImGui::Checkbox(name.c_str(), &prop);
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // string
-    new EventListener<EventFilter<devtools::PropertyFnEvent<std::string>>>(+[](devtools::PropertyFnEvent<std::string>* event) {
-        event->fn = +[](const char* name, std::string& prop) {
-            return ImGui::InputText(name, &prop);
+    devtools::PropertyFnEvent<std::string>().listen([](devtools::PropertyFnEvent<std::string>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView name, std::string& prop) {
+            return ImGui::InputText(name.c_str(), &prop);
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // colors
-    new EventListener<EventFilter<devtools::PropertyFnEvent<ccColor3B>>>(+[](devtools::PropertyFnEvent<ccColor3B>* event) {
-        event->fn = +[](const char* name, ccColor3B& prop) {
+    devtools::PropertyFnEvent<ccColor3B>().listen([](devtools::PropertyFnEvent<ccColor3B>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView name, ccColor3B& prop) {
             auto color = ImVec4(
                 prop.r / 255.f,
                 prop.g / 255.f,
                 prop.b / 255.f,
                 1.0f
             );
-            if (ImGui::ColorEdit3(name, &color.x)) {
+            if (ImGui::ColorEdit3(name.c_str(), &color.x)) {
                 prop.r = static_cast<GLubyte>(color.x * 255);
                 prop.g = static_cast<GLubyte>(color.y * 255);
                 prop.b = static_cast<GLubyte>(color.z * 255);
@@ -97,16 +143,16 @@ $execute {
             return false;
         };
         return ListenerResult::Stop;
-    });
-    new EventListener<EventFilter<devtools::PropertyFnEvent<ccColor4B>>>(+[](devtools::PropertyFnEvent<ccColor4B>* event) {
-        event->fn = +[](const char* name, ccColor4B& prop) {
+    }).leak();
+    devtools::PropertyFnEvent<ccColor4B>().listen([](devtools::PropertyFnEvent<ccColor4B>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView name, ccColor4B& prop) {
             auto color = ImVec4(
                 prop.r / 255.f,
                 prop.g / 255.f,
                 prop.b / 255.f,
                 prop.a / 255.f
             );
-            if (ImGui::ColorEdit4(name, &color.x)) {
+            if (ImGui::ColorEdit4(name.c_str(), &color.x)) {
                 prop.r = static_cast<GLubyte>(color.x * 255);
                 prop.g = static_cast<GLubyte>(color.y * 255);
                 prop.b = static_cast<GLubyte>(color.z * 255);
@@ -116,48 +162,32 @@ $execute {
             return false;
         };
         return ListenerResult::Stop;
-    });
-    new EventListener<EventFilter<devtools::PropertyFnEvent<ccColor4F>>>(+[](devtools::PropertyFnEvent<ccColor4F>* event) {
-        event->fn = +[](const char* name, ccColor4F& prop) {
-            return ImGui::ColorEdit4(name, reinterpret_cast<float*>(&prop));
+    }).leak();
+    devtools::PropertyFnEvent<ccColor4F>().listen([](devtools::PropertyFnEvent<ccColor4F>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView name, ccColor4F& prop) {
+            return ImGui::ColorEdit4(name.c_str(), reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
     // points/sizes
-    new EventListener<EventFilter<devtools::PropertyFnEvent<CCPoint>>>(+[](devtools::PropertyFnEvent<CCPoint>* event) {
-        event->fn = +[](const char* name, CCPoint& prop) {
-            return ImGui::DragFloat2(name, reinterpret_cast<float*>(&prop));
+    devtools::PropertyFnEvent<CCPoint>().listen([](devtools::PropertyFnEvent<CCPoint>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView name, CCPoint& prop) {
+            return ImGui::DragFloat2(name.c_str(), reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
-    });
+    }).leak();
 
-    new EventListener<EventFilter<devtools::PropertyFnEvent<CCSize>>>(+[](devtools::PropertyFnEvent<CCSize>* event) {
-        event->fn = +[](const char* name, CCSize& prop) {
-            return ImGui::DragFloat2(name, reinterpret_cast<float*>(&prop));
+    devtools::PropertyFnEvent<CCSize>().listen([](devtools::PropertyFnEvent<CCSize>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView name, CCSize& prop) {
+            return ImGui::DragFloat2(name.c_str(), reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
-    });
-    new EventListener<EventFilter<devtools::PropertyFnEvent<CCRect>>>(+[](devtools::PropertyFnEvent<CCRect>* event) {
-        event->fn = +[](const char* name, CCRect& prop) {
-            return ImGui::DragFloat4(name, reinterpret_cast<float*>(&prop));
+    }).leak();
+    devtools::PropertyFnEvent<CCRect>().listen([](devtools::PropertyFnEvent<CCRect>::Fn*& fnPtr) {
+        fnPtr = +[](ZStringView name, CCRect& prop) {
+            return ImGui::DragFloat4(name.c_str(), reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
-    });
-
-    // label
-    new EventListener<EventFilter<devtools::DrawLabelFnEvent>>(+[](devtools::DrawLabelFnEvent* event) {
-        event->fn = +[](const char* text) {
-            ImGui::Text("%s", text);
-        };
-        return ListenerResult::Stop;
-    });
-
-    // button
-    new EventListener<EventFilter<devtools::ButtonFnEvent>>(+[](devtools::ButtonFnEvent* event) {
-        event->fn = +[](const char* label) {
-            return ImGui::Button(label);
-        };
-        return ListenerResult::Stop;
-    });
+    }).leak();
 }

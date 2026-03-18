@@ -1,5 +1,3 @@
-
-#include "Geode/ui/SceneManager.hpp"
 #include "platform/platform.hpp"
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
 #include <Geode/modify/AchievementNotifier.hpp>
@@ -23,29 +21,30 @@ class $modify(CCNode) {
 };
 
 // todo: use shortcuts api once Geode has those
+#ifndef GEODE_IS_IOS
 class $modify(CCKeyboardDispatcher) {
-    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool arr) {
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool arr, double timestamp) {
         if (down && (key == KEY_F11 GEODE_MACOS(|| key == KEY_F10))) {
             DevTools::get()->toggle();
             return true;
         }
-        return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr);
+        return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, arr, timestamp);
     }
 };
-
-#ifdef GEODE_IS_MOBILE
+#endif
 
 #include <Geode/loader/GameEvent.hpp>
 $execute {
-    new EventListener<GameEventFilter>(+[](GameEvent*) {
-        DragButton::get();
-    }, GameEventFilter(GameEventType::Loaded));
+    GameEvent(GameEventType::Loaded).listen([] {
+        if (DevTools::get()->isButtonEnabled()) DevTools::get()->setupDragButton();
+    }).leak();
 }
 
 #include <Geode/modify/CCScene.hpp>
 class $modify(CCScene) {
     int getHighestChildZ() {
-        auto btn = DragButton::get();
+        auto btn = DevTools::get()->getDragButton();
+        if (!btn) return CCScene::getHighestChildZ();
         int z = btn->getZOrder();
         btn->setZOrder(-1);
         int ret = CCScene::getHighestChildZ();
@@ -53,8 +52,6 @@ class $modify(CCScene) {
         return ret;
     }
 };
-
-#endif
 
 class $modify(GameToolbox) {
     static void preVisitWithClippingRect(CCNode* node, CCRect clipRect) {
@@ -93,7 +90,7 @@ class $modify(CCDirector) {
         if (!DevTools::get()->shouldUseGDWindow()) {
             return CCDirector::drawScene();
         }
-        
+
         DevTools::get()->setup();
 
         static GLRenderCtx* gdTexture = nullptr;
@@ -156,13 +153,13 @@ class $modify(CCEGLView) {
 };
 
 // For the one eclipse shortcut
-struct ToggleDevToolsEvent : geode::Event {
-    ToggleDevToolsEvent() {}
+struct ToggleDevToolsEvent : Event<ToggleDevToolsEvent, bool()> {
+    using Event::Event;
 };
 
-$on_mod(Loaded) {
-    new EventListener<EventFilter<ToggleDevToolsEvent>>(+[](ToggleDevToolsEvent* e) {
+$execute {
+    ToggleDevToolsEvent().listen([] {
         DevTools::get()->toggle();
         return ListenerResult::Stop;
-    });
+    }).leak();
 }

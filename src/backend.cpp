@@ -486,8 +486,11 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 	}
 }
 
+#ifndef GEODE_IS_IOS
 class $modify(CCKeyboardDispatcher) {
-    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat) {
+    bool dispatchKeyboardMSG(enumKeyCodes key, bool down, bool repeat, double a4) {
+        if(!DevTools::get()->isSetup()) return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat, a4);
+
 		auto& io = ImGui::GetIO();
 		const auto imKey = cocosToImGuiKey(key);
 		if (imKey != ImGuiKey_None) {
@@ -524,11 +527,11 @@ class $modify(CCKeyboardDispatcher) {
 		if (io.WantCaptureKeyboard) {
 			return false;
 		} else {
-			return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat);
+			return CCKeyboardDispatcher::dispatchKeyboardMSG(key, down, repeat, a4);
 		}
     }
 
-    #if defined(GEODE_IS_MACOS) || defined(GEODE_IS_IOS)
+    #if defined(GEODE_IS_MACOS)
     static void onModify(auto& self) {
         Result<> res = self.setHookPriorityBeforePre("CCKeyboardDispatcher::updateModifierKeys", "geode.custom-keybinds");
         if (!res) {
@@ -546,3 +549,4 @@ class $modify(CCKeyboardDispatcher) {
     }
     #endif
 };
+#endif
