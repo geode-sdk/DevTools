@@ -8,6 +8,8 @@
 #include <Geode/ui/SimpleAxisLayout.hpp>
 #include <Geode/ui/Layout.hpp>
 #include <Geode/utils/file.hpp>
+#include <Geode/ui/Button.hpp>
+#include <Geode/ui/NineSlice.hpp>
 
 using namespace geode::prelude;
 
@@ -49,15 +51,19 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     drawTextureAttributes(node);
     drawMenuItemAttributes(node);
 
+    setUsedAPI(false);
     for (auto& callback : m_customCallbacks) {
         ImGui::PushID(&callback);
         callback(node);
         ImGui::PopID();
     }
 
-    ImGui::NewLine();
-    ImGui::Separator();
-    ImGui::NewLine();
+    // fixes that extra separator for nodes that the API isn't used on
+    if (usedAPI()) {
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+    }
 
     drawLayoutOptionsAttributes(node);
 
@@ -280,6 +286,9 @@ void DevTools::drawAxisGapAttribute(CCNode* node) {
 }
 
 void DevTools::drawTextureAttributes(CCNode* node) {
+    if (auto nineSlice = typeinfo_cast<geode::NineSlice*>(node)) {
+        node = nineSlice->getBatchNode();
+    }
     if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
         if (auto texture = textureProtocol->getTexture()) {
             if (auto spriteNode = typeinfo_cast<CCSprite*>(node)) {
@@ -309,8 +318,8 @@ void DevTools::drawTextureAttributes(CCNode* node) {
                 if (ImGui::Checkbox("Rotate Rect", &isRectRotated)) {
                     spriteNode->setTextureRect(spriteNode->getTextureRect(), isRectRotated, spriteNode->getContentSize());
                 }
+                ImGui::NewLine();
             }
-            ImGui::NewLine();
             auto* cachedTextures = CCTextureCache::sharedTextureCache()->m_pTextures;
             for (auto [key, obj] : CCDictionaryExt<std::string, CCTexture2D*>(cachedTextures)) {
                 if (obj == texture) {
@@ -371,6 +380,48 @@ void DevTools::drawMenuItemAttributes(CCNode* node) {
             if (ImGui::DragFloat("Base Scale##menuitembasescale", &baseScale, .03f)) {
                 menuItemSpriteExtra->m_baseScale = baseScale;
             }
+        }
+
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+    }
+    if (auto button = typeinfo_cast<geode::Button*>(node)) {
+
+        if (ImGui::Button(U8STR(FEATHER_LINK " Activate##activatebutton"))) {
+            button->selected();
+            button->activate();
+        }
+        checkbox("Enabled##enabledbutton", button, &geode::Button::isEnabled, &geode::Button::setEnabled);
+
+        float touchMult = button->getTouchMultiplier();
+        if (ImGui::DragFloat("Touch Size Multiplier##buttonsizemult", &touchMult, .1f)) {
+            button->setTouchMultiplier(touchMult);
+        }
+
+        float scaleMult = button->getScaleMultiplier();
+        if (ImGui::DragFloat("Scale Multiplier (AnimationType::Scale)##buttonscalemult", &scaleMult, .1f)) {
+            button->setScaleMultiplier(scaleMult);
+        }
+
+        float selectedDuration = button->getSelectedDuration();
+        if (ImGui::DragFloat("Selected Duration##buttonselectedduration", &selectedDuration, .1f)) {
+            button->setSelectedDuration(selectedDuration);
+        }
+
+        float unselectedDuration = button->getUnselectedDuration();
+        if (ImGui::DragFloat("Unselected Duration##buttonunselectedduration", &unselectedDuration, .1f)) {
+            button->setUnselectedDuration(unselectedDuration);
+        }
+
+        auto moveOffset = button->getMoveOffset();
+
+        float moveOffsetArr[2] = {
+            moveOffset.x,
+            moveOffset.y
+        };
+        if (ImGui::DragFloat2("Move Offset (AnimationType::Move)##buttonmoveoffset", moveOffsetArr)) {
+            button->setMoveOffset({moveOffsetArr[0], moveOffsetArr[1]});
         }
 
         ImGui::NewLine();

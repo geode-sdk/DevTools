@@ -46,6 +46,7 @@ protected:
     bool m_shouldRelayout = false;
     bool m_showModGraph = false;
     bool m_pauseGame = false;
+    bool m_usedAPI = false;
     Settings m_settings;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
@@ -140,4 +141,7 @@ public:
     void toggle();
 
     bool isVisible();
+
+    bool usedAPI();
+    void setUsedAPI(bool used);
 };
