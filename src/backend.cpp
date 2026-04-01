@@ -152,10 +152,17 @@ void DevTools::newFrame() {
 
     // TODO: text input
 
+    //bruh
+#ifdef GEODE_IS_WINDOWS
+    io.AddKeyEvent(ImGuiKey_ModAlt, (GetAsyncKeyState(VK_MENU) & 0x8000) != 0);
+    io.AddKeyEvent(ImGuiKey_ModCtrl, (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0);
+    io.AddKeyEvent(ImGuiKey_ModShift, (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0);
+#else
     auto* kb = director->getKeyboardDispatcher();
     io.KeyAlt = kb->getAltKeyPressed() || kb->getCommandKeyPressed(); // look
     io.KeyCtrl = kb->getControlKeyPressed();
     io.KeyShift = kb->getShiftKeyPressed();
+#endif
 
 #ifdef GEODE_IS_MOBILE
     auto ime = DevToolsIMEDelegate::get();

@@ -173,9 +173,9 @@ void DevTools::drawPage(const char* name, void(DevTools::*pageFun)()) {
     if (ImGui::Begin(name, nullptr, ImGuiWindowFlags_HorizontalScrollbar)) {
         (this->*pageFun)();
 
-#ifdef GEODE_IS_MOBILE
+//#ifdef GEODE_IS_MOBILE why..?
         mobileScrollBehavior();
-#endif
+//#endif
     }
     ImGui::End();
 }
@@ -279,6 +279,8 @@ void DevTools::draw(GLRenderCtx* ctx) {
 #ifdef GEODE_IS_WINDOWS
     setMouseCursor();
 #endif
+
+    //ImGui::ShowDemoWindow();
 }
 
 void DevTools::setupFonts() {
@@ -332,7 +334,7 @@ void DevTools::setup() {
 
 #ifdef GEODE_IS_MOBILE
     ImGui::GetIO().FontGlobalScale = 2.f;
-    ImGui::GetStyle().ScrollbarSize = 60.f;
+    ImGui::GetStyle().ScrollbarSize = 30.f;
     // ImGui::GetStyle().TabBarBorderSize = 60.f;
 #endif
 }
