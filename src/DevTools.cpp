@@ -374,3 +374,11 @@ bool DevTools::shouldUseGDWindow() const {
     return Mod::get()->getSettingValue<bool>("should-use-gd-window");
 
 }
+
+bool DevTools::usedAPI() {
+    return m_usedAPI;
+}
+
+void DevTools::setUsedAPI(bool used) {
+    m_usedAPI = used;
+}
