@@ -18,7 +18,9 @@
 
 #include <mach-o/dyld_images.h>
 #include <mach-o/dyld.h>
+#define CommentType CommentTypeDummy
 #import <Foundation/Foundation.h>
+#undef CommentType
 
 #import <CoreGraphics/CoreGraphics.h>
 #ifdef GEODE_IS_MACOS
