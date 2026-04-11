@@ -1,3 +1,8 @@
+## v1.14.0
+* Bump to Geode `v5.6.1`
+* Fix keyboard arrows typing 'a' characters
+* Add layout padding attribute
+
 ## v1.13.0
 * Updated for Geode v5.0.0 and Geometry Dash 2.2081
 
