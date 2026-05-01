@@ -13,8 +13,11 @@
 
 using namespace geode::prelude;
 
-std::string formatNodeName(CCNode* node, size_t index, bool fake) {
-    std::string name = fmt::format("[{}{}] {} ", index, fake ? "*" : "", geode::cocos::getObjectName(node));
+std::string formatNodeName(CCNode* node, size_t index, bool fake, bool parentHidden) {
+    std::string prefix = "";
+    if (fake) prefix += "*";
+    if (parentHidden) prefix += "...";
+    std::string name = fmt::format("[{}{}] {} ", prefix, index, geode::cocos::getObjectName(node));
     if (node->getTag() != -1) {
         name += fmt::format("({}) ", node->getTag());
     }
@@ -36,8 +39,13 @@ bool isNodeParentOf(CCNode* parent, CCNode* child) {
     return false;
 }
 
-void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible, bool fake) {
+void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible, bool fake, bool parentHidden) {
     if (!this->searchBranch(node)) {
+        return;
+    }
+
+    if (node->getUserFlag("hide"_spr) && m_settings.hideFlaggedNodes) {
+        this->drawNodeChildren(node, drag, visible, true);
         return;
     }
 
@@ -112,7 +120,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
     ImGui::BeginDisabled(!visible);
     ImGui::PushItemFlag(ImGuiItemFlags_Disabled, false); // Bypass iteract blocking in imgui
 
-    const auto name = formatNodeName(node, index, fake);
+    const auto name = formatNodeName(node, index, fake, parentHidden);
     // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
     bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.c_str());
     float height = ImGui::GetItemRectSize().y;
@@ -165,23 +173,27 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
             this->drawNodeAttributes(node);
         }
 
-        size_t i = 0;
-        for (auto& child : CCArrayExt<CCNode*>(node->getChildren())) {
-            this->drawTreeBranch(child, i++, drag || isDrag, visible, false);
-        }
-
-        i = 0;
-        if (auto fakeChildren = typeinfo_cast<CCArray*>(node->getUserObject("extra-children"_spr))) {
-            for (auto& child : CCArrayExt<CCNode*>(fakeChildren)) {
-                this->drawTreeBranch(child, i++, drag || isDrag, visible, true);
-            }
-        }
+        this->drawNodeChildren(node, drag || isDrag, visible, false);
 
         ImGui::TreePop();
     }
     // on leaf nodes expanded is true
     if (drawSeparator && (!expanded || !node->getChildrenCount())) {
         ImGui::Separator();
+    }
+}
+
+void DevTools::drawNodeChildren(CCNode* node, bool drag, bool visible, bool parentHidden) {
+    size_t i = 0;
+    for (auto& child : CCArrayExt<CCNode*>(node->getChildren())) {
+        this->drawTreeBranch(child, i++, drag, visible, false, parentHidden);
+    }
+
+    i = 0;
+    if (auto fakeChildren = typeinfo_cast<CCArray*>(node->getUserObject("extra-children"_spr))) {
+        for (auto& child : CCArrayExt<CCNode*>(fakeChildren)) {
+            this->drawTreeBranch(child, i++, drag, visible, true, parentHidden);
+        }
     }
 }
 
@@ -200,11 +212,11 @@ void DevTools::drawTree() {
         m_searchQuery.clear();
     }
 
-    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false, true, false);
-    this->drawTreeBranch(OverlayManager::get(), 1, false, true, false);
+    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false, true, false, false);
+    this->drawTreeBranch(OverlayManager::get(), 1, false, true, false, false);
 
     if (auto* dragged = this->getDraggedNode()) {
-        const auto name = formatNodeName(dragged, 0, false);
+        const auto name = formatNodeName(dragged, 0, false, false);
         auto bgColor = ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Header]);
         auto textColor = ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Text]);
 

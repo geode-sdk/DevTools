@@ -36,6 +36,7 @@ struct Settings {
     bool buttonInGame = false;
     bool buttonEnabled = false;
     bool treeDragReorder = false;
+    bool hideFlaggedNodes = false;
 };
 
 class DevTools {
@@ -66,7 +67,8 @@ protected:
     void setupPlatform();
 
     void drawTree();
-    void drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible, bool fake);
+    void drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible, bool fake, bool parentHidden);
+    void drawNodeChildren(CCNode* node, bool drag, bool visible, bool parentHidden);
     void drawSettings();
     void drawAdvancedSettings();
     void drawNodeAttributes(CCNode* node);
