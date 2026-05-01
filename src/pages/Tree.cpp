@@ -13,10 +13,10 @@
 
 using namespace geode::prelude;
 
-std::string formatNodeName(CCNode* node, size_t index, bool fake, bool parentHidden) {
+std::string formatNodeName(CCNode* node, size_t index, bool fake, bool flagHidden) {
     std::string prefix = "";
     if (fake) prefix += "*";
-    if (parentHidden) prefix += "...";
+    if (flagHidden) prefix += "...";
     std::string name = fmt::format("[{}{}] {} ", prefix, index, geode::cocos::getObjectName(node));
     if (node->getTag() != -1) {
         name += fmt::format("({}) ", node->getTag());
@@ -39,17 +39,21 @@ bool isNodeParentOf(CCNode* parent, CCNode* child) {
     return false;
 }
 
-void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible, bool fake, bool parentHidden) {
+void DevTools::drawTreeBranch(CCNode* node, size_t index, TreeBranchOptions options) {
     if (!this->searchBranch(node)) {
         return;
     }
 
     if (node->getUserFlag("hide"_spr) && m_settings.hideFlaggedNodes) {
-        this->drawNodeChildren(node, drag, visible, true);
+        this->drawNodeChildren(node, {
+            .drag = options.drag,
+            .visible = options.visible,
+            .flagHidden = true
+        });
         return;
     }
 
-    visible = node->isVisible() && visible;
+    options.visible = node->isVisible() && options.visible;
 
     auto selected = DevTools::get()->getSelectedNode() == node;
 
@@ -66,7 +70,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
 
     bool drawSeparator = false;
 
-    if (auto dragged = this->getDraggedNode(); dragged && dragged != node && !drag && !fake) {
+    if (auto dragged = this->getDraggedNode(); dragged && dragged != node && !options.drag && !options.fake) {
         float mouseY = ImGui::GetMousePos().y;
         float cursorY = ImGui::GetCursorPosY() + ImGui::GetWindowPos().y - ImGui::GetScrollY();
         float height = ImGui::GetTextLineHeight();
@@ -117,10 +121,10 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
     auto alpha = ImGui::GetStyle().DisabledAlpha;
     ImGui::GetStyle().DisabledAlpha = node->isVisible() ? alpha + 0.15f : alpha;
 
-    ImGui::BeginDisabled(!visible);
+    ImGui::BeginDisabled(!options.visible);
     ImGui::PushItemFlag(ImGuiItemFlags_Disabled, false); // Bypass iteract blocking in imgui
 
-    const auto name = formatNodeName(node, index, fake, parentHidden);
+    const auto name = formatNodeName(node, index, options.fake, options.flagHidden);
     // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
     bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.c_str());
     float height = ImGui::GetItemRectSize().y;
@@ -173,7 +177,11 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
             this->drawNodeAttributes(node);
         }
 
-        this->drawNodeChildren(node, drag || isDrag, visible, false);
+        this->drawNodeChildren(node, {
+            .drag = options.drag || isDrag,
+            .visible = options.visible,
+            .flagHidden = false
+        });
 
         ImGui::TreePop();
     }
@@ -183,16 +191,26 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
     }
 }
 
-void DevTools::drawNodeChildren(CCNode* node, bool drag, bool visible, bool parentHidden) {
+void DevTools::drawNodeChildren(CCNode* node, ParentNodeInformation info) {
     size_t i = 0;
     for (auto& child : CCArrayExt<CCNode*>(node->getChildren())) {
-        this->drawTreeBranch(child, i++, drag, visible, false, parentHidden);
+        this->drawTreeBranch(child, i++, {
+            .drag = info.drag,
+            .visible = info.visible,
+            .fake = false,
+            .flagHidden = info.flagHidden
+        });
     }
 
     i = 0;
     if (auto fakeChildren = typeinfo_cast<CCArray*>(node->getUserObject("extra-children"_spr))) {
         for (auto& child : CCArrayExt<CCNode*>(fakeChildren)) {
-            this->drawTreeBranch(child, i++, drag, visible, true, parentHidden);
+            this->drawTreeBranch(child, i++, {
+                .drag = info.drag,
+                .visible = info.visible,
+                .fake = true,
+                .flagHidden = info.flagHidden
+            });
         }
     }
 }
@@ -212,8 +230,8 @@ void DevTools::drawTree() {
         m_searchQuery.clear();
     }
 
-    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false, true, false, false);
-    this->drawTreeBranch(OverlayManager::get(), 1, false, true, false, false);
+    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, { .drag = false });
+    this->drawTreeBranch(OverlayManager::get(), 1, { .drag = false });
 
     if (auto* dragged = this->getDraggedNode()) {
         const auto name = formatNodeName(dragged, 0, false, false);

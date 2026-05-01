@@ -39,6 +39,19 @@ struct Settings {
     bool hideFlaggedNodes = false;
 };
 
+struct TreeBranchOptions {
+    bool drag = true;
+    bool visible = true;
+    bool fake = false;
+    bool flagHidden = false;
+};
+
+struct ParentNodeInformation {
+    bool drag = true;
+    bool visible = true;
+    bool flagHidden = false;
+};
+
 class DevTools {
 protected:
     bool m_visible = false;
@@ -67,8 +80,8 @@ protected:
     void setupPlatform();
 
     void drawTree();
-    void drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible, bool fake, bool parentHidden);
-    void drawNodeChildren(CCNode* node, bool drag, bool visible, bool parentHidden);
+    void drawTreeBranch(CCNode* node, size_t index, TreeBranchOptions options);
+    void drawNodeChildren(CCNode* node, ParentNodeInformation info);
     void drawSettings();
     void drawAdvancedSettings();
     void drawNodeAttributes(CCNode* node);
