@@ -13,8 +13,8 @@
 
 using namespace geode::prelude;
 
-std::string formatNodeName(CCNode* node, size_t index) {
-    std::string name = fmt::format("[{}] {} ", index, geode::cocos::getObjectName(node));
+std::string formatNodeName(CCNode* node, size_t index, bool fake) {
+    std::string name = fmt::format("[{}{}] {} ", index, fake ? "*" : "", geode::cocos::getObjectName(node));
     if (node->getTag() != -1) {
         name += fmt::format("({}) ", node->getTag());
     }
@@ -36,7 +36,7 @@ bool isNodeParentOf(CCNode* parent, CCNode* child) {
     return false;
 }
 
-void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible) {
+void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible, bool fake) {
     if (!this->searchBranch(node)) {
         return;
     }
@@ -58,7 +58,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
 
     bool drawSeparator = false;
 
-    if (auto dragged = this->getDraggedNode(); dragged && dragged != node && !drag) {
+    if (auto dragged = this->getDraggedNode(); dragged && dragged != node && !drag && !fake) {
         float mouseY = ImGui::GetMousePos().y;
         float cursorY = ImGui::GetCursorPosY() + ImGui::GetWindowPos().y - ImGui::GetScrollY();
         float height = ImGui::GetTextLineHeight();
@@ -112,7 +112,7 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
     ImGui::BeginDisabled(!visible);
     ImGui::PushItemFlag(ImGuiItemFlags_Disabled, false); // Bypass iteract blocking in imgui
 
-    const auto name = formatNodeName(node, index);
+    const auto name = formatNodeName(node, index, fake);
     // The order here is unusual due to imgui weirdness; see the second-to-last paragraph in https://kahwei.dev/2022/06/20/imgui-tree-node/
     bool expanded = ImGui::TreeNodeEx(node, flags, "%s", name.c_str());
     float height = ImGui::GetItemRectSize().y;
@@ -164,10 +164,19 @@ void DevTools::drawTreeBranch(CCNode* node, size_t index, bool drag, bool visibl
         if (m_settings.attributesInTree) {
             this->drawNodeAttributes(node);
         }
+
         size_t i = 0;
         for (auto& child : CCArrayExt<CCNode*>(node->getChildren())) {
-            this->drawTreeBranch(child, i++, drag || isDrag, visible);
+            this->drawTreeBranch(child, i++, drag || isDrag, visible, false);
         }
+
+        i = 0;
+        if (auto fakeChildren = typeinfo_cast<CCArray*>(node->getUserObject("extra-children"_spr))) {
+            for (auto& child : CCArrayExt<CCNode*>(fakeChildren)) {
+                this->drawTreeBranch(child, i++, drag || isDrag, visible, true);
+            }
+        }
+
         ImGui::TreePop();
     }
     // on leaf nodes expanded is true
@@ -191,11 +200,11 @@ void DevTools::drawTree() {
         m_searchQuery.clear();
     }
 
-    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false, true);
-    this->drawTreeBranch(OverlayManager::get(), 1, false, true);
+    this->drawTreeBranch(CCDirector::get()->getRunningScene(), 0, false, true, false);
+    this->drawTreeBranch(OverlayManager::get(), 1, false, true, false);
 
     if (auto* dragged = this->getDraggedNode()) {
-        const auto name = formatNodeName(dragged, 0);
+        const auto name = formatNodeName(dragged, 0, false);
         auto bgColor = ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Header]);
         auto textColor = ImGui::GetColorU32(ImGui::GetStyle().Colors[ImGuiCol_Text]);
 
