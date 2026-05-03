@@ -910,7 +910,13 @@ void DevTools::drawLayoutAttributes(CCNode* node){
                 layout->setGap(gap);
                 updateLayout = true;
             }
-            
+
+            auto padding = layout->getPadding();
+            if (ImGui::DragFloat4("Padding", &padding.left)) {
+                layout->setPadding(padding);
+                updateLayout = true;
+            }
+
             auto ignoreInvisibleChildren = layout->isIgnoreInvisibleChildren();
             if (ImGui::Checkbox("Ignore Invisible Children", &ignoreInvisibleChildren)) {
                 layout->ignoreInvisibleChildren(ignoreInvisibleChildren);
@@ -1084,6 +1090,12 @@ void DevTools::drawLayoutAttributes(CCNode* node){
             auto gap = layout->getGap();
             if (ImGui::DragFloat("Gap", &gap)) {
                 layout->setGap(gap);
+                updateLayout = true;
+            }
+
+            auto padding = layout->getPadding();
+            if (ImGui::DragFloat4("Padding", &padding.left)) {
+                layout->setPadding(padding);
                 updateLayout = true;
             }
 
