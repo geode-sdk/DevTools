@@ -94,7 +94,10 @@ void DevTools::drawSettings() {
 
     ImGui::Separator();
 
-    ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 0.01f, 1.0f, 3.0f);
+    ImGui::DragFloat("Font Size", &ImGui::GetIO().FontGlobalScale, 1.f, 1.0f, 3.0f);
+    if (ImGui::DragFloat("Scrollbar Size", &m_settings.scrollbarSize, 1.f, 1.0f, 100.0f)) {
+        ImGui::GetStyle().ScrollbarSize = m_settings.scrollbarSize;
+    }
 
 #ifdef GEODE_IS_DESKTOP
 

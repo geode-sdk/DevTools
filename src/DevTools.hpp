@@ -29,6 +29,7 @@ struct Settings {
     bool advancedSettings = false;
     bool showMemoryViewer = false;
     bool showModGraph = false;
+    float scrollbarSize = GEODE_DESKTOP(14.f) GEODE_MOBILE(60.f);
     std::string theme = DARK_THEME;
     ccColor4B themeColor = {2, 119, 189, 255};
     CCPoint buttonPos = {50, 50};
