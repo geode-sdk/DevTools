@@ -64,12 +64,6 @@ bool GLRenderCtx::begin() {
         glGenTextures(1, &m_texture);
         glBindTexture(GL_TEXTURE_2D, m_texture);
 
-        static int texture_count = 0;
-        texture_count++;
-        if (texture_count > 100) {
-            exit(1);
-        }
-
         glTexImage2D(
             GL_TEXTURE_2D, 0, GL_RGB,
             static_cast<GLsizei>(m_size.x),
@@ -115,4 +109,5 @@ void GLRenderCtx::end() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     //glFlush();
 }
+
 
