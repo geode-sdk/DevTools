@@ -36,6 +36,7 @@ struct matjson::Serialize<Settings> {
         assign(value["button_game"], s.buttonInGame);
         assign(value["button_enabled"], s.buttonEnabled);
         assign(value["tree_drag_reorder"], s.treeDragReorder);
+        assign(value["hide_flagged_nodes"], s.hideFlaggedNodes);
 
         return Ok(s);
     }
@@ -58,7 +59,8 @@ struct matjson::Serialize<Settings> {
             { "button_editor", settings.buttonInEditor },
             { "button_game", settings.buttonInGame },
             { "button_enabled", settings.buttonEnabled },
-            { "tree_drag_reorder", settings.treeDragReorder }
+            { "tree_drag_reorder", settings.treeDragReorder },
+            { "hide_flagged_nodes", settings.hideFlaggedNodes },
         });
     }
 };
