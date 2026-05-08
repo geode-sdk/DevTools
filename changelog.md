@@ -1,5 +1,8 @@
 ## v1.14.0
 * Bump to Geode `v5.7.1`, fixing hangs/crashes when loading the mod on MacOS
+* Allow resizing the scrollbar (#88)
+* Add fake children via the `geode.devtools/extra-children` user object (#87)
+* Add a way to hide children from the node tree via the `geode.devtools/hide` user flag (#87)
 * Fix keyboard arrows typing 'a' characters
 * Add layout padding attribute
 
