@@ -36,6 +36,11 @@ struct Settings {
     bool buttonInGame = false;
     bool buttonEnabled = false;
     bool treeDragReorder = false;
+    #ifdef GEODE_IS_MOBILE
+        float fontScale = 2.f;
+    #else
+        float fontScale = 1.f;
+    #endif
 };
 
 class DevTools {
