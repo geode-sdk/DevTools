@@ -341,7 +341,6 @@ void DevTools::setup() {
 
 #ifdef GEODE_IS_MOBILE
     ImGui::GetIO().FontGlobalScale = 2.f;
-    ImGui::GetStyle().ScrollbarSize = 60.f;
     // ImGui::GetStyle().TabBarBorderSize = 60.f;
 #endif
 }
