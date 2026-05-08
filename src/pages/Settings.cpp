@@ -64,6 +64,14 @@ void DevTools::drawSettings() {
             "(Experimental)\nAllows you to drag/drop nodes in the node tree, changing\ntheir parents or ordering."
         );
     }
+    ImGui::Checkbox("Hide Flagged Nodes", &m_settings.hideFlaggedNodes);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "If enabled, hides nodes in the node tree with the \"geode.devtools/hide\"\n"
+            "user flag set. Allows for hiding nodes irrelevant to debugging, such as containers.\n"
+            "This will keep the children of those nodes visible in the node tree."
+        );
+    }
     ImGui::Checkbox("Advanced Settings", &m_settings.advancedSettings);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
