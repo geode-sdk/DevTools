@@ -1,5 +1,5 @@
 ## v1.14.0
-* Bump to Geode `v5.6.1`
+* Bump to Geode `v5.7.1`, fixing hangs/crashes when loading the mod on MacOS
 * Fix keyboard arrows typing 'a' characters
 * Add layout padding attribute
 
