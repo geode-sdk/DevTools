@@ -36,6 +36,7 @@ struct Settings {
     bool buttonInGame = false;
     bool buttonEnabled = false;
     bool treeDragReorder = false;
+    bool showTouchPrio = false;
 };
 
 class DevTools {
@@ -66,6 +67,8 @@ protected:
     void setupPlatform();
 
     void drawTree();
+    void drawPrioTree();
+    void drawPrioHandler(CCTouchHandler* handler);
     void drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible);
     void drawSettings();
     void drawAdvancedSettings();

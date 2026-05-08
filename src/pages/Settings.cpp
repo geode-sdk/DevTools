@@ -82,6 +82,12 @@ void DevTools::drawSettings() {
             "Shows the mod graph window."
         );
     }
+    ImGui::Checkbox("Show Touch Priority Viewer", &m_settings.showTouchPrio);
+    if (ImGui::IsItemHovered()) {
+        ImGui::SetTooltip(
+            "Shows the touch priority viewer window."
+        );
+    }
     ImGui::PopStyleVar();
 
     ImGui::Separator();
