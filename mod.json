@@ -1,9 +1,9 @@
 {
-	"geode": "5.0.0-beta.1",
-	"version": "v1.13.0",
+	"geode": "5.7.1",
+	"version": "v1.14.0",
 	"gd": {
 		"win": "2.2081",
-		"android": "*",
+		"android": "2.2081",
 		"mac": "2.2081",
 		"ios": "2.2081"
 	},
@@ -11,7 +11,11 @@
 	"name": "DevTools",
 	"developer": "Geode Team",
 	"description": "Developer tools for Geode",
-	"api": { "include": ["include/*.hpp"] },
+	"api": {
+		"include": [
+			"include/*.hpp"
+		]
+	},
 	"links": {
 		"source": "https://github.com/geode-sdk/DevTools"
 	},

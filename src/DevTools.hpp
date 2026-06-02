@@ -29,6 +29,7 @@ struct Settings {
     bool advancedSettings = false;
     bool showMemoryViewer = false;
     bool showModGraph = false;
+    float scrollbarSize = GEODE_DESKTOP(14.f) GEODE_MOBILE(60.f);
     std::string theme = DARK_THEME;
     ccColor4B themeColor = {2, 119, 189, 255};
     CCPoint buttonPos = {50, 50};
@@ -41,6 +42,20 @@ struct Settings {
     #else
         float fontScale = 1.f;
     #endif
+    bool hideFlaggedNodes = false;
+};
+
+struct TreeBranchOptions {
+    bool drag = true;
+    bool visible = true;
+    bool fake = false;
+    bool flagHidden = false;
+};
+
+struct ParentNodeInformation {
+    bool drag = true;
+    bool visible = true;
+    bool flagHidden = false;
 };
 
 class DevTools {
@@ -71,7 +86,8 @@ protected:
     void setupPlatform();
 
     void drawTree();
-    void drawTreeBranch(CCNode* node, size_t index, bool drag, bool visible);
+    void drawTreeBranch(CCNode* node, size_t index, TreeBranchOptions options);
+    void drawNodeChildren(CCNode* node, ParentNodeInformation info);
     void drawSettings();
     void drawAdvancedSettings();
     void drawNodeAttributes(CCNode* node);

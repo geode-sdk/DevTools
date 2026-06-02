@@ -432,6 +432,14 @@ class $modify(CCIMEDispatcher) {
         if (!io.WantCaptureKeyboard) {
             CCIMEDispatcher::dispatchInsertText(text, len, key);
         }
+
+		switch (key) {
+			case KEY_Left:
+			case KEY_Right:
+				return;
+			default: break;
+		}
+		
         std::string str(text, len);
         io.AddInputCharactersUTF8(str.c_str());
     }
