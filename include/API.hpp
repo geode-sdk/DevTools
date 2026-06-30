@@ -8,6 +8,8 @@
 #include <string>
 #include <type_traits>
 #include <Geode/loader/Dispatch.hpp>
+
+#undef MY_MOD_ID
 #define MY_MOD_ID "geode.devtools"
 
 namespace devtools {
