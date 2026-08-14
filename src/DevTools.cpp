@@ -38,6 +38,7 @@ struct matjson::Serialize<Settings> {
         assign(value["button_game"], s.buttonInGame);
         assign(value["button_enabled"], s.buttonEnabled);
         assign(value["tree_drag_reorder"], s.treeDragReorder);
+        assign(value["show_touch_prio"], s.showTouchPrio);
         assign(value["hide_flagged_nodes"], s.hideFlaggedNodes);
 
         return Ok(s);
@@ -64,6 +65,7 @@ struct matjson::Serialize<Settings> {
             { "button_game", settings.buttonInGame },
             { "button_enabled", settings.buttonEnabled },
             { "tree_drag_reorder", settings.treeDragReorder },
+            { "show_touch_prio", settings.showTouchPrio },
             { "hide_flagged_nodes", settings.hideFlaggedNodes },
         });
     }
@@ -258,6 +260,13 @@ void DevTools::drawPages() {
         this->drawPage(
             U8STR(FEATHER_TERMINAL " Memory viewer"),
             &DevTools::drawMemory
+        );
+    }
+
+    if (m_settings.showTouchPrio) {
+        this->drawPage(
+            U8STR(FEATHER_TABLET " Touch Priority Viewer###devtools/touchprio"),
+            &DevTools::drawPrioTree
         );
     }
 }

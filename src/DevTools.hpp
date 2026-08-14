@@ -37,6 +37,7 @@ struct Settings {
     bool buttonInGame = false;
     bool buttonEnabled = false;
     bool treeDragReorder = false;
+    bool showTouchPrio = false;
     #ifdef GEODE_IS_MOBILE
         float fontScale = 2.f;
     #else
@@ -86,6 +87,8 @@ protected:
     void setupPlatform();
 
     void drawTree();
+    void drawPrioTree();
+    void drawPrioHandler(CCTouchHandler* handler);
     void drawTreeBranch(CCNode* node, size_t index, TreeBranchOptions options);
     void drawNodeChildren(CCNode* node, ParentNodeInformation info);
     void drawSettings();
