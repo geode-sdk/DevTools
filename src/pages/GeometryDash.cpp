@@ -380,11 +380,11 @@ void DevTools::drawLayoutHighlights(CCNode* node) {
 void DevTools::drawGD(GLRenderCtx* gdCtx) {
     if (gdCtx) {
         auto winSize = CCDirector::get()->getWinSize();
-        auto title = fmt::format(
+        getTitle() = fmt::format(
             "Geometry Dash ({}x{})###devtools/geometry-dash",
             winSize.width, winSize.height
         );
-        if (ImGui::Begin(title.c_str())) {
+        if (ImGui::Begin(getTitle().c_str())) {
             auto list = ImGui::GetWindowDrawList();
             auto ratio = gdCtx->size().x / gdCtx->size().y;
 

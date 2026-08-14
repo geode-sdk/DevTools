@@ -13,6 +13,8 @@
 ImRect& getGDWindowRect();
 bool& shouldPassEventsToGDButTransformed();
 bool& shouldUpdateGDRenderBuffer();
+bool& touchFromGD();
+std::string& getTitle();
 
 class GLRenderCtx final {
 private:

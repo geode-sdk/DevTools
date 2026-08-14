@@ -55,6 +55,10 @@ namespace devtools {
     /// @return True if DevTools is open, false otherwise.
     inline bool isOpen() GEODE_EVENT_EXPORT_NORES(&isOpen, ());
 
+    /// @brief Checks if the mouse is in the DevTools window.
+    /// @return True if the mouse is in the DevTools window, false otherwise.
+    inline bool isMouseInDevTools() GEODE_EVENT_EXPORT_NORES(&isMouseInDevTools, ());
+
     /// @brief Waits for DevTools to be loaded and then calls the provided callback.
     /// @param callback The function to call once DevTools is loaded.
     template <typename F>
