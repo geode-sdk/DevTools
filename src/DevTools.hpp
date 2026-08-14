@@ -38,6 +38,11 @@ struct Settings {
     bool buttonEnabled = false;
     bool treeDragReorder = false;
     bool showTouchPrio = false;
+    #ifdef GEODE_IS_MOBILE
+        float fontScale = 2.f;
+    #else
+        float fontScale = 1.f;
+    #endif
     bool hideFlaggedNodes = false;
 };
 
