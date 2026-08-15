@@ -375,37 +375,37 @@ class $modify(CCTouchDispatcher) {
         const auto pos = toVec2(touch->getLocation());
         GEODE_MOBILE(io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);)
         io.AddMousePosEvent(pos.x, pos.y);
-        if (io.WantCaptureMouse) {
-            bool didGDSwallow = false;
+        
+        if (DevTools::get()->shouldUseGDWindow()) {
+            auto win = ImGui::GetMainViewport()->Size;
+            const auto gdRect = getGDWindowRect();
+            if ((gdRect.Contains(pos) || touchFromGD()) && !DevTools::get()->pausedGame()) {
+                auto relativePos = ImVec2(
+                    pos.x - gdRect.Min.x,
+                    pos.y - gdRect.Min.y
+                );
+                auto x = (relativePos.x / gdRect.GetWidth()) * win.x;
+                auto y = (1.f - relativePos.y / gdRect.GetHeight()) * win.y;
 
-            if (DevTools::get()->shouldUseGDWindow() && shouldPassEventsToGDButTransformed()) {
-                auto win = ImGui::GetMainViewport()->Size;
-                const auto gdRect = getGDWindowRect();
-                if (gdRect.Contains(pos) && !DevTools::get()->pausedGame()) {
-                    auto relativePos = ImVec2(
-                        pos.x - gdRect.Min.x,
-                        pos.y - gdRect.Min.y
-                    );
-                    auto x = (relativePos.x / gdRect.GetWidth()) * win.x;
-                    auto y = (1.f - relativePos.y / gdRect.GetHeight()) * win.y;
+                auto pos = toCocos(ImVec2(x, y));
+                // setTouchInfo messes up the previous location (causes issues like texturer loader's draggable nodes breaking)
+                touch->m_point = pos;
+                if (type == CCTOUCHBEGAN && shouldPassEventsToGDButTransformed()) {
+                    touchFromGD() = true;
+                    // makes the start location in the touch correct
+                    touch->m_startPoint = pos;
+                }
 
-                    auto pos = toCocos(ImVec2(x, y));
-                    // setTouchInfo messes up the previous location (causes issues like texturer loader's draggable nodes breaking)
-                    touch->m_point = pos;
-                    if (type == CCTOUCHBEGAN) {
-                        // makes the start location in the touch correct
-                        touch->m_startPoint = pos;
-                    }
+                if (touchFromGD()) {
                     CCTouchDispatcher::touches(touches, event, type);
 
-                    ImGui::SetWindowFocus("Geometry Dash");
-                    didGDSwallow = true;
+                    ImGui::SetWindowFocus(getTitle().c_str());
                     io.AddMouseButtonEvent(0, false);
                 }
             }
-
-            // TODO: dragging out of gd makes it click in imgui
-            if (!didGDSwallow) {
+        }
+        if (io.WantCaptureMouse) {
+            if (!touchFromGD()) {
                 if (type == CCTOUCHBEGAN || type == CCTOUCHMOVED) {
                     GEODE_MOBILE(io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);)
                     io.AddMouseButtonEvent(0, true);
@@ -413,6 +413,10 @@ class $modify(CCTouchDispatcher) {
                 else {
                     io.AddMouseButtonEvent(0, false);
                 }
+            }
+
+            if (type == CCTOUCHENDED || type == CCTOUCHCANCELLED) {
+                touchFromGD() = false;
             }
         }
         else {

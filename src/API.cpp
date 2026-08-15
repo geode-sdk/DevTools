@@ -49,6 +49,9 @@ static void handleType() {
 bool devtools::isOpen() {
     return DevTools::get()->isVisible();
 }
+bool devtools::isMouseInDevTools() {
+    return !shouldPassEventsToGDButTransformed();
+}
 void devtools::newLine() {
     ImGui::NewLine();
 }

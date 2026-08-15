@@ -8,6 +8,8 @@ using namespace geode::prelude;
 static bool g_shouldPassEventsToGDButTransformed = false;
 static bool g_updateBuffer = false;
 static ImRect g_GDWindowRect;
+static bool g_touchFromGD = false;
+static std::string g_title;
 
 ImRect& getGDWindowRect() {
     return g_GDWindowRect;
@@ -19,6 +21,14 @@ bool& shouldPassEventsToGDButTransformed() {
 
 bool& shouldUpdateGDRenderBuffer() {
     return g_updateBuffer;
+}
+
+bool& touchFromGD() {
+    return g_touchFromGD;
+}
+
+std::string& getTitle() {
+    return g_title;
 }
 
 GLRenderCtx::~GLRenderCtx() {
