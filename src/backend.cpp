@@ -1,7 +1,9 @@
 #include <cocos2d.h>
 #include <Geode/modify/CCTouchDispatcher.hpp>
+#ifndef GEODE_IS_IOS
 #include <Geode/modify/CCMouseDispatcher.hpp>
 #include <Geode/modify/CCKeyboardDispatcher.hpp>
+#endif
 #include <Geode/modify/CCIMEDispatcher.hpp>
 #include "Geode/cocos/text_input_node/CCIMEDelegate.h"
 #include "Geode/platform/cplatform.h"
@@ -329,6 +331,25 @@ void DevTools::renderDrawData(ImDrawData* draw_data) {
     glDisable(GL_SCISSOR_TEST);
 }
 
+static float SCROLL_SENSITIVITY = 10;
+
+#ifndef GEODE_IS_IOS
+class $modify(CCMouseDispatcher) {
+    bool dispatchScrollMSG(float y, float x) {
+        if(!DevTools::get()->isSetup()) return true;
+
+        auto& io = ImGui::GetIO();
+        io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, -y / SCROLL_SENSITIVITY);
+
+        if (!io.WantCaptureMouse || shouldPassEventsToGDButTransformed()) {
+            return CCMouseDispatcher::dispatchScrollMSG(y, x);
+        }
+
+        return true;
+    }
+};
+#endif
+
 class $modify(CCTouchDispatcher) {
     static void onModify(auto& self) {
         /* 
@@ -521,6 +542,7 @@ $on_mod(Loaded) {
 		}
     }).leak();
 
+	#ifdef GEODE_IS_IOS
     ScrollWheelEvent().listen([](float x, float y) {
         if(!DevTools::get()->isSetup()) return true;
 
@@ -533,6 +555,7 @@ $on_mod(Loaded) {
 
         return ListenerResult::Stop;
     }).leak();
+	#endif
 }
 
 #if defined(GEODE_IS_MACOS)
