@@ -496,8 +496,6 @@ ImGuiKey cocosToImGuiKey(cocos2d::enumKeyCodes key) {
 	}
 }
 
-static float SCROLL_SENSITIVITY = 10;
-
 $on_mod(Loaded) {
     KeyboardInputEvent().listen([](KeyboardInputData& data){
         if(!DevTools::get()->isSetup()) return ListenerResult::Propagate;
