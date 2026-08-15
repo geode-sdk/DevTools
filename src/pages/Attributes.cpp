@@ -69,7 +69,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
 }
 
 void DevTools::drawBasicAttributes(CCNode* node) {
-    if (ImGui::Button("Deselect")) {
+    if (ImGui::Button(U8STR(FEATHER_X_CIRCLE " Deselect"))) {
         return this->selectNode(nullptr);
     }
     ImGui::SameLine();
@@ -109,6 +109,12 @@ void DevTools::drawBasicAttributes(CCNode* node) {
             fmt::format("{:#x}", reinterpret_cast<uintptr_t>(node))
         );
     }
+    ImGui::SameLine();
+    if (ImGui::Button(U8STR(FEATHER_TRASH_2 " Delete"))) {
+        return node->removeFromParentAndCleanup(true);
+    }
+    if (ImGui::IsItemHovered())
+        ImGui::SetTooltip("Deleting nodes cannot be undone and may lead to crashes!");
     if (node->getUserData()) {
         ImGui::Text("User data: 0x%p", node->getUserData());
     }
@@ -910,7 +916,13 @@ void DevTools::drawLayoutAttributes(CCNode* node){
                 layout->setGap(gap);
                 updateLayout = true;
             }
-            
+
+            auto padding = layout->getPadding();
+            if (ImGui::DragFloat4("Padding", &padding.left)) {
+                layout->setPadding(padding);
+                updateLayout = true;
+            }
+
             auto ignoreInvisibleChildren = layout->isIgnoreInvisibleChildren();
             if (ImGui::Checkbox("Ignore Invisible Children", &ignoreInvisibleChildren)) {
                 layout->ignoreInvisibleChildren(ignoreInvisibleChildren);
@@ -1084,6 +1096,12 @@ void DevTools::drawLayoutAttributes(CCNode* node){
             auto gap = layout->getGap();
             if (ImGui::DragFloat("Gap", &gap)) {
                 layout->setGap(gap);
+                updateLayout = true;
+            }
+
+            auto padding = layout->getPadding();
+            if (ImGui::DragFloat4("Padding", &padding.left)) {
+                layout->setPadding(padding);
                 updateLayout = true;
             }
 

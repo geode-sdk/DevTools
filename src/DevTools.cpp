@@ -28,6 +28,8 @@ struct matjson::Serialize<Settings> {
         assign(value["advanced_settings"], s.advancedSettings);
         assign(value["show_memory_viewer"], s.showMemoryViewer);
         assign(value["show_mod_graph"], s.showModGraph);
+        assign(value["font_scale"], s.fontScale);
+        assign(value["scrollbar_size"], s.scrollbarSize);
         assign(value["theme"], s.theme);
         assign(value["theme_color"], s.themeColor);
         assign(value["button_x"], s.buttonPos.x);
@@ -36,6 +38,8 @@ struct matjson::Serialize<Settings> {
         assign(value["button_game"], s.buttonInGame);
         assign(value["button_enabled"], s.buttonEnabled);
         assign(value["tree_drag_reorder"], s.treeDragReorder);
+        assign(value["show_touch_prio"], s.showTouchPrio);
+        assign(value["hide_flagged_nodes"], s.hideFlaggedNodes);
 
         return Ok(s);
     }
@@ -51,6 +55,8 @@ struct matjson::Serialize<Settings> {
             { "advanced_settings", settings.advancedSettings },
             { "show_memory_viewer", settings.showMemoryViewer },
             { "show_mod_graph", settings.showModGraph },
+            { "font_scale", settings.fontScale },
+            { "scrollbar_size", settings.scrollbarSize },
             { "theme", settings.theme },
             { "theme_color", settings.themeColor },
             { "button_x", settings.buttonPos.x },
@@ -58,7 +64,9 @@ struct matjson::Serialize<Settings> {
             { "button_editor", settings.buttonInEditor },
             { "button_game", settings.buttonInGame },
             { "button_enabled", settings.buttonEnabled },
-            { "tree_drag_reorder", settings.treeDragReorder }
+            { "tree_drag_reorder", settings.treeDragReorder },
+            { "show_touch_prio", settings.showTouchPrio },
+            { "hide_flagged_nodes", settings.hideFlaggedNodes },
         });
     }
 };
@@ -254,6 +262,13 @@ void DevTools::drawPages() {
             &DevTools::drawMemory
         );
     }
+
+    if (m_settings.showTouchPrio) {
+        this->drawPage(
+            U8STR(FEATHER_TABLET " Touch Priority Viewer###devtools/touchprio"),
+            &DevTools::drawPrioTree
+        );
+    }
 }
 
 void DevTools::draw(GLRenderCtx* ctx) {
@@ -321,6 +336,7 @@ void DevTools::setup() {
     ImGui::CreateContext();
 
     auto& io = ImGui::GetIO();
+    io.FontGlobalScale = m_settings.fontScale;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     // if this is true then it just doesnt work :( why
     io.ConfigDockingWithShift = false;
@@ -331,10 +347,11 @@ void DevTools::setup() {
     this->setupPlatform();
 
 #ifdef GEODE_IS_MOBILE
-    ImGui::GetIO().FontGlobalScale = 2.f;
     ImGui::GetStyle().ScrollbarSize = 60.f;
+    ImGui::GetIO().FontGlobalScale = 2.f;
     // ImGui::GetStyle().TabBarBorderSize = 60.f;
 #endif
+    ImGui::GetStyle().ScrollbarSize = m_settings.scrollbarSize;
 }
 
 void DevTools::destroy() {
