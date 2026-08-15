@@ -18,6 +18,7 @@ static void handleType() {
             sizeof(T) == 4 ? (isSigned ? ImGuiDataType_S32 : ImGuiDataType_U32) :
             isSigned ? ImGuiDataType_S64 : ImGuiDataType_U64;
         fnPtr = +[](ZStringView name, T& prop) {
+            DevTools::get()->setUsedAPI(true);
             return ImGui::DragScalar(name.c_str(), dataType, &prop);
         };
         return ListenerResult::Stop;
@@ -25,6 +26,7 @@ static void handleType() {
 
     devtools::EnumerableFnEvent<T>().listen([](typename devtools::EnumerableFnEvent<T>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView label, T* value, std::span<std::pair<T, ZStringView> const> items) {
+            DevTools::get()->setUsedAPI(true);
             ImGui::Text("%s:", label.c_str());
             size_t i = 0;
             bool changed = false;
@@ -112,6 +114,7 @@ $execute {
     // checkbox
     devtools::PropertyFnEvent<bool>().listen([](devtools::PropertyFnEvent<bool>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView name, bool& prop) {
+            DevTools::get()->setUsedAPI(true);
             return ImGui::Checkbox(name.c_str(), &prop);
         };
         return ListenerResult::Stop;
@@ -120,6 +123,7 @@ $execute {
     // string
     devtools::PropertyFnEvent<std::string>().listen([](devtools::PropertyFnEvent<std::string>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView name, std::string& prop) {
+            DevTools::get()->setUsedAPI(true);
             return ImGui::InputText(name.c_str(), &prop);
         };
         return ListenerResult::Stop;
@@ -128,6 +132,7 @@ $execute {
     // colors
     devtools::PropertyFnEvent<ccColor3B>().listen([](devtools::PropertyFnEvent<ccColor3B>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView name, ccColor3B& prop) {
+            DevTools::get()->setUsedAPI(true);
             auto color = ImVec4(
                 prop.r / 255.f,
                 prop.g / 255.f,
@@ -140,12 +145,14 @@ $execute {
                 prop.b = static_cast<GLubyte>(color.z * 255);
                 return true;
             }
+            
             return false;
         };
         return ListenerResult::Stop;
     }).leak();
     devtools::PropertyFnEvent<ccColor4B>().listen([](devtools::PropertyFnEvent<ccColor4B>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView name, ccColor4B& prop) {
+            DevTools::get()->setUsedAPI(true);
             auto color = ImVec4(
                 prop.r / 255.f,
                 prop.g / 255.f,
@@ -165,6 +172,7 @@ $execute {
     }).leak();
     devtools::PropertyFnEvent<ccColor4F>().listen([](devtools::PropertyFnEvent<ccColor4F>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView name, ccColor4F& prop) {
+            DevTools::get()->setUsedAPI(true);
             return ImGui::ColorEdit4(name.c_str(), reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
@@ -173,6 +181,7 @@ $execute {
     // points/sizes
     devtools::PropertyFnEvent<CCPoint>().listen([](devtools::PropertyFnEvent<CCPoint>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView name, CCPoint& prop) {
+            DevTools::get()->setUsedAPI(true);
             return ImGui::DragFloat2(name.c_str(), reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
@@ -180,12 +189,14 @@ $execute {
 
     devtools::PropertyFnEvent<CCSize>().listen([](devtools::PropertyFnEvent<CCSize>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView name, CCSize& prop) {
+            DevTools::get()->setUsedAPI(true);
             return ImGui::DragFloat2(name.c_str(), reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
     }).leak();
     devtools::PropertyFnEvent<CCRect>().listen([](devtools::PropertyFnEvent<CCRect>::Fn*& fnPtr) {
         fnPtr = +[](ZStringView name, CCRect& prop) {
+            DevTools::get()->setUsedAPI(true);
             return ImGui::DragFloat4(name.c_str(), reinterpret_cast<float*>(&prop));
         };
         return ListenerResult::Stop;
