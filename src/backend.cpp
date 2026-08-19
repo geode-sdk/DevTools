@@ -390,8 +390,7 @@ class $modify(CCTouchDispatcher) {
                 auto y = (1.f - relativePos.y / gdRect.GetHeight()) * win.y;
 
                 auto pos = toCocos(ImVec2(x, y));
-                // setTouchInfo messes up the previous location (causes issues like texturer loader's draggable nodes breaking)
-                touch->m_point = pos;
+
                 if (type == CCTOUCHBEGAN && shouldPassEventsToGDButTransformed()) {
                     touchFromGD() = true;
                     // makes the start location in the touch correct
@@ -399,6 +398,8 @@ class $modify(CCTouchDispatcher) {
                 }
 
                 if (touchFromGD()) {
+                    // setTouchInfo messes up the previous location (causes issues like texturer loader's draggable nodes breaking)
+                    touch->m_point = pos;
                     CCTouchDispatcher::touches(touches, event, type);
 
                     ImGui::SetWindowFocus(getTitle().c_str());
