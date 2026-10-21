@@ -35,7 +35,7 @@ CCPoint getMousePos_H() {
 
         mouse = toCocos(ImVec2(x, y));
     }
-    
+
     return mouse;
 }
 
@@ -48,7 +48,7 @@ void DevTools::setupPlatform() {
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
 
     // use static since imgui does not own the pointer!
-    static const auto iniPath = (Mod::get()->getSaveDir() / "imgui.ini").u8string();
+    static const auto iniPath = (Mod::get()->getSaveDir() / "imgui.ini").string();
     io.IniFilename = reinterpret_cast<const char*>(iniPath.c_str());
 
     unsigned char* pixels;
@@ -91,7 +91,7 @@ public:
         }
         return false;
     }
-    
+
     bool detachWithIME() override {
         if (CCIMEDelegate::detachWithIME()) {
             m_attached = false;
@@ -202,7 +202,7 @@ namespace {
         ccGLEnableVertexAttribs(kCCVertexAttribFlag_PosColorTex);
 
         static_assert(sizeof(CCPoint) == sizeof(ccVertex2F), "so the cocos devs were right then");
-        
+
         glVertexAttribPointer(kCCVertexAttrib_Position, 2, GL_FLOAT, GL_FALSE, 0, poli.data());
         glVertexAttribPointer(kCCVertexAttrib_Color, 4, GL_FLOAT, GL_FALSE, 0, colors.data());
         glVertexAttribPointer(kCCVertexAttrib_TexCoords, 2, GL_FLOAT, GL_FALSE, 0, uvs.data());
@@ -352,8 +352,8 @@ class $modify(CCMouseDispatcher) {
 
 class $modify(CCTouchDispatcher) {
     static void onModify(auto& self) {
-        /* 
-         * some mods hook this instead of using normal touch delegates for some reason 
+        /*
+         * some mods hook this instead of using normal touch delegates for some reason
          * for example QOLMod, even in the rewrite
          * so i added hook priority
          */
@@ -377,7 +377,7 @@ class $modify(CCTouchDispatcher) {
         const auto pos = toVec2(touch->getLocation());
         GEODE_MOBILE(io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);)
         io.AddMousePosEvent(pos.x, pos.y);
-        
+
         if (DevTools::get()->shouldUseGDWindow()) {
             auto win = ImGui::GetMainViewport()->Size;
             const auto gdRect = getGDWindowRect();
@@ -446,7 +446,7 @@ class $modify(CCIMEDispatcher) {
 				return;
 			default: break;
 		}
-		
+
         std::string str(text, len);
         io.AddInputCharactersUTF8(str.c_str());
     }
