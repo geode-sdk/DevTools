@@ -8,6 +8,9 @@
 #include "platform/platform.hpp"
 #include <Geode/loader/Log.hpp>
 #include <Geode/loader/Mod.hpp>
+#include <Geode/loader/ModEvent.hpp>
+#include <Geode/ui/BasedButtonSprite.hpp>
+#include <Geode/ui/OverlayManager.hpp>
 #include "ImGui.hpp"
 
 template<>

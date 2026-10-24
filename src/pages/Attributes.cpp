@@ -88,7 +88,7 @@ void DevTools::drawBasicAttributes(CCNode* node) {
             file::pick(file::PickMode::SaveFile, file::FilePickOptions {
                 .filters = {{ .description = "PNG Image", .files = {"*.png"} }}
             }),
-            [node = WeakRef(node)](Result<std::optional<std::filesystem::path>> result) {
+            [node = WeakRef(node)](file::PickResult result) {
                 auto nodePtr = node.lock();
                 if (!nodePtr) return;
 
@@ -97,7 +97,7 @@ void DevTools::drawBasicAttributes(CCNode* node) {
                         int width, height;
                         auto bytes = renderToBytes(nodePtr, width, height);
 
-                        auto path = string::pathToString(*file);
+                        auto path = file->string();
                         if (!path.ends_with(".png")) {
                             path += ".png";
                         }
@@ -202,7 +202,7 @@ void DevTools::drawBasicAttributes(CCNode* node) {
         ImGui::SameLine();
         checkbox("Flip Y", sprite, &CCSprite::isFlipY, &CCSprite::setFlipY);
     }
-    
+
     checkbox("Visible", node, &CCNode::isVisible, &CCNode::setVisible);
     checkbox(
         "Ignore Anchor Point for Position",
@@ -225,7 +225,7 @@ void DevTools::drawColorAttributes(CCNode* node) {
                         static_cast<GLubyte>(_color[1] * 255),
                         static_cast<GLubyte>(_color[2] * 255)
                     });
-    
+
                     gradient->setStartOpacity(static_cast<GLubyte>(_color[3] * 255));
                 }
             }
@@ -238,7 +238,7 @@ void DevTools::drawColorAttributes(CCNode* node) {
                         static_cast<GLubyte>(_color[1] * 255),
                         static_cast<GLubyte>(_color[2] * 255)
                     });
-    
+
                     gradient->setEndOpacity(static_cast<GLubyte>(_color[3] * 255));
                 }
             }
@@ -260,7 +260,7 @@ void DevTools::drawColorAttributes(CCNode* node) {
                     static_cast<GLubyte>(_color[1] * 255),
                     static_cast<GLubyte>(_color[2] * 255)
                 });
-    
+
                 rgbaNode->setOpacity(static_cast<GLubyte>(_color[3] * 255));
             }
         }
@@ -467,7 +467,7 @@ void DevTools::drawLayoutOptionsAttributes(CCNode* node) {
             }
             if (hasMinRelativeScale) {
                 if (ImGui::DragFloat("Min Relative Scale##simplescale1", &minRelativeScale)) {
-                    
+
                     opts->setMinRelativeScale(minRelativeScale);
                     updateLayout = true;
                 }
@@ -680,7 +680,7 @@ void DevTools::drawLayoutOptionsAttributes(CCNode* node) {
                 updateLayout = true;
             }
             if (hasCrossAxisAlignment) {
-                
+
                 ImGui::Text("Cross Axis Alignment");
                 bool updateAlignment = false;
                 updateAlignment |= ImGui::RadioButton(
@@ -767,7 +767,7 @@ void DevTools::drawLayoutOptionsAttributes(CCNode* node) {
 void DevTools::drawLayoutAttributes(CCNode* node){
     if (auto rawLayout = node->getLayout()) {
         ImGui::Text("Layout: %s", typeid(*rawLayout).name());
-        
+
         if (ImGui::Button(U8STR(FEATHER_REFRESH_CW " Update Layout"))) {
             node->updateLayout();
         }
@@ -932,7 +932,7 @@ void DevTools::drawLayoutAttributes(CCNode* node){
                 auto direction = static_cast<int>(layout->getMainAxisDirection());
                 ImGui::Text("Main Axis Direction");
                 bool updateDirection = false;
-                
+
                 updateDirection |= ImGui::RadioButton(
                     axisDirection.c_str(), &direction, static_cast<int>(AxisDirection::FrontToBack)
                 );
@@ -995,10 +995,10 @@ void DevTools::drawLayoutAttributes(CCNode* node){
             }
             if (hasMinRelativeScale) {
                 if (ImGui::DragFloat("Min Relative Scale", &minRelativeScale)) {
-                    
+
                     layout->setMinRelativeScale(minRelativeScale);
                     updateLayout = true;
-                    
+
                 }
             }
 

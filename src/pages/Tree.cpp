@@ -3,6 +3,7 @@
 #include "../DevTools.hpp"
 #include "../platform/utils.hpp"
 #include <Geode/ui/OverlayManager.hpp>
+#include <Geode/loader/Mod.hpp>
 #include <misc/cpp/imgui_stdlib.h>
 #include <Geode/utils/string.hpp>
 #include "../ImGui.hpp"

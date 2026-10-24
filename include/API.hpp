@@ -53,11 +53,11 @@ namespace devtools {
 
     /// @brief Checks if DevTools is currently open.
     /// @return True if DevTools is open, false otherwise.
-    inline bool isOpen() GEODE_EVENT_EXPORT_NORES(&isOpen, ());
+    GEODE_EVENT_EXPORT(bool, isOpen, (), ());
 
     /// @brief Checks if the mouse is in the DevTools window.
     /// @return True if the mouse is in the DevTools window, false otherwise.
-    inline bool isMouseInDevTools() GEODE_EVENT_EXPORT_NORES(&isMouseInDevTools, ());
+    GEODE_EVENT_EXPORT(bool, isMouseInDevTools, (), ());
 
     /// @brief Waits for DevTools to be loaded and then calls the provided callback.
     /// @param callback The function to call once DevTools is loaded.
@@ -109,7 +109,7 @@ namespace devtools {
     /// @brief Renders a label in the DevTools UI.
     /// @param text The text to display in the label.
     /// @warning This function should only ever be called from within a registered node callback.
-    inline void label(geode::ZStringView text) GEODE_EVENT_EXPORT_NORES(&label, (text));
+    GEODE_EVENT_EXPORT(void, label, (geode::ZStringView text), (text));
 
     /// @brief Renders an enumerable property editor using radio buttons for the given value in the DevTools UI.
     /// @param label The label for the enumerable property.
@@ -139,7 +139,7 @@ namespace devtools {
     /// @param label The label for the button.
     /// @return True if the button was clicked, false otherwise.
     /// @warning This function should only ever be called from within a registered node callback.
-    inline bool button(geode::ZStringView label) GEODE_EVENT_EXPORT_NORES(&button, (label));
+    GEODE_EVENT_EXPORT(bool, button, (geode::ZStringView label), (label));
 
     /// @brief Renders a button in the DevTools UI and calls the provided callback if the button is clicked.
     /// @param label The label for the button.
@@ -152,19 +152,19 @@ namespace devtools {
         }
     }
 
-    inline void newLine() GEODE_EVENT_EXPORT_NORES(&newLine, ());
-    inline void sameLine() GEODE_EVENT_EXPORT_NORES(&sameLine, ());
-    inline void separator() GEODE_EVENT_EXPORT_NORES(&separator, ());
-    inline void nextItemWidth(float width) GEODE_EVENT_EXPORT_NORES(&nextItemWidth, (width));
-    inline void indent() GEODE_EVENT_EXPORT_NORES(&indent, ());
-    inline void unindent() GEODE_EVENT_EXPORT_NORES(&unindent, ());
+    GEODE_EVENT_EXPORT(void, newLine, (), ());
+    GEODE_EVENT_EXPORT(void, sameLine, (), ());
+    GEODE_EVENT_EXPORT(void, separator, (), ());
+    GEODE_EVENT_EXPORT(void, nextItemWidth, (float width), (width));
+    GEODE_EVENT_EXPORT(void, indent, (), ());
+    GEODE_EVENT_EXPORT(void, unindent, (), ());
 
-    inline bool combo(
+    GEODE_EVENT_EXPORT(bool, combo, (
         geode::ZStringView label,
         int& current,
         std::span<char const*> items,
         int maxHeight = -1
-    ) GEODE_EVENT_EXPORT_NORES(&combo, (label, current, items, maxHeight));
+    ), (label, current, items, maxHeight));
 
     template <UnderlyingIntegral T, typename R = std::initializer_list<geode::ZStringView>>
         requires
@@ -179,12 +179,12 @@ namespace devtools {
         );
     }
 
-    inline bool radio(geode::ZStringView label, int& current, int num) GEODE_EVENT_EXPORT_NORES(&radio, (label, current, num));
+    GEODE_EVENT_EXPORT(bool, radio, (geode::ZStringView label, int& current, int num), (label, current, num));
 
     template <UnderlyingIntegral T, UnderlyingIntegral U>
     bool radio(geode::ZStringView label, T& current, U value) {
         return radio(label, reinterpret_cast<int&>(current), reinterpret_cast<int&>(value));
     }
 
-    inline void inputMultiline(geode::ZStringView label, std::string& text) GEODE_EVENT_EXPORT_NORES(&inputMultiline, (label, text));
+    GEODE_EVENT_EXPORT(void, inputMultiline, (geode::ZStringView label, std::string& text), (label, text));
 }
