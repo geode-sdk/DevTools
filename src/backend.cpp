@@ -427,6 +427,7 @@ class $modify(CCTouchDispatcher) {
                 io.AddMouseButtonEvent(0, false);
             }
             if (!DevTools::get()->shouldUseGDWindow() || !DevTools::get()->shouldPopGame()) {
+                touchFromGD() = false;
                 CCTouchDispatcher::touches(touches, event, type);
             }
         }
@@ -525,6 +526,12 @@ $on_mod(Loaded) {
                 c = static_cast<char>('0' + (data.key - KEY_Zero));
             } else if (data.key == KEY_Space) {
                 c = ' ';
+            } else if (data.key == KEY_OEMPeriod) {
+                c = '.';
+            } else if (data.key == KEY_OEMComma) {
+                c = ',';
+            } else if (data.key == KEY_OEMMinus) {
+                c = '-';
             }
 
             if (c != 0) {
@@ -532,9 +539,8 @@ $on_mod(Loaded) {
                 io.AddInputCharactersUTF8(str.c_str());
             }
         }
-        if (data.key == KEY_Backspace) {
-            io.AddKeyEvent(ImGuiKey_Backspace, true);
-            io.AddKeyEvent(ImGuiKey_Backspace, false);
+        if (data.key == KEY_Backspace && data.action != KeyboardInputData::Action::Repeat) {
+            io.AddKeyEvent(ImGuiKey_Backspace, data.action == KeyboardInputData::Action::Press);
         }
         #endif
 
