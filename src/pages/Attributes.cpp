@@ -294,6 +294,10 @@ void DevTools::drawAxisGapAttribute(CCNode* node) {
 void DevTools::drawTextureAttributes(CCNode* node) {
     if (auto nineSlice = typeinfo_cast<geode::NineSlice*>(node)) {
         node = nineSlice->getBatchNode();
+        auto scaleMultiplier = nineSlice->getScaleMultiplier();
+        if (ImGui::DragFloat("Scale Multiplier##nineslice-scale-multiplier", &scaleMultiplier, .1f)) {
+            nineSlice->setScaleMultiplier(scaleMultiplier);
+        }
     }
     if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
         if (auto texture = textureProtocol->getTexture()) {
