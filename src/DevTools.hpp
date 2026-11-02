@@ -85,7 +85,6 @@ protected:
     DragButton* m_dragButton = nullptr;
 
     void setupFonts();
-    void setupPlatform();
 
     void drawTree();
     void drawPrioTree();
@@ -115,7 +114,6 @@ protected:
     void drawPage(const char* name, void(DevTools::* fun)());
     void drawPages();
     void drawMemory();
-    void draw(GLRenderCtx* ctx);
 
     void newFrame();
     void renderDrawData(ImDrawData*);
@@ -155,11 +153,10 @@ public:
 
     void sceneChanged();
 
-    void render(GLRenderCtx* ctx);
+    void draw(GLRenderCtx* ctx);
 
     // setup ImGui & DevTools
     void setup();
-    void destroy();
 
     void show(bool visible);
     void toggle();

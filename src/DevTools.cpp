@@ -12,6 +12,7 @@
 #include <Geode/ui/BasedButtonSprite.hpp>
 #include <Geode/ui/OverlayManager.hpp>
 #include "ImGui.hpp"
+#include <imgui-cocos.hpp>
 
 template<>
 struct matjson::Serialize<Settings> {
@@ -331,13 +332,6 @@ void DevTools::setupFonts() {
 }
 
 void DevTools::setup() {
-    if (m_setup) return;
-    m_setup = true;
-
-    IMGUI_CHECKVERSION();
-
-    ImGui::CreateContext();
-
     auto& io = ImGui::GetIO();
     io.FontGlobalScale = m_settings.fontScale;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -347,7 +341,6 @@ void DevTools::setup() {
     io.ConfigWindowsResizeFromEdges = true;
 
     this->setupFonts();
-    this->setupPlatform();
 
 #ifdef GEODE_IS_MOBILE
     ImGui::GetStyle().ScrollbarSize = 60.f;
@@ -355,27 +348,13 @@ void DevTools::setup() {
     // ImGui::GetStyle().TabBarBorderSize = 60.f;
 #endif
     ImGui::GetStyle().ScrollbarSize = m_settings.scrollbarSize;
-}
 
-void DevTools::destroy() {
-    if (!m_setup) return;
-    this->show(false);
-    auto& io = ImGui::GetIO();
-    io.BackendPlatformUserData = nullptr;
-    m_fontTexture->release();
-    m_fontTexture = nullptr;
-
-    ImGui::DestroyContext();
-    m_setup = false;
     m_reloadTheme = true;
 }
 
 void DevTools::show(bool visible) {
     m_visible = visible;
-
-    auto& io = ImGui::GetIO();
-    io.WantCaptureMouse = visible;
-    io.WantCaptureKeyboard = visible;
+    ImGuiCocos::get().setVisible(visible);
 }
 
 void DevTools::toggle() {

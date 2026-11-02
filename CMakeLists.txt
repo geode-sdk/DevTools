@@ -49,6 +49,13 @@ if (HAVE_NONTRIVIAL_MEMCALL)
     target_compile_options(${PROJECT_NAME} PRIVATE -Wno-nontrivial-memcall)
 endif()
 
+set(HAS_IMGUI ON)
+set(IMGUI_HOOK_EARLY OFF)
+set(IMGUI_ILL_HANDLE_TOUCHES ON)
+CPMAddPackage("gh:matcool/gd-imgui-cocos#2af6c0150bec58ed0658f152c274b1a29ea2f94e")
+
+target_link_libraries(${PROJECT_NAME} imgui-cocos)
+
 # i still dont like this (alk)
 target_compile_definitions(geode-sdk INTERFACE GEODE_EXPOSE_SECRET_INTERNALS_IN_HEADERS_DO_NOT_DEFINE_PLEASE)
 

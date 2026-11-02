@@ -6,8 +6,8 @@
 #include <Geode/modify/GameToolbox.hpp>
 #include "DevTools.hpp"
 #include <imgui.h>
-#include "ImGui.hpp"
 #include "nodes/DragButton.hpp"
+#include <imgui-cocos.hpp>
 
 using namespace geode::prelude;
 
@@ -71,6 +71,7 @@ class $modify(GameToolbox) {
 
 };
 
+static GLRenderCtx* s_gdTexture = nullptr;
 
 class $modify(CCDirector) {
     void willSwitchToScene(CCScene* scene) {
@@ -83,14 +84,10 @@ class $modify(CCDirector) {
             return CCDirector::drawScene();
         }
 
-        DevTools::get()->setup();
-
-        static GLRenderCtx* gdTexture = nullptr;
-
         if (!DevTools::get()->shouldPopGame()) {
-            if (gdTexture) {
-                delete gdTexture;
-                gdTexture = nullptr;
+            if (s_gdTexture) {
+                delete s_gdTexture;
+                s_gdTexture = nullptr;
             }
             shouldPassEventsToGDButTransformed() = false;
             CCDirector::drawScene();
@@ -98,49 +95,27 @@ class $modify(CCDirector) {
         }
 
         if (shouldUpdateGDRenderBuffer()) {
-            if (gdTexture) {
-                delete gdTexture;
-                gdTexture = nullptr;
+            if (s_gdTexture) {
+                delete s_gdTexture;
+                s_gdTexture = nullptr;
             }
             shouldUpdateGDRenderBuffer() = false;
         }
 
         auto winSize = this->getOpenGLView()->getViewPortRect() * geode::utils::getDisplayFactor();
-        if (!gdTexture) {
-            gdTexture = new GLRenderCtx({ winSize.size.width, winSize.size.height });
+        if (!s_gdTexture) {
+            s_gdTexture = new GLRenderCtx({ winSize.size.width, winSize.size.height });
         }
 
-        if (!gdTexture->begin()) {
-            delete gdTexture;
-            gdTexture = nullptr;
+        if (!s_gdTexture->begin()) {
+            delete s_gdTexture;
+            s_gdTexture = nullptr;
             CCDirector::drawScene();
-            DevTools::get()->render(nullptr);
             return;
         }
         CCDirector::drawScene();
-        gdTexture->end();
 
-        DevTools::get()->render(gdTexture);
-
-        // if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        //     auto backup_current_context = this->getOpenGLView()->getWindow();
-        //     ImGui::UpdatePlatformWindows();
-        //     ImGui::RenderPlatformWindowsDefault();
-        //     glfwMakeContextCurrent(backup_current_context);
-        // }
-    }
-};
-
-class $modify(CCEGLView) {
-    // this is needed for popout mode because we need to render after gd has rendered,
-    // but before the buffers have been swapped, which is not possible with just a
-    // CCDirector::drawScene hook.
-    void swapBuffers() {
-        if (!DevTools::get()->shouldUseGDWindow() || !DevTools::get()->shouldPopGame()) {
-            DevTools::get()->setup();
-            DevTools::get()->render(nullptr);
-        }
-        CCEGLView::swapBuffers();
+        // s_gdTexture->end() is called in the preDrawCall callback of ImGuiCocos
     }
 };
 
@@ -154,4 +129,13 @@ $execute {
         DevTools::get()->toggle();
         return ListenerResult::Stop;
     }).leak();
+
+    ImGuiCocos::get().setup([] {
+        DevTools::get()->setup();
+    }).draw([] {
+        DevTools::get()->draw(s_gdTexture);
+    }).setPreDrawCall([] {
+        if (s_gdTexture)
+            s_gdTexture->end();
+    });
 }
