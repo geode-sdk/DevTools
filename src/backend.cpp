@@ -51,6 +51,26 @@ $execute {
 
 #endif
 
+static float SCROLL_SENSITIVITY = 10;
+
+#ifndef GEODE_IS_IOS
+class $modify(CCMouseDispatcher) {
+    bool dispatchScrollMSG(float y, float x) {
+        if (!DevTools::get()->isSetup())
+            return CCMouseDispatcher::dispatchScrollMSG(y, x);
+
+        auto& io = ImGui::GetIO();
+        io.AddMouseWheelEvent(x / SCROLL_SENSITIVITY, -y / SCROLL_SENSITIVITY);
+
+        if (!io.WantCaptureMouse || shouldPassEventsToGDButTransformed()) {
+            return CCMouseDispatcher::dispatchScrollMSG(y, x);
+        }
+
+        return true;
+    }
+};
+#endif
+
 class $modify(CCTouchDispatcher) {
     static void onModify(auto& self) {
         /*

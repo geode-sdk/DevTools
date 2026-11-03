@@ -160,7 +160,7 @@ void drawLayoutArrows(
             );
         }
     }
-    
+
     foreground.AddCircleFilled(
         ImVec2(x, y), 6.f, IM_COL32(255, 55, 55, 255)
     );
@@ -257,7 +257,7 @@ void drawLayoutArrows(
             );
         }
     }
-    
+
     foreground.AddCircleFilled(
         ImVec2(x, y), 6.f, IM_COL32(255, 55, 55, 255)
     );
@@ -367,7 +367,7 @@ void DevTools::drawLayoutHighlights(CCNode* node) {
         }
         this->drawLayoutHighlights(child);
         if (
-            typeinfo_cast<FLAlertLayer*>(child) || 
+            typeinfo_cast<FLAlertLayer*>(child) ||
             typeinfo_cast<GJDropDownLayer*>(child) ||
             typeinfo_cast<EditorPauseLayer*>(child)
         ) {
@@ -378,58 +378,58 @@ void DevTools::drawLayoutHighlights(CCNode* node) {
 }
 
 void DevTools::drawGD(GLRenderCtx* gdCtx) {
-    if (gdCtx) {
-        auto winSize = CCDirector::get()->getWinSize();
-        getTitle() = fmt::format(
-            "Geometry Dash ({}x{})###devtools/geometry-dash",
-            winSize.width, winSize.height
-        );
-        if (ImGui::Begin(getTitle().c_str())) {
-            auto list = ImGui::GetWindowDrawList();
-            auto ratio = gdCtx->size().x / gdCtx->size().y;
+    if (!gdCtx) return;
 
-            auto pad = ImGui::GetStyle().FramePadding.x;
+    auto winSize = CCDirector::get()->getWinSize();
+    getTitle() = fmt::format(
+        "Geometry Dash ({}x{})###devtools/geometry-dash",
+        winSize.width, winSize.height
+    );
+    if (ImGui::Begin(getTitle().c_str())) {
+        auto list = ImGui::GetWindowDrawList();
+        auto ratio = gdCtx->size().x / gdCtx->size().y;
 
-            auto winPos = ImGui::GetCursorScreenPos();
-            auto winSize = ImGui::GetContentRegionAvail();
-            
-            ImVec2 imgSize = {
-                (winSize.y - pad * 2) * ratio,
-                (winSize.y - pad * 2)
+        auto pad = ImGui::GetStyle().FramePadding.x;
+
+        auto winPos = ImGui::GetCursorScreenPos();
+        auto winSize = ImGui::GetContentRegionAvail();
+
+        ImVec2 imgSize = {
+            (winSize.y - pad * 2) * ratio,
+            (winSize.y - pad * 2)
+        };
+        if (winSize.x - pad * 2 < imgSize.x) {
+            imgSize = {
+                (winSize.x - pad * 2),
+                (winSize.x - pad * 2) / ratio
             };
-            if (winSize.x - pad * 2 < imgSize.x) {
-                imgSize = {
-                    (winSize.x - pad * 2),
-                    (winSize.x - pad * 2) / ratio
-                };
-            }
-            auto imgPos = winPos + winSize / 2 - imgSize / 2;
-            list->AddImage(
-                gdCtx->texture(),
-                imgPos, imgPos + imgSize,
-                { 0, 1 }, { 1, 0 }
-            );
-            getGDWindowRect() = {
-                imgPos.x, imgPos.y,
-                imgPos.x + imgSize.x,
-                imgPos.y + imgSize.y
-            };
-            shouldPassEventsToGDButTransformed() = 
-                // ensure that the some other window isn't on top
-                ImGui::IsWindowHovered() &&
-                getGDWindowRect().Contains(ImGui::GetMousePos());
-            
-            if (m_settings.highlightLayouts) {
-                this->drawLayoutHighlights(CCDirector::get()->getRunningScene());
-            }
-
-            for (auto& [node, mode] : m_toHighlight) {
-                this->drawHighlight(node, mode);
-            }
-            m_toHighlight.clear();
         }
-        ImGui::End();
+        auto imgPos = winPos + winSize / 2 - imgSize / 2;
+        list->AddImage(
+            gdCtx->texture(),
+            imgPos, imgPos + imgSize,
+            { 0, 1 }, { 1, 0 }
+        );
+        getGDWindowRect() = {
+            imgPos.x, imgPos.y,
+            imgPos.x + imgSize.x,
+            imgPos.y + imgSize.y
+        };
+        shouldPassEventsToGDButTransformed() =
+            // ensure that the some other window isn't on top
+            ImGui::IsWindowHovered() &&
+            getGDWindowRect().Contains(ImGui::GetMousePos());
+
+        if (m_settings.highlightLayouts) {
+            this->drawLayoutHighlights(CCDirector::get()->getRunningScene());
+        }
+
+        for (auto& [node, mode] : m_toHighlight) {
+            this->drawHighlight(node, mode);
+        }
+        m_toHighlight.clear();
     }
+    ImGui::End();
 }
 
 // cheaty way to detect resize and update the render

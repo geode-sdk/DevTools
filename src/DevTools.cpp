@@ -96,7 +96,7 @@ bool DevTools::pausedGame() const {
 }
 
 bool DevTools::isSetup() const {
-    return m_setup;
+    return m_setup && ImGuiCocos::get().isInitialized();
 }
 
 bool DevTools::shouldOrderChildren() const {
@@ -350,6 +350,7 @@ void DevTools::setup() {
     ImGui::GetStyle().ScrollbarSize = m_settings.scrollbarSize;
 
     m_reloadTheme = true;
+    m_setup = true;
 }
 
 void DevTools::show(bool visible) {

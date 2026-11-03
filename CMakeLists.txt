@@ -52,7 +52,7 @@ endif()
 set(HAS_IMGUI ON)
 set(IMGUI_HOOK_EARLY OFF)
 set(IMGUI_ILL_HANDLE_TOUCHES ON)
-CPMAddPackage("gh:matcool/gd-imgui-cocos#2af6c0150bec58ed0658f152c274b1a29ea2f94e")
+CPMAddPackage("gh:matcool/gd-imgui-cocos#934958c68b1f050a8976d893584fa71368c1df1f")
 
 target_link_libraries(${PROJECT_NAME} imgui-cocos)
 
