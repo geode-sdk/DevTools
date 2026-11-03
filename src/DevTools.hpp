@@ -68,6 +68,7 @@ protected:
     bool m_showModGraph = false;
     bool m_pauseGame = false;
     bool m_usedAPI = false;
+    bool m_skipMousePosHook = false;
     Settings m_settings;
     ImGuiID m_dockspaceID;
     ImFont* m_defaultFont  = nullptr;
@@ -165,4 +166,8 @@ public:
 
     bool usedAPI();
     void setUsedAPI(bool used);
+
+    bool& skipMousePosHook() {
+        return m_skipMousePosHook;
+    }
 };

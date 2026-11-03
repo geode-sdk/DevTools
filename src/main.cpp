@@ -134,8 +134,10 @@ $execute {
         DevTools::get()->setup();
     }).draw([] {
         DevTools::get()->draw(s_gdTexture);
+        DevTools::get()->skipMousePosHook() = false;
     }).setPreDrawCall([] {
         if (s_gdTexture)
             s_gdTexture->end();
+        DevTools::get()->skipMousePosHook() = true;
     });
 }

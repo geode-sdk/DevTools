@@ -282,9 +282,13 @@ void DevTools::draw(GLRenderCtx* ctx) {
             m_reloadTheme = false;
         }
 
-        m_dockspaceID = ImGui::DockSpaceOverViewport(
-            0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode
-        );
+        if (m_settings.GDInWindow) {
+            m_dockspaceID = ImGui::DockSpaceOverViewport(
+                0, nullptr, ImGuiDockNodeFlags_PassthruCentralNode
+            );
+        } else {
+            m_dockspaceID = ImGui::DockSpace(0, ImVec2(0, 0), ImGuiDockNodeFlags_PassthruCentralNode);
+        }
 
         ImGui::PushFont(m_defaultFont);
         this->drawPages();
@@ -294,10 +298,6 @@ void DevTools::draw(GLRenderCtx* ctx) {
         if (this->shouldUseGDWindow()) this->drawGD(ctx);
         ImGui::PopFont();
     }
-
-#ifdef GEODE_IS_WINDOWS
-    setMouseCursor();
-#endif
 }
 
 void DevTools::setupFonts() {

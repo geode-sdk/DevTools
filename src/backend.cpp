@@ -14,15 +14,17 @@ using namespace cocos2d;
 
 // based off https://github.com/matcool/gd-imgui-cocos
 
-static bool g_useNormalPos = false;
-
 #ifndef GEODE_IS_MOBILE
 
 CCPoint getMousePos_H() {
-    CCPoint mouse = cocos::getMousePos();
+    CCPoint mouse = geode::cocos::getMousePos();
+    if (DevTools::get()->skipMousePosHook()) {
+        return mouse;
+    }
+
     const auto pos = toVec2(mouse);
 
-    if (DevTools::get()->shouldUseGDWindow() && shouldPassEventsToGDButTransformed() && !g_useNormalPos) {
+    if (DevTools::get()->shouldUseGDWindow() && shouldPassEventsToGDButTransformed()) {
         auto win = ImGui::GetMainViewport()->Size;
         const auto gdRect = getGDWindowRect();
 

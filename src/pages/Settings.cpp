@@ -19,8 +19,6 @@ void DevTools::drawSettings() {
     ImGui::Dummy({0.f, 60.f});
 #endif
 
-    // TODO: fix this option as it hasnt worked in a while lol
-#if 0
     ImGui::Checkbox("GD in Window", &m_settings.GDInWindow);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show GD inside a window when DevTools are open");
@@ -29,7 +27,6 @@ void DevTools::drawSettings() {
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip("Show node attributes in the Tree");
     }
-#endif
     ImGui::Checkbox("Highlight Nodes", &m_settings.alwaysHighlight);
     if (ImGui::IsItemHovered()) {
         ImGui::SetTooltip(
