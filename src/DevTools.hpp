@@ -101,6 +101,7 @@ protected:
     void drawLabelAttributes(CCNode* node);
     void drawAxisGapAttribute(CCNode* node);
     void drawTextureAttributes(CCNode* node);
+    void drawBlendingAttributes(CCNode* node);
     void drawMenuItemAttributes(CCNode* node);
     void drawLayoutOptionsAttributes(CCNode* node);
     void drawLayoutAttributes(CCNode* node);
