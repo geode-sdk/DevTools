@@ -257,7 +257,7 @@ std::optional<std::string_view> findStdString(SafePtr ptr) {
         data = reinterpret_cast<char*>(ptr.read_ptr().as_ptr());
     }
 #elif defined(GEODE_IS_ANDROID)
-    static gd::string emptyStdString;
+    static std::string emptyStdString;
     auto internalData = ptr.read_ptr();
     if (!internalData.addr) return {};
     auto size = (internalData - (3 * sizeof(void*))).read<size_t>();

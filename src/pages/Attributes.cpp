@@ -428,10 +428,6 @@ void DevTools::drawBlendingAttributes(CCNode* node) {
             { GL_CONSTANT_ALPHA, "GL_CONSTANT_ALPHA" },
             { GL_ONE_MINUS_CONSTANT_ALPHA, "GL_ONE_MINUS_CONSTANT_ALPHA" },
             { GL_SRC_ALPHA_SATURATE, "GL_SRC_ALPHA_SATURATE" },
-            { GL_SRC1_COLOR, "GL_SRC1_COLOR" },
-            { GL_ONE_MINUS_SRC1_COLOR, "GL_ONE_MINUS_SRC1_COLOR" },
-            { GL_SRC1_ALPHA, "GL_SRC1_ALPHA" },
-            { GL_ONE_MINUS_SRC1_ALPHA, "GL_ONE_MINUS_SRC1_ALPHA" },
         };
 
         auto func = blendProtocol->getBlendFunc();
