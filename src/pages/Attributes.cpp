@@ -49,6 +49,7 @@ void DevTools::drawNodeAttributes(CCNode* node) {
     ImGui::NewLine();
 
     drawTextureAttributes(node);
+    drawBlendingAttributes(node);
     drawMenuItemAttributes(node);
 
     setUsedAPI(false);
@@ -400,6 +401,69 @@ void DevTools::drawTextureAttributes(CCNode* node) {
                 }
             }
         }
+        ImGui::NewLine();
+        ImGui::Separator();
+        ImGui::NewLine();
+    }
+}
+
+void DevTools::drawBlendingAttributes(CCNode* node) {
+    if (auto nineSlice = typeinfo_cast<geode::NineSlice*>(node)) {
+        node = nineSlice->getBatchNode();
+    }
+    if (auto blendProtocol = typeinfo_cast<CCBlendProtocol*>(node)) {
+        static const std::unordered_map<GLenum, const char*> blend_map = {
+            { GL_ZERO, "GL_ZERO" },
+            { GL_ONE, "GL_ONE" },
+            { GL_SRC_COLOR, "GL_SRC_COLOR" },
+            { GL_ONE_MINUS_SRC_COLOR, "GL_ONE_MINUS_SRC_COLOR" },
+            { GL_DST_COLOR, "GL_DST_COLOR" },
+            { GL_ONE_MINUS_DST_COLOR, "GL_ONE_MINUS_DST_COLOR" },
+            { GL_SRC_ALPHA, "GL_SRC_ALPHA" },
+            { GL_ONE_MINUS_SRC_ALPHA, "GL_ONE_MINUS_SRC_ALPHA" },
+            { GL_DST_ALPHA, "GL_DST_ALPHA" },
+            { GL_ONE_MINUS_DST_ALPHA, "GL_ONE_MINUS_DST_ALPHA" },
+            { GL_CONSTANT_COLOR, "GL_CONSTANT_COLOR" },
+            { GL_ONE_MINUS_CONSTANT_COLOR, "GL_ONE_MINUS_CONSTANT_COLOR" },
+            { GL_CONSTANT_ALPHA, "GL_CONSTANT_ALPHA" },
+            { GL_ONE_MINUS_CONSTANT_ALPHA, "GL_ONE_MINUS_CONSTANT_ALPHA" },
+            { GL_SRC_ALPHA_SATURATE, "GL_SRC_ALPHA_SATURATE" },
+        };
+
+        auto func = blendProtocol->getBlendFunc();
+        bool changed = false;
+
+        if (ImGui::BeginCombo("Src", blend_map.at(func.src))) {
+            for (auto& item : blend_map) {
+                if (ImGui::Selectable(item.second, item.first == func.src)) {
+                    func.src = item.first;
+                    changed = true;
+                }
+
+                if (item.first == func.src)
+                    ImGui::SetItemDefaultFocus();
+            }
+
+            ImGui::EndCombo();
+        }
+
+        if (ImGui::BeginCombo("Dst", blend_map.at(func.dst))) {
+            for (auto& item : blend_map) {
+                if (ImGui::Selectable(item.second, item.first == func.dst)) {
+                    func.dst = item.first;
+                    changed = true;
+                }
+
+                if (item.first == func.dst)
+                    ImGui::SetItemDefaultFocus();
+            }
+
+            ImGui::EndCombo();
+        }
+
+        if (changed)
+            blendProtocol->setBlendFunc(func);
+        
         ImGui::NewLine();
         ImGui::Separator();
         ImGui::NewLine();
