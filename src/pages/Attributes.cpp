@@ -412,7 +412,7 @@ void DevTools::drawBlendingAttributes(CCNode* node) {
         node = nineSlice->getBatchNode();
     }
     if (auto blendProtocol = typeinfo_cast<CCBlendProtocol*>(node)) {
-        const std::unordered_map<GLenum, const char*> blend_map = {
+        static const std::unordered_map<GLenum, const char*> blend_map = {
             { GL_ZERO, "GL_ZERO" },
             { GL_ONE, "GL_ONE" },
             { GL_SRC_COLOR, "GL_SRC_COLOR" },
