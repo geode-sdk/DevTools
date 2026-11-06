@@ -272,9 +272,62 @@ void DevTools::drawColorAttributes(CCNode* node) {
 }
 
 void DevTools::drawLabelAttributes(CCNode* node) {
-    if (auto labelNode = typeinfo_cast<CCLabelProtocol*>(node)) {
+    // geode::Label
+    if (auto label = typeinfo_cast<Label*>(node)) {
+        std::string str = label->getText();
+        if (ImGui::InputTextMultiline("Text", &str, ImVec2(0, 0), ImGuiInputTextFlags_CtrlEnterForNewLine)) {
+            label->setText(std::move(str));
+        }
+
+        checkbox("Rich Text", label, &Label::isRichTextEnabled, &Label::setRichTextEnabled);
+
+        int alignment = static_cast<int>(label->getAlignment());
+        ImGui::TextUnformatted("Text Alignment");
+        bool changed = false;
+        changed |= ImGui::RadioButton("Left", &alignment, (int)Label::Alignment::Left);
+        ImGui::SameLine();
+        changed |= ImGui::RadioButton("Center", &alignment, (int)Label::Alignment::Center);
+        ImGui::SameLine();
+        changed |= ImGui::RadioButton("Right", &alignment, (int)Label::Alignment::Right);
+        ImGui::SameLine();
+        changed |= ImGui::RadioButton("Justify", &alignment, (int)Label::Alignment::Justify);
+        if (changed) {
+            label->setAlignment(static_cast<Label::Alignment>(alignment));
+        }
+
+        auto maxWidth = label->getMaxWidth();
+        if (ImGui::DragFloat("Max Width", &maxWidth, 1.f)) {
+            label->setMaxWidth(maxWidth);
+        }
+
+        checkbox("Break words", label, &Label::isBreakWords, &Label::setBreakWords);
+
+        auto extraKerning = label->getExtraKerning();
+        if (ImGui::DragFloat("Extra Kerning", &extraKerning)) {
+            label->setExtraKerning(extraKerning);
+        }
+
+        auto lineSpacing = label->getLineSpacing();
+        if (ImGui::DragFloat("Line Spacing", &lineSpacing)) {
+            label->setLineSpacing(lineSpacing);
+        }
+
+        checkbox("Emojis inherit color", label, &Label::getUseColoredEmojis, &Label::setUseColoredEmojis);
+        ImGui::SameLine();
+        checkbox("Nodes inherit color", label, &Label::getUseColoredNodes, &Label::setUseColoredNodes);
+
+        if (ImGui::Button("Remove Emojis")) {
+            label->setEmojiRegistry(EmojiRegistry());
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Apply Vanilla Emojis")) {
+            label->setEmojiRegistry(EmojiRegistry::vanillaEmojis());
+        }
+    }
+    // CCLabelBMFont and children
+    else if (auto labelNode = typeinfo_cast<CCLabelProtocol*>(node)) {
         std::string str = labelNode->getString();
-        if (ImGui::InputText("Text", &str, 256)) {
+        if (ImGui::InputText("Text", &str, ImGuiInputTextFlags_CtrlEnterForNewLine)) {
             labelNode->setString(str.c_str());
         }
     }
@@ -295,6 +348,10 @@ void DevTools::drawAxisGapAttribute(CCNode* node) {
 void DevTools::drawTextureAttributes(CCNode* node) {
     if (auto nineSlice = typeinfo_cast<geode::NineSlice*>(node)) {
         node = nineSlice->getBatchNode();
+        auto scaleMultiplier = nineSlice->getScaleMultiplier();
+        if (ImGui::DragFloat("Scale Multiplier##nineslice-scale-multiplier", &scaleMultiplier, .1f)) {
+            nineSlice->setScaleMultiplier(scaleMultiplier);
+        }
     }
     if (auto textureProtocol = typeinfo_cast<CCTextureProtocol*>(node)) {
         if (auto texture = textureProtocol->getTexture()) {

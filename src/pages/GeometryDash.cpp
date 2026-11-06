@@ -160,7 +160,7 @@ void drawLayoutArrows(
             );
         }
     }
-    
+
     foreground.AddCircleFilled(
         ImVec2(x, y), 6.f, IM_COL32(255, 55, 55, 255)
     );
@@ -257,7 +257,7 @@ void drawLayoutArrows(
             );
         }
     }
-    
+
     foreground.AddCircleFilled(
         ImVec2(x, y), 6.f, IM_COL32(255, 55, 55, 255)
     );
@@ -309,9 +309,11 @@ void DevTools::drawHighlight(CCNode* node, HighlightMode mode) {
         return;
     }
 
-    auto anchor = ImVec2(
-        node->getAnchorPoint().x * (tmax.x - tmin.x) + tmin.x,
-        node->getAnchorPoint().y * (tmax.y - tmin.y) + tmin.y
+    auto realAnchor = node->convertToWorldSpace(node->isIgnoreAnchorPointForPosition() ? ccp(0, 0) : node->getAnchorPointInPoints());
+    ImVec2 anchor = toVec2(realAnchor);
+    anchor = ImVec2(
+        anchor.x / wsize.x * rect.GetWidth() + rect.Min.x,
+        anchor.y / wsize.y * rect.GetHeight() + rect.Min.y
     );
 
     switch (mode) {
@@ -367,7 +369,7 @@ void DevTools::drawLayoutHighlights(CCNode* node) {
         }
         this->drawLayoutHighlights(child);
         if (
-            typeinfo_cast<FLAlertLayer*>(child) || 
+            typeinfo_cast<FLAlertLayer*>(child) ||
             typeinfo_cast<GJDropDownLayer*>(child) ||
             typeinfo_cast<EditorPauseLayer*>(child)
         ) {
@@ -392,7 +394,7 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
 
             auto winPos = ImGui::GetCursorScreenPos();
             auto winSize = ImGui::GetContentRegionAvail();
-            
+
             ImVec2 imgSize = {
                 (winSize.y - pad * 2) * ratio,
                 (winSize.y - pad * 2)
@@ -414,11 +416,11 @@ void DevTools::drawGD(GLRenderCtx* gdCtx) {
                 imgPos.x + imgSize.x,
                 imgPos.y + imgSize.y
             };
-            shouldPassEventsToGDButTransformed() = 
+            shouldPassEventsToGDButTransformed() =
                 // ensure that the some other window isn't on top
                 ImGui::IsWindowHovered() &&
                 getGDWindowRect().Contains(ImGui::GetMousePos());
-            
+
             if (m_settings.highlightLayouts) {
                 this->drawLayoutHighlights(CCDirector::get()->getRunningScene());
             }
