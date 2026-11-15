@@ -7,7 +7,7 @@
 #include <initializer_list>
 #include <string>
 #include <type_traits>
-#include <Geode/loader/Dispatch.hpp>
+#include <Geode/loader/EventExport.hpp>
 
 #undef MY_MOD_ID
 #define MY_MOD_ID "geode.devtools"
