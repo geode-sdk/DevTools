@@ -40,6 +40,4 @@ jobs:
       - uses: geode-sdk/build-geode-mod-docker/merge@main
         with:
           upload: true
-        with:
-          name: Build Output
-          path: ${{ steps.build.outputs.build-output }}
+
