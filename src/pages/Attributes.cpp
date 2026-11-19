@@ -10,6 +10,7 @@
 #include <Geode/utils/file.hpp>
 #include <Geode/ui/Button.hpp>
 #include <Geode/ui/NineSlice.hpp>
+#include <Geode/ui/Label.hpp>
 
 using namespace geode::prelude;
 
