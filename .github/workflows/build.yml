@@ -17,8 +17,8 @@ jobs:
         - target: macm1
         - target: macintel
         - target: ios
-        - target: android32
-        - target: android64
+        # - target: android32
+        # - target: android64
 
     name: Build ${{ matrix.config.target }}
     runs-on: ubuntu-latest
@@ -29,6 +29,7 @@ jobs:
       - uses: geode-sdk/build-geode-mod-docker@main
         with:
           target: ${{ matrix.config.target }}
+          sdk: nightly
           upload: true
 
   merge:
