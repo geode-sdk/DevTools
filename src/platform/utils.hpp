@@ -3,6 +3,8 @@
 #include <string>
 #include <stdint.h>
 #include <Geode/cocos/cocoa/CCObject.h>
+#include <vector>
+#include <stdint.h>
 
 std::string formatAddressIntoOffset(uintptr_t addr, bool module);
 
