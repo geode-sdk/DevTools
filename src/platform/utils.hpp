@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <stdint.h>
 #include <Geode/cocos/cocoa/CCObject.h>
 
