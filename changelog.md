@@ -1,3 +1,15 @@
+## v1.15.0
+* Support for 2.2091
+* Bump to Geode `v6.0.0`
+* Save font size across GD restarts (#82)
+* Add a viewer for touch priority (#80)
+* Add ability to delete nodes (#72)
+* Add some button and Nineslice changes (#84)
+* Fix annoying touch issues (#89)
+* Fix an issue that caused mistranslated touches (#90)
+* Fix anchor point drawing (#93)
+* Fix some touch offsetting (#92)
+
 ## v1.14.0
 * Bump to Geode `v5.7.1`, fixing hangs/crashes when loading the mod on MacOS
 * Allow resizing the scrollbar (#88)
